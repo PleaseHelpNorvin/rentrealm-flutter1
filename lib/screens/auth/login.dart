@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart'; // Import provider
+import 'package:rentealm_flutter/controllers/auth_controller.dart';
 // import '../../components/alertutils.dart';
 // import '../../utils/https.dart';
 import './register.dart';
@@ -40,8 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
         automaticallyImplyLeading: false,
         title: const Text("Login"),
       ),
-      body: Consumer<UserController>(
-        builder: (context, userController, child) {
+      body: Consumer<AuthController>(
+        builder: (context, authController, child) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Form(
@@ -91,12 +92,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
                   ElevatedButton(
-                    onPressed: userController.isLoading
+                    onPressed: authController.isLoading
                         ? null // Disable button if loading
                         : () {
                             if (_formKey.currentState!.validate()) {
                               // Call loginUser method from provider with email and password
-                              userController.loginUser(
+                              authController.loginUser(
                                 email: emailController.text,
                                 password: passwordController.text,
                                 context: context,
@@ -111,16 +112,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       foregroundColor: Colors.white,
                     ),
-                    child: userController.isLoading
+                    child: authController.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text("Login"),
                   ),
                   const SizedBox(height: 20),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushNamed(
                         context,
-                        MaterialPageRoute(builder: (context) => RegisterScreen()),
+                        '/register'
                       );
                     },
                     child: RichText(

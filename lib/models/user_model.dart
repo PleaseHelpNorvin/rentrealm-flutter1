@@ -39,7 +39,7 @@ class User {
 }
 
 class UserData {
-  final String token;
+  final String? token;
   final User user;
 
   UserData({
@@ -64,7 +64,7 @@ class UserData {
 
 class UserResponse {
   final bool success;
-  final String message;
+  final String? message;
   final UserData? data;
 
   UserResponse({
@@ -73,11 +73,11 @@ class UserResponse {
     this.data,
   });
 
-  factory UserResponse.fromJson(Map<String, dynamic> json) {
+  factory UserResponse.fromJson(Map<String, dynamic> responseData) {
     return UserResponse(
-      success: json['success'],
-      message: json['message'],
-      data: json['data'] != null ? UserData.fromJson(json['data']) : null,
+      success: responseData['success'],
+      message: responseData['message'],
+      data: responseData['data'] != null ? UserData.fromJson(responseData['data']) : null,
     );
   }
 
@@ -90,86 +90,3 @@ class UserResponse {
   }
 }
 
-// class userLoginResponse {
-//   final bool success;
-//   final String message;
-//   final UserData? data;
-
-//   userLoginResponse({
-//     required this.success,
-//     required this.message,
-//     this.data,
-//   });
-
-//   factory userLoginResponse.fromJson(Map<String, dynamic> json) {
-//     return userLoginResponse(
-//       success: json['success'],
-//       message: json['message'],
-//       data: json['data'] != null ? UserData.fromJson(json['data']) : null,
-//     );
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'success': success,
-//       'message': message,
-//       'data': data?.toJson(),
-//     };
-//   }
-// }
-
-// class userLogoutResponse {
-//   final bool success;
-//   final String? message;
-//   final dynamic data;
-
-//   userLogoutResponse({
-//     required this.success,
-//     this.message,
-//     this.data,
-//   });
-
-//   factory userLogoutResponse.fromJson(Map<String, dynamic> json) {
-//     return userLogoutResponse(
-//       success: json['success'] ?? false,
-//       message: json['message'],
-//       data: json['data'],
-//     );
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'success': success,
-//       'message': message,
-//       'data': data,
-//     };
-//   }
-// }
-
-// class UserUpdateResponse {
-//   final bool success;
-//   final String message;
-//   final UserData? data;
-
-//   UserUpdateResponse({
-//     required this.success,
-//     required this.message,
-//     this.data,
-//   });
-
-//   factory UserUpdateResponse.fromJson(Map<String, dynamic> json) {
-//     return UserUpdateResponse(
-//       success: json['success'],
-//       message: json['message'],
-//       data: json['data']['user'] != null ? UserData.fromJson(json['data']['user']) : null,
-//     );
-//   }
-
-//   Map<String, dynamic> toJson() {
-//     return {
-//       'success': success,
-//       'message': message,
-//       'data': data?.toJson(),
-//     };
-//   }
-// }

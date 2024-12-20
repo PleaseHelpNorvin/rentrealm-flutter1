@@ -1,128 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/controllers/auth_controller.dart';
 import '../models/user_model.dart'; // Your User model import
 import '../networks/apiservice.dart'; // Assuming you have the API service here
 import '../components/alert_utils.dart'; // For showing alerts
 
 class UserController with ChangeNotifier {
-  final apiService = ApiService();
+  final ApiService apiService = ApiService();
 
-  UserResponse? _user;
   bool _isLoading = false;
+  UserResponse? _user;
 
-  UserResponse? get user => _user;
   bool get isLoading => _isLoading;
+  UserResponse? get user => _user;
 
-  // Set user
-  void setUser(UserResponse user) {
+  void setUser(UserResponse? user) {
     _user = user;
     notifyListeners();
   }
 
-  // Clear user
-  void clearUser() {
-    _user = null;
-    notifyListeners();
-  }
-
-  // Handle login logic
-  Future<void>loginUser({
-    required String email,
-    required String password,
-    required BuildContext context,
-  }) async {
-    _isLoading = true;
-    notifyListeners();
-
+  // Fetch user data from API - Now taking token and userId as parameters
+  Future<void>fetchUser(BuildContext context, String token, int userId) async {
     try {
-      // Assuming you have an ApiService class to handle HTTP requests
-      final response =
-          await apiService.loginUser(email: email, password: password);
-
-      _isLoading = false;
+      _isLoading = true;
       notifyListeners();
 
+      final response = await apiService.getUser(token: token, userId: userId);
+
       if (response != null && response.success) {
-        // Access the 'user' and 'token' from the response data
-        final userData = response.data;
-
-        if (userData != null) {
-          // Save the user data to your UserProvider
-          setUser(UserResponse(
-           success: response.success,
-           message: response.message,
-           data: response.data,
-          ));
-
-          // Optionally, handle the token here, e.g., save it to local storage
-          // String token = userData.token;
-
-          // Show success alert
-          AlertUtils.showSuccessAlert(
-            context,
-            title: 'Login Successful',
-            message: response.message ?? 'Welcome!',
-          );
-
-          // Delay navigation to let the alert display momentarily
-          await Future.delayed(const Duration(seconds: 1));
-
-          Navigator.pushReplacementNamed(context, '/home');
-        }
+        setUser(response);
       } else {
-        // Show error message if login failed
-        AlertUtils.showErrorAlert(
-          context,
-          title: 'Login Failed',
-          message: response?.message ?? 'Invalid credentials or network issue.',
-        );
+        // Handle error (maybe show an alert or a message to the user)
+        print("Failed to fetch user data");
+        AlertUtils.showErrorAlert(context, message: "Failed to fetch user data");
       }
     } catch (e) {
+      // Handle error, maybe show an alert
+      print("error $e");
+      AlertUtils.showErrorAlert(context, title: "Exception", message: "Something went wrong: $e");
+    } finally {
       _isLoading = false;
       notifyListeners();
-
-      // Display an error alert for unexpected exceptions
-      AlertUtils.showErrorAlert(
-        context,
-        title: 'Error',
-        message: 'An unexpected error occurred. Please try again.',
-      );
-    }
-  }
-
-  Future<void>registerUser({
-    required String name,
-    required String email,
-    required String password,
-    required BuildContext context,
-  }) async {
-    _isLoading = true;
-    notifyListeners();
-    try {
-      final response = await apiService.registerUser(name: name, email: email, password: password);
-      _isLoading = false;
-      notifyListeners();
-      
-      if (response != null && response.success) {
-        final userData = response.data;
-
-        if(userData != null) {
-          setUser(UserResponse(
-            success: response.success,
-            message: response.message,
-            data: response.data,
-          ));
-
-          AlertUtils.showSuccessAlert(
-            context,
-            title: 'Register Successful',
-            message: response.message?? 'Welcome!',
-          );
-        }
-      }
-
-    } catch (e) {
-      print('Exception: $e');
-      return;
     }
   }
 }

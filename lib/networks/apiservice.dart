@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../apis/api.dart';
+import '../models/profile_model.dart';
 import '../models/user_model.dart';
 
 class ApiService {
@@ -86,4 +87,73 @@ class ApiService {
       return null;
     }
   }
+
+  Future<UserResponse?>getUser({
+    required int userId,
+    required String token,
+  }) async{
+    final uri = Uri.parse('${Api.baseUrl}/tenant/user/show/$userId');
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type" : "application/json",
+          "Accept" : "application/json",
+          "Authorization" : "Bearer $token", 
+        },
+      );
+
+      if(response.statusCode == 200 || response.statusCode == 201){
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getUser Call: $responseData");
+        return UserResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exeption: $e');
+      return null;
+    }
+  }
+
+  Future<UserProfileResponse?>getUserProfile({
+    required int userId,
+    required String token,
+  }) async {
+    final uri = Uri.parse('${Api.baseUrl}/tenant/profile/show/$userId');
+      try {
+        final response = await http.get(
+          uri,
+          headers: {
+            "Content-Type" : "application/json",
+            "Accept" : "application/json",
+            "Authorization" : "Bearer $token", 
+          },
+        );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        return UserProfileResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+
+    } catch (e) {
+      print('Exeption: $e');
+      return null;
+    }
+  }
+
+  Future<UserProfileResponse?>postUserProfile({
+    required int userId,
+    required String token,
+    required Map<String, String>userProfile
+  }) async {
+
+  }
+  
+
+  
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:flutter/src/foundation/diagnostics.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/controllers/auth_controller.dart';
 import 'package:rentealm_flutter/controllers/user_controller.dart';
 import './login.dart';
 
@@ -11,7 +12,7 @@ class RegisterScreen extends StatefulWidget{
 }
 
 class RegisterScreenState extends State<RegisterScreen>{
-  final TextEditingController nameController = TextEditingController(text: 'password');
+  final TextEditingController nameController = TextEditingController(text: 'Norvin Crujido');
   final TextEditingController emailController = TextEditingController(text: 'test@test.com');
   final TextEditingController passwordController = TextEditingController(text: 'password');
 
@@ -37,8 +38,8 @@ class RegisterScreenState extends State<RegisterScreen>{
         automaticallyImplyLeading: false,
         title: const Text("Login"),
       ),
-      body: Consumer<UserController>(
-        builder: (context, userController, child) {
+      body: Consumer<AuthController>(
+        builder: (context, authController, child) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Form(
@@ -49,6 +50,20 @@ class RegisterScreenState extends State<RegisterScreen>{
                     "assets/images/rentrealm_logo.png",
                     width: 200,
                     height: 200,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: nameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Name ',
+                      border: OutlineInputBorder(),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Name is required';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -88,12 +103,13 @@ class RegisterScreenState extends State<RegisterScreen>{
                   ),
                   const SizedBox(height: 40),
                   ElevatedButton(
-                    onPressed: userController.isLoading
+                    onPressed: authController.isLoading
                         ? null // Disable button if loading
                         : () {
                             if (_formKey.currentState!.validate()) {
                               // Call loginUser method from provider with email and password
-                              userController.loginUser(
+                              authController.registerUser(
+                                name: nameController.text,
                                 email: emailController.text,
                                 password: passwordController.text,
                                 context: context,
@@ -108,16 +124,16 @@ class RegisterScreenState extends State<RegisterScreen>{
                       ),
                       foregroundColor: Colors.white,
                     ),
-                    child: userController.isLoading
+                    child: authController.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("Login"),
+                        : const Text("Submit Register"),
                   ),
                   const SizedBox(height: 20),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushNamed(
                         context,
-                        MaterialPageRoute(builder: (context) => RegisterScreen()),
+                          '/login'
                       );
                     },
                     child: RichText(
