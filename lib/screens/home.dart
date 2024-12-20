@@ -7,7 +7,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,44 +55,57 @@ class _ProfileCardWidgetState extends State<ProfileCardWidget> {
   String profilePictureUrl =
       "https://www.w3schools.com/w3images/avatar2.png";
 
+
+  void _onCardTap() {
+    print("Profile Card Tapped");
+    Navigator.pushNamed(
+      context,
+      '/creteprofile1'
+    );
+    // You can add navigation or other logic here
+  }
+
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
       constraints: BoxConstraints(
         minHeight: 100,
       ),
-      child: Card(
-        elevation: 5,
-        margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: <Widget>[
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: NetworkImage(profilePictureUrl),
-                onBackgroundImageError: (exception, stackTrace) {
-                  print("Failed to load image");
-                },
-              ),
-              SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      fontSize: 24,
+      child: GestureDetector(
+        onTap: _onCardTap,  // Handles the tap
+        child: Card(
+          elevation: 5,
+          margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: <Widget>[
+                CircleAvatar(
+                  radius: 50,
+                  backgroundImage: NetworkImage(profilePictureUrl),
+                  onBackgroundImageError: (exception, stackTrace) {
+                    print("Failed to load image");
+                  },
+                ),
+                SizedBox(width: 20),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 24,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(email),
-                  SizedBox(height: 10),
-                  Text("Bio or Additional Info"),
-                ],
-              ),
-            ],
+                    SizedBox(height: 5),
+                    Text(email),
+                    SizedBox(height: 10),
+                    Text("Bio or Additional Info"),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

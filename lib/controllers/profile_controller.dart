@@ -18,6 +18,14 @@ class ProfileController with ChangeNotifier{
     notifyListeners();
   }
 
+  Future<void>ImageConversion(BuildContext context, String token, int userId) async {
+    try {
+      
+    } catch (e) {
+      
+    }
+  }
+
   Future<void>createUserProfile(BuildContext context, String token, int userId, Map<String, String> profileData) async {
     try {
       _isLoading = true;

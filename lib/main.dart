@@ -7,13 +7,14 @@ import './screens/home.dart';
 import './screens/get_started.dart';
 import './screens/auth/login.dart';
 import './screens/auth/register.dart';
-
+import './screens/profile/create_profile_screen1.dart';
 
 
 //personal providers
 import 'controllers/user_controller.dart';
 import 'controllers/profile_controller.dart';
 import 'controllers/auth_controller.dart';
+// import '.';
 
 
 void main() {
@@ -42,6 +43,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/home': (context) => HomeScreen(),
+        '/creteprofile1' : (context) => CreateProfileScreen1(),
       },
     );
   }
