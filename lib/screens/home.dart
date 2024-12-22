@@ -56,11 +56,11 @@ class _ProfileCardWidgetState extends State<ProfileCardWidget> {
       "https://www.w3schools.com/w3images/avatar2.png";
 
 
-  void _onCardTap() {
+  void onNavigatetoCreateProfile1() {
     print("Profile Card Tapped");
     Navigator.pushNamed(
       context,
-      '/creteprofile1'
+      '/createprofile1'
     );
     // You can add navigation or other logic here
   }
@@ -72,7 +72,7 @@ class _ProfileCardWidgetState extends State<ProfileCardWidget> {
         minHeight: 100,
       ),
       child: GestureDetector(
-        onTap: _onCardTap,  // Handles the tap
+        onTap: onNavigatetoCreateProfile1,  // Handles the tap
         child: Card(
           elevation: 5,
           margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
@@ -115,10 +115,10 @@ class _ProfileCardWidgetState extends State<ProfileCardWidget> {
 
 class PaymentCardWidget extends StatefulWidget {
   @override
-  _PaymentCardWidgetState createState() => _PaymentCardWidgetState();
+  PaymentCardWidgetState createState() => PaymentCardWidgetState();
 }
 
-class _PaymentCardWidgetState extends State<PaymentCardWidget> {
+class PaymentCardWidgetState extends State<PaymentCardWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -149,10 +149,10 @@ class _PaymentCardWidgetState extends State<PaymentCardWidget> {
 
 class RentCardWidget extends StatefulWidget {
   @override
-  _RentCardWidgetState createState() => _RentCardWidgetState();
+  RentCardWidgetState createState() => RentCardWidgetState();
 }
 
-class _RentCardWidgetState extends State<RentCardWidget> {
+class RentCardWidgetState extends State<RentCardWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(

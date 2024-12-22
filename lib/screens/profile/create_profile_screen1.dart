@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+
+import '../../controllers/profile_controller.dart';
 class CreateProfileScreen1 extends StatefulWidget{
   @override
   CreateProfileScreenState1 createState() => CreateProfileScreenState1(); 
@@ -17,7 +20,7 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget> [
           PictureWidget(),
-
+          
         ],
       ),
     );
@@ -42,46 +45,57 @@ class _PictureWidgetState extends State<PictureWidget> {
       setState(() {
         _image = File(pickedFile.path);
       });
+    
+      // Access the ProfileController via Provider
+      final profileController = Provider.of<ProfileController>(context, listen: false);
+
+      // Call imageConversion and pass the image
+      await profileController.imageConversion(
+        context,
+        "your_token_here", // Replace with actual token
+        123, // Replace with actual userId
+        _image!,
+      );
     }
   }
 
   @override
-    Widget build(BuildContext context) {
-      return Center( // Center the entire Column
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // Vertically center the children
-          crossAxisAlignment: CrossAxisAlignment.center, // Horizontally center the children
-          children: <Widget>[
-            GestureDetector(
-              onTap: _pickImage, // Trigger the image picker when tapped
-              child: Stack(
-                alignment: Alignment.center, // Center the icon inside the CircleAvatar
-                children: [
-                  _image == null
-                      ? CircleAvatar(
-                          radius: 100,
-                          backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
-                        )
-                      : CircleAvatar(
-                          radius: 100,
-                          backgroundImage: FileImage(_image!),
-                        ),
-                  Positioned(
-                    // center: 10, // Adjust the position of the icon (you can change this value)
-                    child: Icon(
-                      Icons.camera_alt,
-                      size: 30, // Icon size
-                      color: Colors.white, // Icon color
-                    ),
+  Widget build(BuildContext context) {
+    return Center( // Center the entire Column
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center, // Vertically center the children
+        crossAxisAlignment: CrossAxisAlignment.center, // Horizontally center the children
+        children: <Widget>[
+          GestureDetector(
+            onTap: _pickImage, // Trigger the image picker when tapped
+            child: Stack(
+              alignment: Alignment.center, // Center the icon inside the CircleAvatar
+              children: [
+                _image == null
+                    ? CircleAvatar(
+                        radius: 100,
+                        backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
+                      )
+                    : CircleAvatar(
+                        radius: 100,
+                        backgroundImage: FileImage(_image!),
+                      ),
+                Positioned(
+                  // center: 10, // Adjust the position of the icon (you can change this value)
+                  child: Icon(
+                    Icons.camera_alt,
+                    size: 30, // Icon size
+                    color: Colors.white, // Icon color
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-          ],
-        ),
-      );
-    }
-
-
+          ),
+          SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
 }
+
+ 
