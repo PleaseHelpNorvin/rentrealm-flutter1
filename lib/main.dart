@@ -23,7 +23,7 @@ void main() {
       providers: [
         ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
         ChangeNotifierProvider<UserController>(create: (_) => UserController()),
-        // ChangeNotifierProvider<ProfileProvider>(create: (_) => ProfileProvider()), // Uncomment if needed
+        ChangeNotifierProvider<ProfileController>(create: (_) => ProfileController()),
       ],
       child: MyApp(),
     ),
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/home': (context) => HomeScreen(),
-        '/creteprofile1' : (context) => CreateProfileScreen1(),
+        '/createprofile1' : (context) => CreateProfileScreen1(),
       },
     );
   }

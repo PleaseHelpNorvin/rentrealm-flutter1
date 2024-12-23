@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
@@ -18,11 +21,21 @@ class ProfileController with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<void>ImageConversion(BuildContext context, String token, int userId) async {
+  Future<void>imageConversion(BuildContext context, String token, int userId, File image) async {
     try {
+      final bytes = await image.readAsBytes(); // Read image file as bytes
+      final base64Image = base64Encode(bytes); // Convert to Base64 if required by the API
       
+       // Example of sending the image as part of profile data
+      final profileData = {
+        'profile_picture_url': base64Image, // Include the image in the data payload
+      };
+
+       await createUserProfile(context, token, userId, profileData);
+
     } catch (e) {
-      
+        print("Image conversion error: $e");
+        AlertUtils.showErrorAlert(context, message: "Failed to process the image.");
     }
   }
 
