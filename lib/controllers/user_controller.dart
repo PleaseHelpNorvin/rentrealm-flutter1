@@ -1,9 +1,13 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/controllers/auth_controller.dart';
 import '../models/user_model.dart'; // Your User model import
 import '../networks/apiservice.dart'; // Assuming you have the API service here
-import '../components/alert_utils.dart'; // For showing alerts
+import '../components/alert_utils.dart';
+import 'profile_controller.dart'; // For showing alerts
 
 class UserController with ChangeNotifier {
   final ApiService apiService = ApiService();
@@ -19,8 +23,8 @@ class UserController with ChangeNotifier {
     notifyListeners();
   }
 
-  // Fetch user data from API - Now taking token and userId as parameters
-  Future<void>fetchUser(BuildContext context, String token, int userId) async {
+
+  Future<void> fetchUser(BuildContext context, String token, int userId) async {
     try {
       _isLoading = true;
       notifyListeners();
@@ -29,18 +33,33 @@ class UserController with ChangeNotifier {
 
       if (response != null && response.success) {
         setUser(response);
+        print("fetchUser():  ${response.message}");
+
+         AlertUtils.showSuccessAlert(
+          context,
+          title: 'Login Successful',
+          message: 'Welcome, ${response.data?.user.name}!',
+          onConfirmBtnTap: () {
+            Navigator.pushReplacementNamed(context, '/home',);
+          }
+        );
+        
+        
       } else {
-        // Handle error (maybe show an alert or a message to the user)
         print("Failed to fetch user data");
         AlertUtils.showErrorAlert(context, message: "Failed to fetch user data");
       }
+
+
+
     } catch (e) {
-      // Handle error, maybe show an alert
-      print("error $e");
+      print("Error: $e");
       AlertUtils.showErrorAlert(context, title: "Exception", message: "Something went wrong: $e");
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
+
+   
 }

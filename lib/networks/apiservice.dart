@@ -13,8 +13,8 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    final url = Uri.parse('${Api.baseUrl}/login');
-
+    final uri = Uri.parse('${Api.baseUrl}/login');
+    print("loginUser() $uri");
     try {
       // Prepare request body
       final body = {
@@ -24,7 +24,7 @@ class ApiService {
 
       // Make POST request
       final response = await http.post(
-        url,
+        uri,
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
@@ -33,7 +33,9 @@ class ApiService {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        print('loginUser() response.body: ${response.body}');
         final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print('loginUser() responseData: $responseData');
         return UserResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
@@ -93,6 +95,8 @@ class ApiService {
     required String token,
   }) async{
     final uri = Uri.parse('${Api.baseUrl}/tenant/user/show/$userId');
+
+    print("getUser() token: $token");
     try {
       final response = await http.get(
         uri,
@@ -120,8 +124,10 @@ class ApiService {
   Future<UserProfileResponse?>getUserProfile({
     required int userId,
     required String token,
+    // required context,
   }) async {
     final uri = Uri.parse('${Api.baseUrl}/tenant/profile/show/$userId');
+    print(uri);
       try {
         final response = await http.get(
           uri,
@@ -134,6 +140,7 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
+        // print('response body ${response.body}');
         return UserProfileResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${response.body}');

@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/components/alert_utils.dart';
+import 'package:rentealm_flutter/controllers/auth_controller.dart';
+
+import '../controllers/profile_controller.dart';
+import '../controllers/user_controller.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -6,7 +12,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  
 
+  @override
+  void initState() {
+    super.initState();
+    final profileController = Provider.of<ProfileController>(context, listen: false);
+    profileController.loadUserProfile(context);
+  }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -67,6 +82,9 @@ class _ProfileCardWidgetState extends State<ProfileCardWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final profileController = Provider.of<ProfileController>(context, listen: false);
+    // final profile = profileController.fetchUserProfile(context, token, userId);
+
     return ConstrainedBox(
       constraints: BoxConstraints(
         minHeight: 100,
