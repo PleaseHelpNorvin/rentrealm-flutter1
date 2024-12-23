@@ -70,24 +70,17 @@ class _PictureWidgetState extends State<PictureWidget> {
   final picker = ImagePicker();
 
   // Function to pick image from gallery
-  Future<void> _pickImage() async {
+  Future<void> pickImage() async {
+    final profileController = Provider.of<ProfileController>(context, listen: false);
+
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
       });
-    
-      // Access the ProfileController via Provider
-      final profileController = Provider.of<ProfileController>(context, listen: false);
-
-      // Call imageConversion and pass the image
-      // await profileController.imageConversion(
-      //   context,
-      //   "your_token_here", // Replace with actual token
-      //   123, // Replace with actual userId
-      //   _image!,
-      // );
+      
+      await profileController.movetoPersistentLocation(File(pickedFile.path));     
     }
   }
 
@@ -102,7 +95,7 @@ class _PictureWidgetState extends State<PictureWidget> {
         crossAxisAlignment: CrossAxisAlignment.center, // Horizontally center the children
         children: <Widget>[
           GestureDetector(
-            onTap: _pickImage, // Trigger the image picker when tapped
+            onTap: pickImage, // Trigger the image picker when tapped
             child: Stack(
               alignment: Alignment.center, // Center the icon inside the CircleAvatar
               children: [

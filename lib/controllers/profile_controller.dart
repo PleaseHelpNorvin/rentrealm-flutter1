@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../components/alert_utils.dart';
 import '../controllers/auth_controller.dart';
@@ -19,16 +20,29 @@ class ProfileController with ChangeNotifier {
 
   void setLoading(bool value) {
     _isLoading = value;
-    notifyListeners();
+    // notifyListeners();
   }
 
   void setUserProfile(UserProfileResponse? profile) {
     _userProfile = profile;
-    notifyListeners();
+    // notifyListeners();
+  }
+
+  Future<void> movetoPersistentLocation(File pickedFile) async {
+    final appDocDir = await getApplicationDocumentsDirectory();
+    final fileName = pickedFile.path.split('/').last;
+    final newFile = File('${appDocDir.path}/$fileName');
+
+    // Copy the file to the new location
+    await pickedFile.copy(newFile.path);
   }
 
   /// Convert an image to Base64 and include it in profile data
   Future<void> imageConversion(BuildContext context, File image) async {
+    final authController = Provider.of<AuthController>(context, listen: false);
+    String? token = authController.token;
+    int? userId = authController.user?.data?.user.id;
+
     try {
       final bytes = await image.readAsBytes(); // Read image file as bytes
       final base64Image = base64Encode(bytes); // Convert to Base64 for API
@@ -36,10 +50,6 @@ class ProfileController with ChangeNotifier {
       final profileData = {
         'profile_picture_url': base64Image,
       };
-
-      final authController = Provider.of<AuthController>(context, listen: false);
-      String? token = authController.token;
-      int? userId = authController.user?.data?.user.id;
 
       if (token != null && userId != null) {
         await createUserProfile(context, token, userId, profileData);
