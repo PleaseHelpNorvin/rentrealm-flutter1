@@ -11,11 +11,6 @@ import '../../controllers/auth_controller.dart';
 import '../../controllers/profile_controller.dart';
 import '../../controllers/user_controller.dart';
 class CreateProfileScreen1 extends StatefulWidget{
-  
-  // CreateProfileScreen1({
-  //   required String token,
-  //   required int userId,
-  // });
 
   @override
   CreateProfileScreenState1 createState() => CreateProfileScreenState1(); 
@@ -45,7 +40,7 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget> [
           PictureWidget(user: user),
-          
+          FieldWidget(user : user),
         ],
       ),
     );
@@ -62,56 +57,39 @@ class PictureWidget extends StatefulWidget {
 }
 
 class _PictureWidgetState extends State<PictureWidget> {
-  File? _image;
-
-  final picker = ImagePicker();
-
-  // Function to pick image from gallery
-  Future<void> pickImage() async {
-    final profileController = Provider.of<ProfileController>(context, listen: false);
-
-    final pickedFile = await picker.pickImage(source: ImageSource.camera);
-
-    if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-        print("raw picture:  $_image");
-      });
-      File compressedFile = await profileController.imageCompression(context, File(pickedFile.path));
-      profileController.sendProfilePicture(context, compressedFile);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    // print("User token: ${widget.user.data?.token??'no user token'}");
+    final profileController = Provider.of<ProfileController>(context);
+    // print("User token: ${widget.user.data?.token??'no user token'}"); 
     print("User ID: ${widget.user.data?.user.id}");
 
-    return Center( // Center the entire Column
+        return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center, // Vertically center the children
-        crossAxisAlignment: CrossAxisAlignment.center, // Horizontally center the children
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           GestureDetector(
-            onTap: pickImage, // Trigger the image picker when tapped
+            onTap: () {
+              profileController.pickImage(context, ImageSource.camera);
+            },
             child: Stack(
-              alignment: Alignment.center, // Center the icon inside the CircleAvatar
+              alignment: Alignment.center,
               children: [
-                _image == null
-                    ? CircleAvatar(
-                        radius: 100,
-                        backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
-                      )
-                    : CircleAvatar(
-                        radius: 100,
-                        backgroundImage: FileImage(_image!),
-                      ),
+                profileController.image == null
+                  ? CircleAvatar(
+                      radius: 100,
+                      backgroundImage: AssetImage('assets/images/profile_placeholder.png'),
+                    )
+                  : CircleAvatar(
+                      radius: 100,
+                      backgroundImage: FileImage(profileController.image!),
+                    ),
                 Positioned(
-                  // center: 10, // Adjust the position of the icon (you can change this value)
                   child: Icon(
                     Icons.camera_alt,
-                    size: 30, // Icon size
-                    color: Colors.white, // Icon color
+                    size: 30,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -124,4 +102,26 @@ class _PictureWidgetState extends State<PictureWidget> {
   }
 }
 
- 
+class FieldWidget extends StatefulWidget {
+  final UserResponse user;
+
+  const FieldWidget({super.key, required this.user});
+
+  @override
+  _FieldWidgetState createState() => _FieldWidgetState();
+}
+
+class _FieldWidgetState extends State<FieldWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          
+        ],
+      ),
+    );
+  }
+}

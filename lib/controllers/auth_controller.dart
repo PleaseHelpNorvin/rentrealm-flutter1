@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/controllers/profile_controller.dart';
 import '../models/user_model.dart'; // Your User model import
 import '../networks/apiservice.dart'; // Assuming you have the API service here
 import '../components/alert_utils.dart';

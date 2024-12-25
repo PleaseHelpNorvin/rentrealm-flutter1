@@ -4,6 +4,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:image/image.dart' as img;
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../components/alert_utils.dart';
@@ -13,6 +14,11 @@ import '../networks/apiservice.dart';
 
 class ProfileController with ChangeNotifier {
   final ApiService apiService = ApiService();
+  final ImagePicker _picker = ImagePicker();
+
+  File? _image;
+  File? get image => _image;
+
 
   bool _isLoading = false;
   UserProfileResponse? _userProfile;
@@ -30,12 +36,26 @@ class ProfileController with ChangeNotifier {
     // notifyListeners();
   }
 
+   // Function to pick image from camera
+  Future<void> pickImage(BuildContext context, ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      _image = File(pickedFile.path);
+      print("picked Image : $_image");
+      notifyListeners();  // Notify UI to update when the image is picked
+      // You can perform image compression and send it here if needed
+      // await compressAndSendImage(_image!);
+      File compressedFile = await imageCompression(context, File(pickedFile.path) );
+      sendProfilePicture(context, compressedFile);
+    }
+  }
+
   Future<File> imageCompression(BuildContext context, File pickedFile) async {
     // Decode the original image
     final originalImageData = img.decodeImage(pickedFile.readAsBytesSync());
 
     // Resize the image
-    final resizedImage = img.copyResize(originalImageData!, width: 800);
+    final resizedImage = img.copyResize(originalImageData!, width: 3000);
 
     print("Decoded and resized image: $resizedImage");
 
