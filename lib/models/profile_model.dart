@@ -48,7 +48,7 @@ class UserProfile {
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       userId: int.tryParse(json['user_id'].toString()) ?? 0,
-      profilePictureUrl: json['profile_picture_url'],  // URL now handled as string
+      profilePictureUrl: json['profile_picture_url'] ?? 'no profile pic',  // URL now handled as string
       phoneNumber: json['phone_number'],
       socialMediaLinks: json['social_media_links'] ?? '',
       municipality: json['municipality'] ?? '',

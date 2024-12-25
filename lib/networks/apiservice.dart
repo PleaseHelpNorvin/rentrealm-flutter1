@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+import 'package:http_parser/http_parser.dart'; // Import this for MediaType
+import '../models/profile_model.dart';
 import '../apis/api.dart';
 import '../models/profile_model.dart';
 import '../models/user_model.dart';
@@ -153,14 +155,79 @@ class ApiService {
     }
   }
 
-  Future<UserProfileResponse?>postUserProfile({
+   Future<http.MultipartRequest> createMultipartRequest({
     required int userId,
     required String token,
-    required Map<String, String>userProfile
+    required Map<String, String> data,
   }) async {
+    Uri url = Uri.parse('${Api.baseUrl}/tenant/profile/storepicture/$userId');
+    
+    // Create a multipart request
+    var request = http.MultipartRequest('POST', url);
 
+    // Set the authorization header (Bearer token)
+    request.headers.addAll({
+      'Authorization': 'Bearer $token',
+      'Accept': 'application/json',
+    });
+
+    // Add the regular form data fields
+    data.forEach((key, value) {
+      request.fields[key] = value;
+    });
+
+    return request;
   }
-  
+
+  Future<UserProfileResponse?> postUserProfile(String token, int userId ,http.MultipartRequest request) async {
+  final uri = Uri.parse('${Api.baseUrl}/tenant/profile/update/$userId');
+  print('POST request to: $uri');
+
+  try {
+    // Create a multipart request
+    var request = http.MultipartRequest('POST', uri);
+
+    // Add the headers
+    request.headers.addAll({
+      "Authorization": "Bearer $token",
+      "Accept": "application/json",
+    });
+    UserProfile userProfile = new UserProfile();
+    // Add form fields (text data)
+    userProfile.forEach((key, value) {
+      request.fields[key] = value;
+    });
+
+    // If there is a profile picture, add it as a multipart file
+    if (profilePicture != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'profile_picture',  // Field name expected by the backend
+        profilePicture.path,
+        contentType: MediaType('image', 'jpeg'), // Adjust content type if needed
+      ));
+    }
+
+    // Send the request
+    var response = await request.send();
+
+    // Get the response body
+    final responseBody = await http.Response.fromStream(response);
+
+    // Check the response status
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final Map<String, dynamic> responseData = jsonDecode(responseBody.body);
+      print('Response from postUserProfile: $responseData');
+      return UserProfileResponse.fromJson(responseData);
+    } else {
+      print('Error: ${response.statusCode} - ${responseBody.body}');
+      return null;
+    }
+  } catch (e) {
+    print('Exception: $e');
+    return null;
+  }
+}
+
 
   
 }

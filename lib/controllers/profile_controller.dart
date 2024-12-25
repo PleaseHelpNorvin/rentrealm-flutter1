@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:http_parser/http_parser.dart';
+import 'package:image/image.dart' as img;
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -28,66 +30,64 @@ class ProfileController with ChangeNotifier {
     // notifyListeners();
   }
 
-  Future<void> movetoPersistentLocation(File pickedFile) async {
+  Future<File> imageCompression(File pickedFile) async {
+    // Decode the original image
+    final originalImageData = img.decodeImage(pickedFile.readAsBytesSync());
+
+    // Resize the image
+    final resizedImage = img.copyResize(originalImageData!, width: 800);
+
+    print("Decoded and resized image: $resizedImage");
+
+    // Save the compressed image directly
     final appDocDir = await getApplicationDocumentsDirectory();
-    final fileName = pickedFile.path.split('/').last;
-    final newFile = File('${appDocDir.path}/$fileName');
+    final compressedFile = File('${appDocDir.path}/compressed_${pickedFile.path.split('/').last}')
+      ..writeAsBytesSync(img.encodeJpg(resizedImage, quality: 80));
 
-    // Copy the file to the new location
-    await pickedFile.copy(newFile.path);
+    print("Compressed image saved directly to persistent storage: ${compressedFile.path}");
+    return compressedFile;
+
   }
 
-  /// Convert an image to Base64 and include it in profile data
-  Future<void> imageConversion(BuildContext context, File image) async {
-    final authController = Provider.of<AuthController>(context, listen: false);
-    String? token = authController.token;
-    int? userId = authController.user?.data?.user.id;
+ Future<void> createUserProfile(
+  BuildContext context, String token, int userId, Map<String, String> profileData, File? compressedImageFile) async {
+  try {
+    setLoading(true);
 
-    try {
-      final bytes = await image.readAsBytes(); // Read image file as bytes
-      final base64Image = base64Encode(bytes); // Convert to Base64 for API
+    // Create the multipart request
+    final request = await apiService.createMultipartRequest(
+      userId: userId,
+      token: token,
+      data: profileData,
+    );
 
-      final profileData = {
-        'profile_picture_url': base64Image,
-      };
-
-      if (token != null && userId != null) {
-        await createUserProfile(context, token, userId, profileData);
-      } else {
-        AlertUtils.showErrorAlert(context, message: "User not authenticated.");
-      }
-    } catch (e) {
-      print("Image conversion error: $e");
-      AlertUtils.showErrorAlert(context, message: "Failed to process the image.");
+    // Attach the image file if available
+    if (compressedImageFile != null) {
+      final imageFileName = compressedImageFile.path.split('/').last;
+      request.files.add(await http.MultipartFile.fromPath(
+        'image', // Field name expected by API
+        compressedImageFile.path,
+        filename: imageFileName,
+        contentType: MediaType('image', 'jpeg'), // You can specify content type like jpeg, png, etc.
+      ));
     }
-  }
 
-  /// Create or update user profile
-  Future<void> createUserProfile(
-      BuildContext context, String token, int userId, Map<String, String> profileData) async {
-    try {
-      setLoading(true);
+    // Send the multipart request
+    final response = await apiService.postUserProfile(request);
 
-      final response = await apiService.postUserProfile(
-        token: token,
-        userId: userId,
-        userProfile: profileData,
-      );
-
-      if (response != null && response.success) {
-        setUserProfile(response);
-        AlertUtils.showSuccessAlert(context, message: "Profile updated successfully!");
-      } else {
-        AlertUtils.showErrorAlert(context, message: "Failed to update profile.");
-        print("Failed to update profile: ${response?.message}");
-      }
-    } catch (e) {
-      print("Error creating/updating profile: $e");
-      AlertUtils.showErrorAlert(context, message: "Something went wrong: $e");
-    } finally {
-      setLoading(false);
+    if (response != null && response.success == true) {
+      setUserProfile(response); // Store the profile if successful
+      AlertUtils.showSuccessAlert(context, message: "Profile updated successfully!");
+    } else {
+      AlertUtils.showErrorAlert(context, message: "Failed to update profile.");
     }
+  } catch (e) {
+    print("Error creating/updating profile: $e");
+    AlertUtils.showErrorAlert(context, message: "Something went wrong: $e");
+  } finally {
+    setLoading(false);
   }
+}
 
   /// Load user profile
   Future<void> loadUserProfile(BuildContext context) async {

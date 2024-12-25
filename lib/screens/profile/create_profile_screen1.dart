@@ -78,9 +78,10 @@ class _PictureWidgetState extends State<PictureWidget> {
     if (pickedFile != null) {
       setState(() {
         _image = File(pickedFile.path);
+        print("raw picture:  $_image");
       });
       
-      await profileController.movetoPersistentLocation(File(pickedFile.path));     
+      await profileController.imageCompression(File(pickedFile.path));     
     }
   }
 
