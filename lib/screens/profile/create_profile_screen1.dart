@@ -31,15 +31,12 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
     return Center(child: Text("User is not logged in."));
   }
 
-  print('from main widget: ${user.data?.user.id}');
-  print('from main widget: ${user.data?.user.name}');
-  print('from main widget: ${user.data?.user.email}');
-  print('from main widget: ${user.data?.user.role}');
-  print('from main widget: ${user.data?.user.createdAt}');
-
-
-
-    
+  print('from profile main widget: ${user.data?.user.id}');
+  print('from profile main widget: ${user.data?.user.name}');
+  print('from profile main widget: ${user.data?.user.email}');
+  print('from profile main widget: ${user.data?.user.role}');
+  print('from profile main widget: ${user.data?.user.createdAt}');
+  print('from profile main widget: ${user.data?.token}');
     return Scaffold(
       appBar: AppBar(
 
@@ -80,8 +77,8 @@ class _PictureWidgetState extends State<PictureWidget> {
         _image = File(pickedFile.path);
         print("raw picture:  $_image");
       });
-      
-      await profileController.imageCompression(File(pickedFile.path));     
+      File compressedFile = await profileController.imageCompression(context, File(pickedFile.path));
+      profileController.sendProfilePicture(context, compressedFile);
     }
   }
 

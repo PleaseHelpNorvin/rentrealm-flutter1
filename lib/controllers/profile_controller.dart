@@ -30,7 +30,7 @@ class ProfileController with ChangeNotifier {
     // notifyListeners();
   }
 
-  Future<File> imageCompression(File pickedFile) async {
+  Future<File> imageCompression(BuildContext context, File pickedFile) async {
     // Decode the original image
     final originalImageData = img.decodeImage(pickedFile.readAsBytesSync());
 
@@ -46,48 +46,33 @@ class ProfileController with ChangeNotifier {
 
     print("Compressed image saved directly to persistent storage: ${compressedFile.path}");
     return compressedFile;
-
   }
 
- Future<void> createUserProfile(
-  BuildContext context, String token, int userId, Map<String, String> profileData, File? compressedImageFile) async {
-  try {
-    setLoading(true);
-
-    // Create the multipart request
-    final request = await apiService.createMultipartRequest(
-      userId: userId,
-      token: token,
-      data: profileData,
-    );
-
-    // Attach the image file if available
-    if (compressedImageFile != null) {
-      final imageFileName = compressedImageFile.path.split('/').last;
-      request.files.add(await http.MultipartFile.fromPath(
-        'image', // Field name expected by API
-        compressedImageFile.path,
-        filename: imageFileName,
-        contentType: MediaType('image', 'jpeg'), // You can specify content type like jpeg, png, etc.
-      ));
+  Future<void> sendProfilePicture(BuildContext context, File compressedFile) async {
+    final authController = Provider.of<AuthController>(context, listen: false);
+    int? userId = authController.user?.data?.user.id;
+    String? token = authController.token;
+    
+    // Check if token and userId are null
+    if (userId == null || token == null) {
+      AlertUtils.showErrorAlert(context, message: 'User is not authenticated.');
+      return; // Exit the method if userId or token is null
     }
 
-    // Send the multipart request
-    final response = await apiService.postUserProfile(request);
+    print("sendProfilePicture() called with: ${compressedFile}");
 
-    if (response != null && response.success == true) {
-      setUserProfile(response); // Store the profile if successful
-      AlertUtils.showSuccessAlert(context, message: "Profile updated successfully!");
+    if (compressedFile == null) {
+      AlertUtils.showErrorAlert(context, message: 'No file selected');
     } else {
-      AlertUtils.showErrorAlert(context, message: "Failed to update profile.");
-    }
-  } catch (e) {
-    print("Error creating/updating profile: $e");
-    AlertUtils.showErrorAlert(context, message: "Something went wrong: $e");
-  } finally {
-    setLoading(false);
+      print("sendProfilePicture() called with: ${compressedFile.path}");
+      print("File exists: ${await compressedFile.exists()}");  // Check if file exists
+    } 
+    await apiService.postProfilePicture(
+      token: token,
+      userId: userId,
+      compressedFile: compressedFile,
+    );
   }
-}
 
   /// Load user profile
   Future<void> loadUserProfile(BuildContext context) async {

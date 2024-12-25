@@ -155,79 +155,37 @@ class ApiService {
     }
   }
 
-   Future<http.MultipartRequest> createMultipartRequest({
+  Future<UserProfileResponse?> postProfilePicture({
     required int userId,
     required String token,
-    required Map<String, String> data,
+    required File compressedFile,
   }) async {
-    Uri url = Uri.parse('${Api.baseUrl}/tenant/profile/storepicture/$userId');
-    
-    // Create a multipart request
-    var request = http.MultipartRequest('POST', url);
+    print("userId: $userId");
+    print("token: $token");
+    print("compressedFilePath: ${compressedFile.path}");
 
-    // Set the authorization header (Bearer token)
-    request.headers.addAll({
-      'Authorization': 'Bearer $token',
-      'Accept': 'application/json',
-    });
+    final uri = Uri.parse('${Api.baseUrl}/tenant/profile/storepicture/$userId');
+    final request = http.MultipartRequest('POST', uri)
+      ..headers['Authorization'] = 'Bearer $token'
+      ..files.add(await http.MultipartFile.fromPath(
+        'profile_picture_url', compressedFile.path));
 
-    // Add the regular form data fields
-    data.forEach((key, value) {
-      request.fields[key] = value;
-    });
+    final response = await request.send();
 
-    return request;
-  }
-
-  Future<UserProfileResponse?> postUserProfile(String token, int userId ,http.MultipartRequest request) async {
-  final uri = Uri.parse('${Api.baseUrl}/tenant/profile/update/$userId');
-  print('POST request to: $uri');
-
-  try {
-    // Create a multipart request
-    var request = http.MultipartRequest('POST', uri);
-
-    // Add the headers
-    request.headers.addAll({
-      "Authorization": "Bearer $token",
-      "Accept": "application/json",
-    });
-    UserProfile userProfile = new UserProfile();
-    // Add form fields (text data)
-    userProfile.forEach((key, value) {
-      request.fields[key] = value;
-    });
-
-    // If there is a profile picture, add it as a multipart file
-    if (profilePicture != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'profile_picture',  // Field name expected by the backend
-        profilePicture.path,
-        contentType: MediaType('image', 'jpeg'), // Adjust content type if needed
-      ));
-    }
-
-    // Send the request
-    var response = await request.send();
-
-    // Get the response body
-    final responseBody = await http.Response.fromStream(response);
-
-    // Check the response status
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final Map<String, dynamic> responseData = jsonDecode(responseBody.body);
-      print('Response from postUserProfile: $responseData');
-      return UserProfileResponse.fromJson(responseData);
+    if (response.statusCode == 200) {
+      print('Profile picture uploaded successfully');
+      // Convert the StreamedResponse to String and decode it as JSON
+      final responseBody = await response.stream.bytesToString();
+      final Map<String, dynamic> jsonResponse = jsonDecode(responseBody);
+      print(responseBody);
+      // Parse the JSON into a UserProfileResponse object
+      return UserProfileResponse.fromJson(jsonResponse);
     } else {
-      print('Error: ${response.statusCode} - ${responseBody.body}');
+      print('Failed to upload profile picture');
+      // Handle error
       return null;
     }
-  } catch (e) {
-    print('Exception: $e');
-    return null;
   }
-}
-
 
   
 }
