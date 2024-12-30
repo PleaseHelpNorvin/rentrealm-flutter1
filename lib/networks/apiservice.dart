@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart'; // Import this for MediaType
 import '../models/profile_model.dart';
@@ -9,7 +10,7 @@ import '../models/user_model.dart';
 
 class ApiService {
   final String api = Api.baseUrl;
-  
+
   //login api call
   Future<UserResponse?> loginUser({
     required String email,
@@ -78,8 +79,7 @@ class ApiService {
       // Check for successful response
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        return UserResponse
-            .fromJson(responseData); // Parse response into model
+        return UserResponse.fromJson(responseData); // Parse response into model
       } else {
         // Handle errors
         print('Error: ${response.statusCode} - ${response.body}');
@@ -92,10 +92,10 @@ class ApiService {
     }
   }
 
-  Future<UserResponse?>getUser({
+  Future<UserResponse?> getUser({
     required int userId,
     required String token,
-  }) async{
+  }) async {
     final uri = Uri.parse('${Api.baseUrl}/tenant/user/show/$userId');
 
     print("getUser() token: $token");
@@ -103,13 +103,13 @@ class ApiService {
       final response = await http.get(
         uri,
         headers: {
-          "Content-Type" : "application/json",
-          "Accept" : "application/json",
-          "Authorization" : "Bearer $token", 
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
         },
       );
 
-      if(response.statusCode == 200 || response.statusCode == 201){
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getUser Call: $responseData");
         return UserResponse.fromJson(responseData);
@@ -123,22 +123,22 @@ class ApiService {
     }
   }
 
-  Future<UserProfileResponse?>getUserProfile({
+  Future<UserProfileResponse?> getUserProfile({
     required int userId,
     required String token,
     // required context,
   }) async {
     final uri = Uri.parse('${Api.baseUrl}/tenant/profile/show/$userId');
     print(uri);
-      try {
-        final response = await http.get(
-          uri,
-          headers: {
-            "Content-Type" : "application/json",
-            "Accept" : "application/json",
-            "Authorization" : "Bearer $token", 
-          },
-        );
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
@@ -148,7 +148,6 @@ class ApiService {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
-
     } catch (e) {
       print('Exeption: $e');
       return null;
@@ -168,7 +167,7 @@ class ApiService {
     final request = http.MultipartRequest('POST', uri)
       ..headers['Authorization'] = 'Bearer $token'
       ..files.add(await http.MultipartFile.fromPath(
-        'profile_picture_url', compressedFile.path));
+          'profile_picture_url', compressedFile.path));
 
     final response = await request.send();
 
@@ -187,5 +186,64 @@ class ApiService {
     }
   }
 
-  
+  Future<UserProfileResponse?> postProfileData({
+    required int? userId,
+    required String? token,
+    required String phoneNumberController,
+    required String socialMediaLinkController,
+    required String occupationController,
+    required String line1Controller,
+    required String line2Controller,
+    required String provinceController,
+    required String countryController,
+    required String postalCodeController,
+    required String? driverLicenseNumber,
+    required String? nationalIdNumber,
+    required String? passportNumber,
+    required String? socialSecurityNumber,
+  }) async {
+    print('From Api call User_id: $userId');
+    print('From Api call token: $token');
+    print('From Api call Phone Number: $phoneNumberController');
+    print('From Api call Social Media Link: $socialMediaLinkController');
+    print('From Api call Occupation: $occupationController');
+    print('From Api call Line 1 Address: $line1Controller');
+    print('From Api call Line 2 Address: $line2Controller');
+    print('From Api call Province: $provinceController');
+    print('From Api call Country: $countryController');
+    print('From Api call Postal Code Controller: $postalCodeController');
+    print('From Api call Driver License Number: $driverLicenseNumber');
+    print('From Api call National ID Number: $nationalIdNumber');
+    print('From Api call Passport Number: $passportNumber');
+    print('From Api call Social Security Number: $socialSecurityNumber');
+
+    final uri = Uri.parse('${Api.baseUrl}/tenant/profile/store/$userId');
+    final requestBody = {
+      "phone_number": phoneNumberController,
+      "social_media_links": socialMediaLinkController,
+      "occupation": occupationController,
+      "line_1": line1Controller,
+      "line_2": line1Controller,
+      "province": provinceController,
+      "country": countryController,
+      "postal_code": postalCodeController,
+      "driver_license_number": driverLicenseNumber,
+      "national_id_number": nationalIdNumber,
+      "passport_number": passportNumber,
+      "social_security_number": socialSecurityNumber,
+    };
+
+    final response = await http.post(uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(requestBody));
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      print('from ApiService.postProfileData:  $responseData');
+    }
+  }
 }

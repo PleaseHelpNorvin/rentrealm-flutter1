@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/models/user_model.dart';
+
+import '../../controllers/profile_controller.dart';
 
 class CreateProfileScreen3 extends StatefulWidget {
   final UserResponse user;
@@ -181,6 +184,22 @@ class CreateProfileScreenState3 extends State<CreateProfileScreen3> {
                       print(
                           'Type: ${idData['type']}, Value: ${idData['controller'].text}');
                     }
+
+                    final profileController =
+                        Provider.of<ProfileController>(context, listen: false);
+
+                    profileController.onCreateUserProfile(
+                        context,
+                        widget.phoneNumberController,
+                        widget.socialMediaLinkController,
+                        widget.occupationController,
+                        widget.line1Controller,
+                        widget.line2Controller,
+                        widget.provinceController,
+                        widget.countryController,
+                        widget.postalCodeController,
+                        _identificationList);
+
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('All Data Submitted!')),
                     );

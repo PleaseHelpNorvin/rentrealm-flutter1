@@ -19,7 +19,6 @@ class ProfileController with ChangeNotifier {
   File? _image;
   File? get image => _image;
 
-
   bool _isLoading = false;
   UserProfileResponse? _userProfile;
 
@@ -36,16 +35,17 @@ class ProfileController with ChangeNotifier {
     // notifyListeners();
   }
 
-   // Function to pick image from camera
+  // Function to pick image from camera
   Future<void> pickImage(BuildContext context, ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       _image = File(pickedFile.path);
       print("picked Image : $_image");
-      notifyListeners();  // Notify UI to update when the image is picked
+      notifyListeners(); // Notify UI to update when the image is picked
       // You can perform image compression and send it here if needed
       // await compressAndSendImage(_image!);
-      File compressedFile = await imageCompression(context, File(pickedFile.path) );
+      File compressedFile =
+          await imageCompression(context, File(pickedFile.path));
       sendProfilePicture(context, compressedFile);
     }
   }
@@ -61,18 +61,21 @@ class ProfileController with ChangeNotifier {
 
     // Save the compressed image directly
     final appDocDir = await getApplicationDocumentsDirectory();
-    final compressedFile = File('${appDocDir.path}/compressed_${pickedFile.path.split('/').last}')
-      ..writeAsBytesSync(img.encodeJpg(resizedImage, quality: 80));
+    final compressedFile =
+        File('${appDocDir.path}/compressed_${pickedFile.path.split('/').last}')
+          ..writeAsBytesSync(img.encodeJpg(resizedImage, quality: 80));
 
-    print("Compressed image saved directly to persistent storage: ${compressedFile.path}");
+    print(
+        "Compressed image saved directly to persistent storage: ${compressedFile.path}");
     return compressedFile;
   }
 
-  Future<void> sendProfilePicture(BuildContext context, File compressedFile) async {
+  Future<void> sendProfilePicture(
+      BuildContext context, File compressedFile) async {
     final authController = Provider.of<AuthController>(context, listen: false);
     int? userId = authController.user?.data?.user.id;
     String? token = authController.token;
-    
+
     // Check if token and userId are null
     if (userId == null || token == null) {
       AlertUtils.showErrorAlert(context, message: 'User is not authenticated.');
@@ -85,13 +88,82 @@ class ProfileController with ChangeNotifier {
       AlertUtils.showErrorAlert(context, message: 'No file selected');
     } else {
       print("sendProfilePicture() called with: ${compressedFile.path}");
-      print("File exists: ${await compressedFile.exists()}");  // Check if file exists
-    } 
+      print(
+          "File exists: ${await compressedFile.exists()}"); // Check if file exists
+    }
     await apiService.postProfilePicture(
       token: token,
       userId: userId,
       compressedFile: compressedFile,
     );
+  }
+
+  Future<void> onCreateUserProfile(
+      BuildContext context,
+      String phoneNumberController,
+      String socialMediaLinkController,
+      String occupationController,
+      String line1Controller,
+      String line2Controller,
+      String provinceController,
+      String countryController,
+      String postalCodeController,
+      List<Map<String, dynamic>> identificationData) async {
+    final authController = Provider.of<AuthController>(context, listen: false);
+    int? userId = authController.user?.data?.user.id;
+    String? token = authController.token;
+    String? driverLicenseNumber;
+    String? nationalIdNumber;
+    String? passportNumber;
+    String? socialSecurityNumber;
+
+    for (var idData in identificationData) {
+      switch (idData['type']) {
+        case 'Driver License Number':
+          driverLicenseNumber = idData['controller'].text;
+          break;
+        case 'National ID':
+          nationalIdNumber = idData['controller'].text;
+          break;
+        case 'Passport Number':
+          passportNumber = idData['controller'].text;
+          break;
+        case 'Social Security Number':
+          socialSecurityNumber = idData['controller'].text;
+          break;
+        default:
+          print('Unknown identification type: ${idData['type']}');
+      }
+    }
+    print('User_id: $userId');
+    print('token: $token');
+    print('Phone Number: $phoneNumberController');
+    print('Social Media Link: $socialMediaLinkController');
+    print('Occupation: $occupationController');
+    print('Line 1 Address: $line1Controller');
+    print('Line 2 Address: $line2Controller');
+    print('Province: $provinceController');
+    print('Country: $countryController');
+    print('Postal Code Controller: $postalCodeController');
+    print('Driver License Number: $driverLicenseNumber');
+    print('National ID Number: $nationalIdNumber');
+    print('Passport Number: $passportNumber');
+    print('Social Security Number: $socialSecurityNumber');
+    await apiService.postProfileData(
+        userId: userId,
+        token: token,
+        phoneNumberController: phoneNumberController,
+        socialMediaLinkController: socialMediaLinkController,
+        occupationController: occupationController,
+        line1Controller: line1Controller,
+        line2Controller: line2Controller,
+        provinceController: provinceController,
+        countryController: countryController,
+        postalCodeController: postalCodeController,
+        driverLicenseNumber: driverLicenseNumber,
+        nationalIdNumber: nationalIdNumber,
+        passportNumber: passportNumber,
+        socialSecurityNumber: socialSecurityNumber);
   }
 
   /// Load user profile
@@ -105,7 +177,8 @@ class ProfileController with ChangeNotifier {
         await fetchUserProfile(context, token: token, userId: userId);
       } catch (e) {
         print("Error loading user profile: $e");
-        AlertUtils.showErrorAlert(context, message: "Failed to load user profile.");
+        AlertUtils.showErrorAlert(context,
+            message: "Failed to load user profile.");
       }
     } else {
       AlertUtils.showErrorAlert(context, message: "User not authenticated.");
@@ -113,11 +186,13 @@ class ProfileController with ChangeNotifier {
   }
 
   /// Fetch user profile data
-  Future<void> fetchUserProfile(context, {required String token, required int userId}) async {
+  Future<void> fetchUserProfile(context,
+      {required String token, required int userId}) async {
     try {
       setLoading(true);
 
-      final response = await apiService.getUserProfile(token: token, userId: userId);
+      final response =
+          await apiService.getUserProfile(token: token, userId: userId);
 
       if (response != null && response.success) {
         setUserProfile(response);
@@ -135,7 +210,8 @@ class ProfileController with ChangeNotifier {
       }
     } catch (e) {
       print("Error fetching user profile: $e");
-      AlertUtils.showErrorAlert(context, title: "Error", message: "Something went wrong: $e");
+      AlertUtils.showErrorAlert(context,
+          title: "Error", message: "Something went wrong: $e");
     } finally {
       setLoading(false);
     }
