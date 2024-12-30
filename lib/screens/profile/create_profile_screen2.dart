@@ -42,6 +42,8 @@ class CreateProfileScreenState2 extends State<CreateProfileScreen2> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         title: Text("Fill Address"),
       ),
       body: Column(
@@ -114,7 +116,7 @@ class CreateProfileScreenState2 extends State<CreateProfileScreen2> {
                       BorderRadius.circular(8), // Optional: rounded corners
                 ),
               ),
-              child: const Text('Submit'),
+              child: const Text('Next'),
             ),
           ),
         ],

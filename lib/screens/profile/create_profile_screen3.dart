@@ -53,6 +53,8 @@ class CreateProfileScreenState3 extends State<CreateProfileScreen3> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         title: const Text("Fill Identification"),
       ),
       body: Padding(
@@ -80,67 +82,94 @@ class CreateProfileScreenState3 extends State<CreateProfileScreen3> {
                     );
                   }
                 },
-                icon: const Icon(Icons.add),
+                icon: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
                 label: const Text('Add Identification'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue, // Set text color to white
+                  minimumSize: Size(double.infinity,
+                      50), // Set minimum width to make it full width, and height to 50
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(8), // Optional: rounded corners
+                  ),
+                ),
               ),
               const SizedBox(height: 10),
               Expanded(
-                child: ListView.builder(
-                  itemCount: _identificationList.length,
-                  itemBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        DropdownButtonFormField<String>(
-                          value: _identificationList[index]['type'],
-                          decoration: const InputDecoration(
-                            labelText: "Select Identification Type",
-                            border: OutlineInputBorder(),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.all(20.0), // Add padding to all edges
+                  child: ListView.builder(
+                    itemCount: _identificationList.length,
+                    itemBuilder: (context, index) {
+                      return Column(
+                        children: [
+                          const SizedBox(height: 10),
+                          DropdownButtonFormField<String>(
+                            value: _identificationList[index]['type'],
+                            decoration: const InputDecoration(
+                              labelText: "Select Identification Type",
+                              border: OutlineInputBorder(),
+                            ),
+                            items: _identificationOptions.map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _identificationList[index]['type'] = newValue!;
+                              });
+                            },
+                            validator: (value) {
+                              if (value == null ||
+                                  value == 'Select Identification Type') {
+                                return 'Please select a valid identification type';
+                              }
+
+                              // Check if the selected value already exists
+                              int occurrences = _identificationList
+                                  .where((item) => item['type'] == value)
+                                  .length;
+                              if (occurrences > 1) {
+                                return 'This identification type has already been selected';
+                              }
+
+                              return null;
+                            },
                           ),
-                          items: _identificationOptions.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (newValue) {
-                            setState(() {
-                              _identificationList[index]['type'] = newValue!;
-                            });
-                          },
-                          validator: (value) {
-                            if (value == null ||
-                                value == 'Select Identification Type') {
-                              return 'Please select a valid identification type';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          controller: _identificationList[index]['controller'],
-                          decoration: InputDecoration(
-                            labelText: _getFieldLabel(
-                                _identificationList[index]['type']),
-                            hintText: _getFieldHint(
-                                _identificationList[index]['type']),
-                            border: const OutlineInputBorder(),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: _identificationList[index]
+                                ['controller'],
+                            decoration: InputDecoration(
+                              labelText: _getFieldLabel(
+                                  _identificationList[index]['type']),
+                              hintText: _getFieldHint(
+                                  _identificationList[index]['type']),
+                              border: const OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (_identificationList[index]['type'] ==
+                                  'Select Identification Type') {
+                                return 'Please select an identification type first';
+                              }
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a ${_getFieldLabel(_identificationList[index]['type'])}';
+                              }
+                              return null;
+                            },
                           ),
-                          validator: (value) {
-                            if (_identificationList[index]['type'] ==
-                                'Select Identification Type') {
-                              return 'Please select an identification type first';
-                            }
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a ${_getFieldLabel(_identificationList[index]['type'])}';
-                            }
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                      ],
-                    );
-                  },
+                          const SizedBox(height: 20),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -158,6 +187,16 @@ class CreateProfileScreenState3 extends State<CreateProfileScreen3> {
                   }
                 },
                 child: const Text('Submit'),
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue, // Set text color to white
+                  minimumSize: Size(double.infinity,
+                      50), // Set minimum width to make it full width, and height to 50
+                  shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.circular(8), // Optional: rounded corners
+                  ),
+                ),
               ),
             ],
           ),

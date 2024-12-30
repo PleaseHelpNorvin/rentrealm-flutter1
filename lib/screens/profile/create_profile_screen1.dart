@@ -45,6 +45,8 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         title: Text('Create Profile'),
       ),
       body: Column(
@@ -118,7 +120,7 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Submit'),
+              child: const Text('Next'),
             ),
           ),
         ],
