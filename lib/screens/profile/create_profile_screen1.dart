@@ -20,9 +20,12 @@ class CreateProfileScreen1 extends StatefulWidget {
 class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
   final GlobalKey<FormState> _formKey =
       GlobalKey<FormState>(); // Global key for form validation
-  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _phoneNumberController =
+      TextEditingController(text: "09454365069");
   final TextEditingController _socialMediaLinkController =
-      TextEditingController();
+      TextEditingController(text: "Norvin S Crujido - Facebook");
+  final TextEditingController _occupationController =
+      TextEditingController(text: "Developer");
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +65,7 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
                         formKey: _formKey,
                         phoneNumberController: _phoneNumberController,
                         socialMediaLinkController: _socialMediaLinkController,
+                        occupationController: _occupationController,
                       ), // Pass form key
                     ),
                   ),
@@ -78,17 +82,21 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
                 if (_formKey.currentState?.validate() ?? false) {
                   String phoneNumber = _phoneNumberController.text;
                   String socialMediaLink = _socialMediaLinkController.text;
+                  String occupation = _occupationController.text;
 
                   print("Social Media Link: $socialMediaLink");
-                  print("PhonNumber: $phoneNumber");
+                  print("Phone number: $phoneNumber");
+                  print("Occupation: $occupation");
 
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => CreateProfileScreen2(
-                          user: user,
-                          phoneNumberController: phoneNumber,
-                          socialMediaLinkController: socialMediaLink),
+                        user: user,
+                        phoneNumberController: phoneNumber,
+                        socialMediaLinkController: socialMediaLink,
+                        occupationController: occupation,
+                      ),
                     ),
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -107,8 +115,7 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
                 minimumSize: Size(double.infinity,
                     50), // Set minimum width to make it full width, and height to 50
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(8), // Optional: rounded corners
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: const Text('Submit'),
@@ -180,13 +187,16 @@ class FieldWidget extends StatefulWidget {
   final GlobalKey<FormState> formKey;
   final TextEditingController phoneNumberController;
   final TextEditingController socialMediaLinkController;
+  final TextEditingController occupationController;
 
-  const FieldWidget(
-      {super.key,
-      required this.user,
-      required this.formKey,
-      required this.phoneNumberController,
-      required this.socialMediaLinkController});
+  const FieldWidget({
+    super.key,
+    required this.user,
+    required this.formKey,
+    required this.phoneNumberController,
+    required this.socialMediaLinkController,
+    required this.occupationController,
+  });
 
   @override
   _FieldWidgetState createState() => _FieldWidgetState();
@@ -261,6 +271,33 @@ class _FieldWidgetState extends State<FieldWidget> {
                     return null;
                   },
                 ), // Add some spacing between form fields
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: widget.occupationController, // Attach controller
+                  decoration: const InputDecoration(
+                    labelText: "Occupation",
+                    hintText: "e.g., Developer",
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return "Occupation is required";
+                    }
+
+                    // Validate that the occupation does not exceed 20 characters
+                    if (value.length > 20) {
+                      return "Occupation must be 20 characters or less";
+                    }
+
+                    // Validate the format of the occupation (e.g., Developer or John Doe - Facebook)
+                    final occupationRegex = RegExp(r'^[a-zA-Z0-9 ]+$');
+                    if (!occupationRegex.hasMatch(value)) {
+                      return "Please enter a valid occupation (e.g., Developer)";
+                    }
+
+                    return null;
+                  },
+                )
               ],
             ),
           ),
