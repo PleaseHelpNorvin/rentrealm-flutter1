@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/models/user_model.dart';
 
-import '../../controllers/profile_controller.dart';
+import '../../../controllers/profile_controller.dart';
 
 class CreateProfileScreen3 extends StatefulWidget {
   final UserResponse user;

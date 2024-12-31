@@ -15,22 +15,39 @@ class GetStartedScreenState extends State<GetstartedScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blueAccent, // Background color
-      body: Center( // Using Center widget to center the entire content
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Center vertically
-            crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
+      backgroundColor: Colors.blueAccent,
+      body: Stack(
+        // Use Stack to layer the circles behind the content
+        children: <Widget>[
+          // Custom painted circles in the background
+          CustomPaint(
+            size: Size(double.infinity, double.infinity),
+            painter: BackgroundPainter(),
+          ),
+          // Content of the screen (text and button)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              _buildWelcomeText(),
-              SizedBox(height: 20),
-              _buildSubtitle(),
               SizedBox(height: 40),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    _buildWelcomeText(),
+                    SizedBox(height: 20),
+                    _buildSubtitle(),
+                  ],
+                ),
+              ),
+              Spacer(),
               _buildGetStartedButton(),
+              SizedBox(height: 20)
             ],
           ),
-        ),
+        ],
       ),
     );
   }
@@ -86,5 +103,27 @@ class GetStartedScreenState extends State<GetstartedScreen> {
         builder: (context) => RegisterScreen(),
       ),
     );
+  }
+}
+
+// Custom painter to draw the background circles
+class BackgroundPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = Colors.white.withOpacity(0.2) // Light color for the circles
+      ..style = PaintingStyle.fill;
+
+    // Draw circles at random positions
+    canvas.drawCircle(Offset(size.width * 0.2, size.height * 0.2), 100, paint);
+    canvas.drawCircle(Offset(size.width * 0.6, size.height * 0.4), 150, paint);
+    canvas.drawCircle(Offset(size.width * 0.8, size.height * 0.7), 80, paint);
+
+    // You can add more circles or change their size, opacity, or positions as needed
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false; // We don't need to repaint for this case
   }
 }

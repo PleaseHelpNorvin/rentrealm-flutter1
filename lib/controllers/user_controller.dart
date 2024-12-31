@@ -23,7 +23,6 @@ class UserController with ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> fetchUser(BuildContext context, String token, int userId) async {
     try {
       _isLoading = true;
@@ -35,31 +34,56 @@ class UserController with ChangeNotifier {
         setUser(response);
         print("fetchUser():  ${response.message}");
 
-         AlertUtils.showSuccessAlert(
-          context,
-          title: 'Login Successful',
-          message: 'Welcome, ${response.data?.user.name}!',
-          onConfirmBtnTap: () {
-            Navigator.pushReplacementNamed(context, '/home',);
-          }
-        );
-        
-        
+        AlertUtils.showSuccessAlert(context,
+            title: 'Login Successful',
+            message: 'Welcome, ${response.data?.user.name}!',
+            onConfirmBtnTap: () {
+          Navigator.pushReplacementNamed(
+            context,
+            '/home',
+          );
+        });
       } else {
         print("Failed to fetch user data");
-        AlertUtils.showErrorAlert(context, message: "Failed to fetch user data");
+        AlertUtils.showErrorAlert(context,
+            message: "Failed to fetch user data");
       }
-
-
-
     } catch (e) {
       print("Error: $e");
-      AlertUtils.showErrorAlert(context, title: "Exception", message: "Something went wrong: $e");
+      AlertUtils.showErrorAlert(context,
+          title: "Exception", message: "Something went wrong: $e");
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-   
+  Future<void> logoutUser(BuildContext context) async {
+    final authController = Provider.of<AuthController>(context, listen: false);
+    // int? userId = authController.user?.data?.user.id;
+    String? token = authController.token;
+    if (token != null) {
+      print('from logoutUser() $token');
+      try {
+        _isLoading = true;
+        notifyListeners();
+
+        AlertUtils.showLogoutDialog(
+          context,
+          title: 'Babye :< ',
+          message: 'Are you sure you want to log out?',
+          onConfirmTap: () async {
+            final response = await apiService.postLogout(token);
+            if (response) {}
+
+            Navigator.pushReplacementNamed(
+                context, '/login'); // Example: navigate to login page
+          },
+          onCancelTap: () {
+            Navigator.pop(context);
+          },
+        );
+      } catch (e) {}
+    }
+  }
 }

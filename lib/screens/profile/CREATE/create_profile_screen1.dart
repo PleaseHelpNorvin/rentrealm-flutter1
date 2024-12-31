@@ -6,11 +6,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/controllers/auth_controller.dart';
 import 'package:rentealm_flutter/models/user_model.dart';
-import 'package:rentealm_flutter/screens/profile/create_profile_screen2.dart';
+import 'package:rentealm_flutter/screens/profile/CREATE/create_profile_screen2.dart';
 
-import '../../controllers/auth_controller.dart';
-import '../../controllers/profile_controller.dart';
-import '../../controllers/user_controller.dart';
+import '../../../controllers/auth_controller.dart';
+import '../../../controllers/profile_controller.dart';
+import '../../../controllers/user_controller.dart';
 
 class CreateProfileScreen1 extends StatefulWidget {
   @override

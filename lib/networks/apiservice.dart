@@ -50,6 +50,34 @@ class ApiService {
     }
   }
 
+  Future<bool> postLogout(String token) async {
+    final uri = Uri.parse('${Api.baseUrl}/logout');
+    print("logoutUser() $uri");
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization":
+              "Bearer $token", // Pass the token to authenticate the request
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Logout successful: ${response.body}');
+        return true; // Return true if logout is successful
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return false; // Return false if logout fails
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return false; // Return false if there is an exception
+    }
+  }
+
   Future<UserResponse?> registerUser({
     required String name,
     required String email,
@@ -218,32 +246,41 @@ class ApiService {
     print('From Api call Social Security Number: $socialSecurityNumber');
 
     final uri = Uri.parse('${Api.baseUrl}/tenant/profile/store/$userId');
-    final requestBody = {
-      "phone_number": phoneNumberController,
-      "social_media_links": socialMediaLinkController,
-      "occupation": occupationController,
-      "line_1": line1Controller,
-      "line_2": line1Controller,
-      "province": provinceController,
-      "country": countryController,
-      "postal_code": postalCodeController,
-      "driver_license_number": driverLicenseNumber,
-      "national_id_number": nationalIdNumber,
-      "passport_number": passportNumber,
-      "social_security_number": socialSecurityNumber,
-    };
+    try {
+      final requestBody = {
+        "phone_number": phoneNumberController,
+        "social_media_links": socialMediaLinkController,
+        "occupation": occupationController,
+        "line_1": line1Controller,
+        "line_2": line1Controller,
+        "province": provinceController,
+        "country": countryController,
+        "postal_code": postalCodeController,
+        "driver_license_number": driverLicenseNumber,
+        "national_id_number": nationalIdNumber,
+        "passport_number": passportNumber,
+        "social_security_number": socialSecurityNumber,
+      };
 
-    final response = await http.post(uri,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Bearer $token",
-        },
-        body: jsonEncode(requestBody));
+      final response = await http.post(uri,
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer $token",
+          },
+          body: jsonEncode(requestBody));
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-      print('from ApiService.postProfileData:  $responseData');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print('from ApiService.postProfileData:  $responseData');
+        return UserProfileResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
     }
   }
 }

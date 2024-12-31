@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/components/alert_utils.dart';
@@ -12,21 +14,21 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  
-
   @override
   void initState() {
     super.initState();
-    final profileController = Provider.of<ProfileController>(context, listen: false);
+    final profileController =
+        Provider.of<ProfileController>(context, listen: false);
     profileController.loadUserProfile(context);
   }
-
-  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
         title: const Text('Home Screen'),
       ),
       body: Column(
@@ -35,14 +37,16 @@ class _HomeScreenState extends State<HomeScreen> {
           ProfileCardWidget(),
           // GridView without Expanded as GridView takes care of layout itself
           GridView.builder(
-            padding: const EdgeInsets.fromLTRB(16, 0 , 16 , 16),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2, // Number of columns in the grid
               crossAxisSpacing: 1, // Horizontal spacing between grid items
               mainAxisSpacing: 1, // Vertical spacing between grid items
-              childAspectRatio: 1, // Aspect ratio of grid items (square in this case)
+              childAspectRatio:
+                  1, // Aspect ratio of grid items (square in this case)
             ),
-            itemCount: 2, // Number of items in the grid (now set to 2 for both cards)
+            itemCount:
+                2, // Number of items in the grid (now set to 2 for both cards)
             itemBuilder: (context, index) {
               if (index == 0) {
                 return PaymentCardWidget(); // Display PaymentCardWidget at index 0
@@ -50,8 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 return RentCardWidget(); // Display RentCardWidget at index 1
               }
             },
-            shrinkWrap: true, // Makes GridView take only as much space as needed
-            physics: NeverScrollableScrollPhysics(), // Disable scrolling if needed
+            shrinkWrap:
+                true, // Makes GridView take only as much space as needed
+            physics:
+                NeverScrollableScrollPhysics(), // Disable scrolling if needed
           ),
         ],
       ),
@@ -59,38 +65,36 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class ProfileCardWidget extends StatefulWidget {
-  @override
-  _ProfileCardWidgetState createState() => _ProfileCardWidgetState();
-}
-
-class _ProfileCardWidgetState extends State<ProfileCardWidget> {
-  String name = "John Doe";
-  String email = "johndoe@example.com";
-  String profilePictureUrl =
-      "https://www.w3schools.com/w3images/avatar2.png";
-
-
-  void onNavigatetoCreateProfile1() {
+class ProfileCardWidget extends StatelessWidget {
+  void onNavigatetoCreateProfile1(BuildContext context) {
     print("Profile Card Tapped");
-    Navigator.pushNamed(
-      context,
-      '/createprofile1'
-    );
-    // You can add navigation or other logic here
+    Navigator.pushNamed(context, '/profile');
   }
 
   @override
   Widget build(BuildContext context) {
-    final profileController = Provider.of<ProfileController>(context, listen: false);
-    // final profile = profileController.fetchUserProfile(context, token, userId);
+    final userController = Provider.of<UserController>(context);
+    final profileController = Provider.of<ProfileController>(context);
+    // File? profilePictureFile = profileController.image;
+    String profilePictureFile =
+        profileController.userProfile?.data.profilePictureUrl ??
+            "https://www.w3schools.com/w3images/avatar2.png";
+
+    print('profilePictureFile: $profilePictureFile');
+
+    // final profilePictureUrl = profilePictureFile != null
+    //     ? profilePictureFile.path // Use file path if the File object exists
+    //     : "https://www.w3schools.com/w3images/avatar2.png"; // Default profile picture
+
+    final name = userController.user?.data?.user.name ?? "Loading...";
+    final email = userController.user?.data?.user.email ?? "Loading...";
 
     return ConstrainedBox(
       constraints: BoxConstraints(
         minHeight: 100,
       ),
       child: GestureDetector(
-        onTap: onNavigatetoCreateProfile1,  // Handles the tap
+        onTap: () => onNavigatetoCreateProfile1(context), // Handles the tap
         child: Card(
           elevation: 5,
           margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
@@ -100,9 +104,9 @@ class _ProfileCardWidgetState extends State<ProfileCardWidget> {
               children: <Widget>[
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage(profilePictureUrl),
+                  backgroundImage: NetworkImage(profilePictureFile),
                   onBackgroundImageError: (exception, stackTrace) {
-                    print("Failed to load image");
+                    print("Failed to load image: $exception");
                   },
                 ),
                 SizedBox(width: 20),
@@ -154,7 +158,7 @@ class PaymentCardWidgetState extends State<PaymentCardWidget> {
               Icon(
                 Icons.payment,
                 size: 40,
-                color: Colors.green,
+                color: Colors.blue,
               ),
               SizedBox(height: 10),
             ],

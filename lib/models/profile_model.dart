@@ -2,7 +2,7 @@ import '../models/user_model.dart';
 
 class UserProfile {
   final int userId;
-  final String profilePictureUrl; // Changed from File to String
+  String profilePictureUrl; // Changed from File to String
   final String phoneNumber;
   final String socialMediaLinks;
   final String occupation;
@@ -50,7 +50,7 @@ class UserProfile {
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       userId: int.tryParse(json['user_id'].toString()) ?? 0,
-      profilePictureUrl: json['profile_picture_url'] ?? null,
+      profilePictureUrl: json['profile_picture_url'] ?? '',
       phoneNumber: json['phone_number'],
       socialMediaLinks: json['social_media_links'] ?? '',
       occupation: json['occupation'] ?? '',
@@ -90,7 +90,36 @@ class UserProfileResponse {
     return UserProfileResponse(
       success: json['success'],
       message: json['message'],
-      data: UserProfile.fromJson(json['data']['profile']),
+      data: json['data'] != null && json['data']['profile'] != null
+          ? UserProfile.fromJson(json['data']['profile'])
+          : UserProfile(
+              userId: 0, // Provide a default value for userId
+              profilePictureUrl: '',
+              phoneNumber: '',
+              socialMediaLinks: '',
+              occupation: '',
+              address: '',
+              line_1: '',
+              line_2: '',
+              province: '',
+              country: '',
+              postalCode: '',
+              driverLicenseNumber: '',
+              nationalId: '',
+              passportNumber: '',
+              socialSecurityNumber: '',
+              updatedAt: null,
+              createdAt: null,
+              id: 0,
+            ), // Default UserProfile with fallback values
     );
   }
+
+  // factory UserProfileResponse.fromJson(Map<String, dynamic> json) {
+  //   return UserProfileResponse(
+  //     success: json['success'],
+  //     message: json['message'],
+  //     data: UserProfile.fromJson(json['data']['profile']),
+  //   );
+  // }
 }

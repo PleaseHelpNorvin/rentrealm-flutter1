@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 import 'package:image/image.dart' as img;
@@ -27,12 +28,12 @@ class ProfileController with ChangeNotifier {
 
   void setLoading(bool value) {
     _isLoading = value;
-    // notifyListeners();
+    notifyListeners();
   }
 
   void setUserProfile(UserProfileResponse? profile) {
     _userProfile = profile;
-    // notifyListeners();
+    notifyListeners();
   }
 
   // Function to pick image from camera
@@ -91,11 +92,37 @@ class ProfileController with ChangeNotifier {
       print(
           "File exists: ${await compressedFile.exists()}"); // Check if file exists
     }
-    await apiService.postProfilePicture(
+    final response = await apiService.postProfilePicture(
       token: token,
       userId: userId,
       compressedFile: compressedFile,
     );
+
+    if (response != null && response.success) {
+      // Update user profile with the new picture URL
+      String updatedProfilePictureUrl = response.data.profilePictureUrl;
+
+      // You should update the profileController with the new data
+      // _userProfile?.data.profilePictureUrl = updatedProfilePictureUrl;
+
+      // Notify listeners to update the UI
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _userProfile?.data.profilePictureUrl = updatedProfilePictureUrl;
+
+        // You should update the profileController with the new data
+        setUserProfile(_userProfile);
+
+        AlertUtils.showSuccessAlert(
+          context,
+          title: "Profile Picture Updated",
+          message: "Your profile picture has been updated successfully.",
+        );
+      });
+    } else {
+      AlertUtils.showErrorAlert(context,
+          message: "Failed to update profile picture.");
+    }
+    // await loadUserProfile(context);
   }
 
   Future<void> onCreateUserProfile(
@@ -149,7 +176,7 @@ class ProfileController with ChangeNotifier {
     print('National ID Number: $nationalIdNumber');
     print('Passport Number: $passportNumber');
     print('Social Security Number: $socialSecurityNumber');
-    await apiService.postProfileData(
+    final response = await apiService.postProfileData(
         userId: userId,
         token: token,
         phoneNumberController: phoneNumberController,
@@ -164,6 +191,25 @@ class ProfileController with ChangeNotifier {
         nationalIdNumber: nationalIdNumber,
         passportNumber: passportNumber,
         socialSecurityNumber: socialSecurityNumber);
+
+    if (response != null && response.success) {
+      setUserProfile(response);
+      AlertUtils.showSuccessAlert(
+        context,
+        title: "Profile Created Successfully",
+        message: "Thank You For Creating Profile",
+        onConfirmBtnTap: () {
+          Navigator.pushReplacementNamed(context, '/home');
+        },
+      );
+    } else {
+      setUserProfile(null);
+      AlertUtils.showErrorAlert(context,
+          title: "Its Not You Its Us",
+          message: "Something wrong with the server", onConfirmBtnTap: () {
+        return;
+      });
+    }
   }
 
   /// Load user profile
