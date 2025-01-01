@@ -5,16 +5,19 @@ import 'package:rentealm_flutter/controllers/auth_controller.dart';
 import 'package:rentealm_flutter/controllers/user_controller.dart';
 import './login.dart';
 
-class RegisterScreen extends StatefulWidget{
-
+class RegisterScreen extends StatefulWidget {
   @override
   RegisterScreenState createState() => RegisterScreenState();
 }
 
-class RegisterScreenState extends State<RegisterScreen>{
-  final TextEditingController nameController = TextEditingController(text: 'Norvin Crujido');
-  final TextEditingController emailController = TextEditingController(text: 'test@test.com');
-  final TextEditingController passwordController = TextEditingController(text: 'password');
+class RegisterScreenState extends State<RegisterScreen> {
+  bool _isPasswordVisible = false;
+  final TextEditingController nameController =
+      TextEditingController(text: 'Norvin Crujido');
+  final TextEditingController emailController =
+      TextEditingController(text: 'test@test.com');
+  final TextEditingController passwordController =
+      TextEditingController(text: 'password');
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -24,7 +27,7 @@ class RegisterScreenState extends State<RegisterScreen>{
     // Initialize any state if needed
   }
 
-    @override
+  @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
@@ -76,7 +79,8 @@ class RegisterScreenState extends State<RegisterScreen>{
                       if (value == null || value.isEmpty) {
                         return 'Email is required';
                       }
-                      if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zAZ0-9.-]+\.[a-zA-Z]{2,}$")
+                      if (!RegExp(
+                              r"^[a-zA-Z0-9._%+-]+@[a-zAZ0-9.-]+\.[a-zA-Z]{2,}$")
                           .hasMatch(value)) {
                         return 'Enter a valid email';
                       }
@@ -86,10 +90,24 @@ class RegisterScreenState extends State<RegisterScreen>{
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
+                    obscureText: _isPasswordVisible,
+                    decoration: InputDecoration(
                       labelText: 'Password',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(
+                            () {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            },
+                          );
+                        },
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -131,10 +149,7 @@ class RegisterScreenState extends State<RegisterScreen>{
                   const SizedBox(height: 20),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                          '/login'
-                      );
+                      Navigator.pushNamed(context, '/login');
                     },
                     child: RichText(
                       text: TextSpan(

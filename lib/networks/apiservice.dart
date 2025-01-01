@@ -252,7 +252,7 @@ class ApiService {
         "social_media_links": socialMediaLinkController,
         "occupation": occupationController,
         "line_1": line1Controller,
-        "line_2": line1Controller,
+        "line_2": line2Controller,
         "province": provinceController,
         "country": countryController,
         "postal_code": postalCodeController,
@@ -282,5 +282,137 @@ class ApiService {
       print('Exception: $e');
       return null;
     }
+  }
+
+  Future<UserResponse?> updateUser({
+    required int id,
+    required String token,
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final uri = Uri.parse('${Api.baseUrl}/tenant/user/update/$id');
+    try {
+      final requestBody = {
+        "name": name,
+        "email": email,
+        "password": password,
+      };
+
+      final response = await http.post(uri,
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer $token",
+          },
+          body: jsonEncode(requestBody));
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print('from ApiService.postProfileData:  $responseData');
+        return UserResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
+  Future<UserProfileResponse?> updateUserProfile({
+    required int userId,
+    required String token,
+    required String phoneNumberController,
+    required String socialMediaLinkController,
+    required String occupationController,
+    // required String line1Controller,
+    // required String line2Controller,
+    // required String provinceController,
+    // required String countryController,
+    // required String postalCodeController,
+    // required String driverLicenseNumber,
+    // required String nationalIdNumber,
+    // required String passportNumber,
+    // required String socialSecurityNumber,
+  }) async {
+    print('From updateUserProfile() User_id: $userId');
+    print('From updateUserProfile() token: $token');
+    print('From updateUserProfile() Phone Number: $phoneNumberController');
+    print(
+        'From updateUserProfile() Social Media Link: $socialMediaLinkController');
+    print('From updateUserProfile() Occupation: $occupationController');
+    // print('From updateUserProfile() Line 1 Address: $line1Controller');
+    // print('From updateUserProfile() Line 2 Address: $line2Controller');
+    // print('From updateUserProfile() Province: $provinceController');
+    // print('From updateUserProfile() Country: $countryController');
+    // print(
+    //     'From updateUserProfile() Postal Code Controller: $postalCodeController');
+    // print(
+    //     'From updateUserProfile() Driver License Number: $driverLicenseNumber');
+    // print('From updateUserProfile() National ID Number: $nationalIdNumber');
+    // print('From updateUserProfile() Passport Number: $passportNumber');
+    // print(
+    //     'From updateUserProfile() Social Security Number: $socialSecurityNumber');
+  }
+
+  Future<UserProfileResponse?> updateUserAddress({
+    required int userId,
+    required String token,
+    // required String phoneNumberController,
+    // required String socialMediaLinkController,
+    // required String occupationController,
+    required String line1Controller,
+    required String line2Controller,
+    required String provinceController,
+    required String countryController,
+    required String postalCodeController,
+    // required String driverLicenseNumber,
+    // required String nationalIdNumber,
+    // required String passportNumber,
+    // required String socialSecurityNumber,
+  }) async {
+    print('From updateUserProfile() User_id: $userId');
+    print('From updateUserProfile() token: $token');
+    print('From updateUserProfile() Line 1 Address: $line1Controller');
+    print('From updateUserProfile() Line 2 Address: $line2Controller');
+    print('From updateUserProfile() Province: $provinceController');
+    print('From updateUserProfile() Country: $countryController');
+    print(
+        'From updateUserProfile() Postal Code Controller: $postalCodeController');
+    // print(
+    //     'From updateUserProfile() Driver License Number: $driverLicenseNumber');
+    // print('From updateUserProfile() National ID Number: $nationalIdNumber');
+    // print('From updateUserProfile() Passport Number: $passportNumber');
+    // print(
+    //     'From updateUserProfile() Social Security Number: $socialSecurityNumber');
+  }
+
+  Future<UserProfileResponse?> updateUserIdentification({
+    required int userId,
+    required String token,
+    // required String phoneNumberController,
+    // required String socialMediaLinkController,
+    // required String occupationController,
+    // required String line1Controller,
+    // required String line2Controller,
+    // required String provinceController,
+    // required String countryController,
+    // required String postalCodeController,
+    required String driverLicenseNumber,
+    required String nationalIdNumber,
+    required String passportNumber,
+    required String socialSecurityNumber,
+  }) async {
+    print('From updateUserProfile() User_id: $userId');
+    print('From updateUserProfile() token: $token');
+
+    print(
+        'From updateUserProfile() Driver License Number: $driverLicenseNumber');
+    print('From updateUserProfile() National ID Number: $nationalIdNumber');
+    print('From updateUserProfile() Passport Number: $passportNumber');
+    print(
+        'From updateUserProfile() Social Security Number: $socialSecurityNumber');
   }
 }

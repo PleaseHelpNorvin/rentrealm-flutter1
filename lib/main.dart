@@ -15,6 +15,7 @@ import './screens/profile/UPDATE/edit_identification_screen.dart';
 import 'controllers/user_controller.dart';
 import 'controllers/profile_controller.dart';
 import 'controllers/auth_controller.dart';
+import 'screens/profile/UPDATE/edit_profile_screen.dart';
 import 'screens/profile/profile_screen.dart';
 // import '.';
 
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/createprofile1': (context) => CreateProfileScreen1(),
         '/profile': (context) => ProfileScreen(),
         '/edituser': (context) => EditUserScreen(),
+        '/editprofile': (context) => EditProfileScreen(),
         '/editaddress': (context) => EditAddressScreen(),
         '/editidentification': (context) => EditIdentificationScreen(),
       },

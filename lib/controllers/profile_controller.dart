@@ -262,4 +262,59 @@ class ProfileController with ChangeNotifier {
       setLoading(false);
     }
   }
+
+  Future<void> onUpdateUserAddress(
+    BuildContext context,
+    String line1Controller,
+    String line2Controller,
+    String provinceController,
+    String countryController,
+    String postalCodeController,
+  ) async {
+    final authController = Provider.of<AuthController>(context, listen: false);
+    final userId = authController.user?.data?.user.id ?? 0;
+    final token = authController.token ?? 'no token';
+
+    print('User_id: $userId');
+    print('token: $token');
+    print('Line 1 Address: $line1Controller');
+    print('Line 2 Address: $line2Controller');
+    print('Province: $provinceController');
+    print('Country: $countryController');
+    print('Postal Code Controller: $postalCodeController');
+  }
+
+  Future<void> onUpdateUserProfile(
+    BuildContext context,
+    String phoneNumberController,
+    String socialMediaLinksController,
+    String occupationController,
+  ) async {
+    final authController = Provider.of<AuthController>(context, listen: false);
+    final userId = authController.user?.data?.user.id ?? 0;
+    final token = authController.token ?? 'no token';
+
+    print('User_id: $userId');
+    print('token: $token');
+    print('Phone Number: $phoneNumberController');
+    print('Social Media Links: $socialMediaLinksController');
+    print('Occupation: $occupationController');
+
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final response = await apiService.updateUserProfile(
+        userId: userId,
+        token: token,
+        phoneNumberController: phoneNumberController,
+        socialMediaLinkController: socialMediaLinksController,
+        occupationController: occupationController,
+      );
+    } catch (e) {}
+  }
+
+  Future<void> onUpdateUserIdentifications(
+    BuildContext context,
+  ) async {}
 }

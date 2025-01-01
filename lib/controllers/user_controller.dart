@@ -86,4 +86,33 @@ class UserController with ChangeNotifier {
       } catch (e) {}
     }
   }
+
+  Future<void> onUpdateUser(
+      BuildContext context, String name, String email, String password) async {
+    final authController = Provider.of<AuthController>(context, listen: false);
+
+    final userId = user?.data?.user.id ?? 0;
+    final token = authController.token ?? 'no token';
+
+    print('onUpdateUser(): $token');
+    print('onUpdateUser(): $userId');
+
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final response = await apiService.updateUser(
+        id: userId,
+        token: token,
+        name: name,
+        email: email,
+        password: password,
+      );
+      if (response?.success == true) {
+        print('onUpdateUser: $response');
+      } else {
+        print('onUpdateUser: $response');
+      }
+    } catch (e) {}
+  }
 }

@@ -115,6 +115,16 @@ class ListTilesState extends State<ListTiles> {
             ListTile(
               textColor: Colors.white,
               iconColor: Colors.white,
+              title: Text('Edit User Profile'),
+              trailing: Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.pushNamed(context, '/editprofile');
+              },
+            ),
+            Divider(),
+            ListTile(
+              textColor: Colors.white,
+              iconColor: Colors.white,
               title: Text('Edit Address'),
               trailing: Icon(Icons.arrow_forward_ios),
               onTap: () {
