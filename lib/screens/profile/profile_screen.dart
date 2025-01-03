@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -54,7 +56,8 @@ class ProfilePictureState extends State<ProfilePicture> {
             "https://www.w3schools.com/w3images/avatar2.png";
     final userController = Provider.of<UserController>(context, listen: false);
     String email = userController.user?.data?.user.email ?? 'no name fetched';
-
+    File? profilePicture = profileController.image;
+    print("ProfilePictureState: ${profilePicture?.path}");
     return Column(
       mainAxisAlignment: MainAxisAlignment.center, // Centers content vertically
       children: <Widget>[
@@ -68,9 +71,13 @@ class ProfilePictureState extends State<ProfilePicture> {
           },
           child: CircleAvatar(
             radius: 100.0, // Set the radius of the circle
-            backgroundImage:
-                NetworkImage(profilePictureFile), // Image from assets
+            // backgroundImage:
+                // NetworkImage(profilePictureFile), // Image from assets
+         backgroundImage: profilePicture != null
+        ? FileImage(profilePicture) // Use FileImage if a local file is picked
+        : NetworkImage(profilePictureFile), 
           ),
+
         ),
         SizedBox(height: 10), // Space between the image and the text
         Text(

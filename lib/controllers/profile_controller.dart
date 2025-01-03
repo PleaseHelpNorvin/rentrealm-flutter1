@@ -311,6 +311,16 @@ class ProfileController with ChangeNotifier {
         socialMediaLinkController: socialMediaLinksController,
         occupationController: occupationController,
       );
+
+      if (response != null && response.success) {
+        setUserProfile(response);
+        print('response: $response');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Success Update'))
+        );
+      }else{
+        print('Error: $response');
+      }
     } catch (e) {}
   }
 

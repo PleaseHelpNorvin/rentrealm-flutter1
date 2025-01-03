@@ -80,6 +80,8 @@ class ProfileCardWidget extends StatelessWidget {
         profileController.userProfile?.data.profilePictureUrl ??
             "https://www.w3schools.com/w3images/avatar2.png";
 
+    File? profilePicture = profileController.image;
+
     print('profilePictureFile: $profilePictureFile');
 
     // final profilePictureUrl = profilePictureFile != null
@@ -104,7 +106,9 @@ class ProfileCardWidget extends StatelessWidget {
               children: <Widget>[
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: NetworkImage(profilePictureFile),
+                  backgroundImage: profilePicture != null
+                  ? FileImage(profilePicture!) // Use FileImage if a local file is picked
+                  : NetworkImage(profilePictureFile) as ImageProvider, 
                   onBackgroundImageError: (exception, stackTrace) {
                     print("Failed to load image: $exception");
                   },

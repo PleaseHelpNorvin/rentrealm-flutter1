@@ -75,7 +75,6 @@ class UserController with ChangeNotifier {
           onConfirmTap: () async {
             final response = await apiService.postLogout(token);
             if (response) {}
-
             Navigator.pushReplacementNamed(
                 context, '/login'); // Example: navigate to login page
           },
@@ -108,8 +107,11 @@ class UserController with ChangeNotifier {
         email: email,
         password: password,
       );
+      
       if (response?.success == true) {
+        setUser(response);
         print('onUpdateUser: $response');
+
       } else {
         print('onUpdateUser: $response');
       }

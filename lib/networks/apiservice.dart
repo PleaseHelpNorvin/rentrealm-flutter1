@@ -257,7 +257,8 @@ class ApiService {
         "country": countryController,
         "postal_code": postalCodeController,
         "driver_license_number": driverLicenseNumber,
-        "national_id_number": nationalIdNumber,
+        "national_id": nationalIdNumber,
+        
         "passport_number": passportNumber,
         "social_security_number": socialSecurityNumber,
       };
@@ -309,7 +310,7 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print('from ApiService.postProfileData:  $responseData');
+        print('from ApiService.updateUser:  $responseData');
         return UserResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
@@ -327,15 +328,6 @@ class ApiService {
     required String phoneNumberController,
     required String socialMediaLinkController,
     required String occupationController,
-    // required String line1Controller,
-    // required String line2Controller,
-    // required String provinceController,
-    // required String countryController,
-    // required String postalCodeController,
-    // required String driverLicenseNumber,
-    // required String nationalIdNumber,
-    // required String passportNumber,
-    // required String socialSecurityNumber,
   }) async {
     print('From updateUserProfile() User_id: $userId');
     print('From updateUserProfile() token: $token');
@@ -343,18 +335,37 @@ class ApiService {
     print(
         'From updateUserProfile() Social Media Link: $socialMediaLinkController');
     print('From updateUserProfile() Occupation: $occupationController');
-    // print('From updateUserProfile() Line 1 Address: $line1Controller');
-    // print('From updateUserProfile() Line 2 Address: $line2Controller');
-    // print('From updateUserProfile() Province: $provinceController');
-    // print('From updateUserProfile() Country: $countryController');
-    // print(
-    //     'From updateUserProfile() Postal Code Controller: $postalCodeController');
-    // print(
-    //     'From updateUserProfile() Driver License Number: $driverLicenseNumber');
-    // print('From updateUserProfile() National ID Number: $nationalIdNumber');
-    // print('From updateUserProfile() Passport Number: $passportNumber');
-    // print(
-    //     'From updateUserProfile() Social Security Number: $socialSecurityNumber');
+
+    final uri = Uri.parse('${Api.baseUrl}/tenant/profile/update/$userId');
+    try {
+      final requestBody = {
+        "phone_number" : phoneNumberController,
+        "social_media_links" : socialMediaLinkController,
+        "occupation" : occupationController,
+      };
+
+      final request = await http.post(
+        uri,
+        headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(requestBody)
+      );
+
+      if (request.statusCode == 200 || request.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(request.body);
+        print('from ApiService.updateUserProfile:  $responseData');
+        return UserProfileResponse.fromJson(responseData);
+      } else {
+        print('Error: ${request.statusCode} - ${request.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
   }
 
   Future<UserProfileResponse?> updateUserAddress({
