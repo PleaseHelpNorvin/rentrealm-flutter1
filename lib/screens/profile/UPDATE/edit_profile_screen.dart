@@ -47,7 +47,7 @@ class EditProfileScreenState extends State<EditProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
-        title: Text("Edit Address"),
+        title: Text("Edit User Profile"),
       ),
       body: Column(
         children: <Widget>[
@@ -148,8 +148,8 @@ class FieldWidgetState extends State<FieldWidget> {
                 TextFormField(
                   controller: widget.socialMediaLinksController,
                   decoration: const InputDecoration(
-                    labelText: "new Phone Number",
-                    hintText: "Enter your new Phone Number",
+                    labelText: "new Social Media Links",
+                    hintText: "Enter your new Social Media Links",
                     border: OutlineInputBorder(),
                   ),
                 ),

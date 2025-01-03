@@ -42,46 +42,52 @@ class ProfilePictureState extends State<ProfilePicture> {
   @override
   void initState() {
     super.initState();
-    final profileController =
-        Provider.of<ProfileController>(context, listen: false);
-    profileController.loadUserProfile(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final profileController =
+          Provider.of<ProfileController>(context, listen: false);
+      profileController.loadUserProfile(context);
+    });
+
+    // final profileController =
+    //     Provider.of<ProfileController>(context, listen: false);
+    // profileController.loadUserProfile(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final profileController =
-        Provider.of<ProfileController>(context, listen: false);
-    String profilePictureFile =
+    final profileController = Provider.of<ProfileController>(context);
+    final userController = Provider.of<UserController>(context, listen: false);
+
+    // Get the profile picture URL or fallback to a default image
+    String profilePictureUrl =
         profileController.userProfile?.data.profilePictureUrl ??
             "https://www.w3schools.com/w3images/avatar2.png";
-    final userController = Provider.of<UserController>(context, listen: false);
-    String email = userController.user?.data?.user.email ?? 'no name fetched';
+
+    // Get the email, or use a default value if not available
+    String email = userController.user?.data?.user.email ?? 'no email fetched';
+
+    // Get the profile picture file if it exists
     File? profilePicture = profileController.image;
-    print("ProfilePictureState: ${profilePicture?.path}");
+
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center, // Centers content vertically
+      mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         GestureDetector(
           onTap: () {
-            print("CircleAvatar tapped!");
-            setState(() {
-              profileController.pickImage(context, ImageSource.camera);
-              profileController.loadUserProfile(context);
-            }); // Add your logic here, such as navigation or showing a dialog.
+            profileController.pickImage(context, ImageSource.camera);
+            profileController.loadUserProfile(
+                context); // Ensure user profile is updated after image selection
           },
           child: CircleAvatar(
-            radius: 100.0, // Set the radius of the circle
-            // backgroundImage:
-                // NetworkImage(profilePictureFile), // Image from assets
-         backgroundImage: profilePicture != null
-        ? FileImage(profilePicture) // Use FileImage if a local file is picked
-        : NetworkImage(profilePictureFile), 
+            radius: 100.0,
+            backgroundImage: profilePicture != null
+                ? FileImage(profilePicture)
+                : NetworkImage(profilePictureUrl),
           ),
-
         ),
-        SizedBox(height: 10), // Space between the image and the text
+        SizedBox(height: 10),
         Text(
-          email, // User's name or any other text you want to display
+          email,
           style: TextStyle(
             fontSize: 20.0,
             fontWeight: FontWeight.bold,

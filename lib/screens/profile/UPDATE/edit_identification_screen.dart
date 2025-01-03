@@ -31,6 +31,7 @@ class EditIdentificationScreenState extends State<EditIdentificationScreen> {
     super.initState();
     final profileController =
         Provider.of<ProfileController>(context, listen: false);
+    profileController.loadUserProfile(context);
     final driverLicenseNumber =
         profileController.userProfile?.data.driverLicenseNumber ?? '';
     final nationalIdNumber =
@@ -45,10 +46,10 @@ class EditIdentificationScreenState extends State<EditIdentificationScreen> {
     _passportNumberController.text = passportNumber;
     _socialSecuritySystemNumberController.text = socialSecuritySystemNumber;
 
-    print('editIdentification: $_driverLicenseNumberController');
-    print('editIdentification: $_nationalIdNumberController');
-    print('editIdentification: $_passportNumberController');
-    print('editIdentification: $_socialSecuritySystemNumberController');
+    // print('editIdentification: $_driverLicenseNumberController');
+    // print('editIdentification: $_nationalIdNumberController');
+    // print('editIdentification: $_passportNumberController');
+    // print('editIdentification: $_socialSecuritySystemNumberController');
   }
 
   @override
@@ -80,7 +81,11 @@ class EditIdentificationScreenState extends State<EditIdentificationScreen> {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                if (_formKey.currentState?.validate() ?? false) {
+                  // String
+                }
+              },
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue, // Set text color to white

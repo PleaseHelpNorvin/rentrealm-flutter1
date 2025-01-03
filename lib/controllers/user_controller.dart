@@ -107,11 +107,18 @@ class UserController with ChangeNotifier {
         email: email,
         password: password,
       );
-      
+
       if (response?.success == true) {
         setUser(response);
+        AlertUtils.showSuccessAlert(
+          context,
+          title: "Update Success",
+          message: "your User updated successfully",
+          onConfirmBtnTap: () {
+            Navigator.pushReplacementNamed(context, '/home');
+          },
+        );
         print('onUpdateUser: $response');
-
       } else {
         print('onUpdateUser: $response');
       }
