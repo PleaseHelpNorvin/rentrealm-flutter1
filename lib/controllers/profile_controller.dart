@@ -222,7 +222,7 @@ class ProfileController with ChangeNotifier {
   }
 
   /// Load user profile
-  Future<void> loadUserProfile(BuildContext context) async {
+  Future<bool> loadUserProfile(BuildContext context) async {
     final authController = Provider.of<AuthController>(context, listen: false);
     int? userId = authController.user?.data?.user.id;
     String? token = authController.token;
@@ -230,13 +230,16 @@ class ProfileController with ChangeNotifier {
     if (token != null && userId != null) {
       try {
         await fetchUserProfile(context, token: token, userId: userId);
+        return true;
       } catch (e) {
         print("Error loading user profile: $e");
         AlertUtils.showErrorAlert(context,
             message: "Failed to load user profile.");
       }
+      return false;
     } else {
       AlertUtils.showErrorAlert(context, message: "User not authenticated.");
+      return false;
     }
   }
 

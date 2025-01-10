@@ -89,21 +89,23 @@ class CreateProfileScreenState2 extends State<CreateProfileScreen2> {
                   print("postal code Controller $postalCodeController");
 
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CreateProfileScreen3(
-                              user: widget.user,
-                              phoneNumberController:
-                                  widget.phoneNumberController,
-                              socialMediaLinkController:
-                                  widget.socialMediaLinkController,
-                              occupationController: widget.occupationController,
-                              //address part
-                              line1Controller: line1Controller,
-                              line2Controller: line2Controller,
-                              provinceController: provinceController,
-                              countryController: countryController,
-                              postalCodeController: postalCodeController)));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CreateProfileScreen3(
+                        user: widget.user,
+                        phoneNumberController: widget.phoneNumberController,
+                        socialMediaLinkController:
+                            widget.socialMediaLinkController,
+                        occupationController: widget.occupationController,
+                        //address part
+                        line1Controller: line1Controller,
+                        line2Controller: line2Controller,
+                        provinceController: provinceController,
+                        countryController: countryController,
+                        postalCodeController: postalCodeController,
+                      ),
+                    ),
+                  );
                 }
               },
               style: ElevatedButton.styleFrom(

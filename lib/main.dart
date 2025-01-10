@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/controllers/tenant_controller.dart';
 
 //personal screens
 import './screens/home.dart';
@@ -25,6 +26,8 @@ void main() {
       providers: [
         ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
         ChangeNotifierProvider<UserController>(create: (_) => UserController()),
+        ChangeNotifierProvider<TenantController>(
+            create: (_) => TenantController()),
         ChangeNotifierProvider<ProfileController>(
             create: (_) => ProfileController()),
       ],

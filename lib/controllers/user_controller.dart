@@ -13,9 +13,9 @@ class UserController with ChangeNotifier {
   final ApiService apiService = ApiService();
 
   bool _isLoading = false;
-  UserResponse? _user;
-
   bool get isLoading => _isLoading;
+
+  UserResponse? _user;
   UserResponse? get user => _user;
 
   void setUser(UserResponse? user) {

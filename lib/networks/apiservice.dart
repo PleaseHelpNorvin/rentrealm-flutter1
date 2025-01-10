@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart'; // Import this for MediaType
+import 'package:rentealm_flutter/models/tenant_model.dart';
 import '../models/profile_model.dart';
 import '../apis/api.dart';
 import '../models/profile_model.dart';
@@ -446,5 +447,13 @@ class ApiService {
     print('From updateUserProfile() Passport Number: $passportNumber');
     print(
         'From updateUserProfile() Social Security Number: $socialSecurityNumber');
+  }
+
+  Future<Tenant?> getTenant({
+    required String token,
+    required int? userId,
+  }) async {
+    print('getTenant(): $token');
+    print('getTenant(): $userId');
   }
 }

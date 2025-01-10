@@ -107,8 +107,9 @@ class ProfileCardWidget extends StatelessWidget {
                 CircleAvatar(
                   radius: 50,
                   backgroundImage: profilePicture != null
-                  ? FileImage(profilePicture!) // Use FileImage if a local file is picked
-                  : NetworkImage(profilePictureFile) as ImageProvider, 
+                      ? FileImage(
+                          profilePicture!) // Use FileImage if a local file is picked
+                      : NetworkImage(profilePictureFile) as ImageProvider,
                   onBackgroundImageError: (exception, stackTrace) {
                     print("Failed to load image: $exception");
                   },
