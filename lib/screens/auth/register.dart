@@ -39,7 +39,7 @@ class RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text("Login"),
+        title: const Text("Register"),
       ),
       body: Consumer<AuthController>(
         builder: (context, authController, child) {
@@ -153,13 +153,13 @@ class RegisterScreenState extends State<RegisterScreen> {
                     },
                     child: RichText(
                       text: TextSpan(
-                        text: "Don't have an account? ",
+                        text: "Already have an account? ",
                         style: const TextStyle(
                           color: Colors.black, // Default text color
                         ),
                         children: <TextSpan>[
                           TextSpan(
-                            text: 'Register Here',
+                            text: 'Login Here',
                             style: TextStyle(
                               color: Colors.blue,
                               // decoration: TextDecoration.underline, // Corrected underline
