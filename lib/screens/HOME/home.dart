@@ -12,29 +12,27 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   // You can change this name based on user login data
-  String userName = "User";  
+  String userName = "User";
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ProfileProvider>(context, listen: false)
-        .loadUserProfile(context);
+      Provider.of<ProfileProvider>(context, listen: false);
 
-      Provider.of<UserProvider> (context, listen: false)
-      .fetchUser(context);
-
+      Provider.of<UserProvider>(context, listen: false).fetchUser(context);
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(  // Make the whole body scrollable
+      body: SingleChildScrollView(
+        // Make the whole body scrollable
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, 
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               // Welcome Back Text
               Padding(
@@ -47,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              
+
               // Row of Cards
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -71,12 +69,14 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: 8),
                             Text(
                               'Total Users',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 4),
                             Text(
                               '1,250',
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -98,16 +98,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.shopping_cart, size: 40, color: Colors.green),
+                            Icon(Icons.shopping_cart,
+                                size: 40, color: Colors.green),
                             SizedBox(height: 8),
                             Text(
                               'Total Orders',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                             SizedBox(height: 4),
                             Text(
                               '450',
-                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 24, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
@@ -116,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              
+
               // Card under the Row of Cards (Maintenance Requests Card)
               Card(
                 elevation: 5,
@@ -126,10 +129,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.orange.shade50,
                 child: const SizedBox(
                   width: double.infinity,
-                  height: 1000, // Increased height to 200px
+                  height: 450, // Increased height to 200px
                   child: Padding(
                     padding: EdgeInsets.all(16.0),
-                    child: SingleChildScrollView( // Make content scrollable
+                    child: SingleChildScrollView(
+                      // Make content scrollable
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
@@ -137,7 +141,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           SizedBox(height: 8),
                           Text(
                             'Your Maintenance Requests',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 4),
                           // Static Data for Maintenance Request

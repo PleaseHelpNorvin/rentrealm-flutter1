@@ -5,25 +5,25 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rentealm_flutter/screens/homelogged.dart';
 import '../PROVIDERS/auth_provider.dart';
-
 
 import '../CUSTOMS/alert_utils.dart';
 import '../MODELS/profile_model.dart';
 import '../NETWORKS/apiservice.dart';
 import '../SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
 
-class ProfileProvider extends ChangeNotifier{
+class ProfileProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
   bool _isLoading = false;
   bool get isLoading => _isLoading;
-  
+
   File? _image;
   File? get image => _image;
 
   String? _token;
   String? get token => _token;
-  
+
   UserProfileResponse? _userProfile;
   UserProfileResponse? get userProfile => _userProfile;
 
@@ -41,7 +41,6 @@ class ProfileProvider extends ChangeNotifier{
     _userProfile = profile;
     notifyListeners();
   }
-
 
   Future<void> pickImage(BuildContext context, ImageSource source) async {
     final ImagePicker _picker = ImagePicker();
@@ -209,7 +208,12 @@ class ProfileProvider extends ChangeNotifier{
         title: "Profile Created Successfully",
         message: "Thank You For Creating Profile",
         onConfirmBtnTap: () {
-          Navigator.pushReplacementNamed(context, '/home');
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const HomeLoggedScreen()),
+            );
+          });
         },
       );
     } else {
@@ -221,7 +225,6 @@ class ProfileProvider extends ChangeNotifier{
       });
     }
   }
-
 
   Future<bool> loadUserProfile(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -262,7 +265,8 @@ class ProfileProvider extends ChangeNotifier{
           title: "Profile Not Found",
           message: "Please create your profile first!",
           onConfirmBtnTap: () {
-            Navigator.pushReplacementNamed(context, '/createprofile1'); // Then navigate
+            Navigator.pushReplacementNamed(
+                context, '/createprofile1'); // Then navigate
           },
         );
       }
@@ -316,12 +320,14 @@ class ProfileProvider extends ChangeNotifier{
           title: "Update Success",
           message: "your address updated successfully",
           onConfirmBtnTap: () {
-            Navigator.pop(context); // Go back to ProfileScreen if it was opened via Navigator
+            Navigator.pop(
+                context); // Go back to ProfileScreen if it was opened via Navigator
 
             WidgetsBinding.instance.addPostFrameCallback((_) {
-            // Navigate back to Profile screen
-              Navigator.pop(context);  // This will go back to the previous screen, which is Profile.
-            });   
+              // Navigate back to Profile screen
+              Navigator.pop(
+                  context); // This will go back to the previous screen, which is Profile.
+            });
           },
         );
       } else {}
@@ -376,7 +382,7 @@ class ProfileProvider extends ChangeNotifier{
         print('Error: $response');
       }
     } catch (e) {}
-  } 
+  }
 
   Future<void> onUpdateIdentifications(
     BuildContext context,
@@ -388,14 +394,14 @@ class ProfileProvider extends ChangeNotifier{
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final userId = authProvider.user?.data?.user.id ?? 0;
     final token = authProvider.token ?? 'no token';
-    
+
     try {
       final response = await apiService.updateUserIdentifications(
-        userId: userId, 
-        token: token, 
-        driverLicenseNumber: driverLicenseNumber, 
-        nationalIdNumber: nationalIdNumber, 
-        passportNumber: passportNumber, 
+        userId: userId,
+        token: token,
+        driverLicenseNumber: driverLicenseNumber,
+        nationalIdNumber: nationalIdNumber,
+        passportNumber: passportNumber,
         socialSecurityNumber: socialSecurityNumber,
       );
       if (response != null && response.success) {
@@ -420,6 +426,4 @@ class ProfileProvider extends ChangeNotifier{
       print("Error in onUpdateIdentifications: $e");
     }
   }
-  
-  
 }

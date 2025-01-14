@@ -30,7 +30,10 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
       final token = authProvider.token;
       final userId = authProvider.userId;
 
-      final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+      final profileProvider =
+          // Provider.of<ProfileProvider>(context, listen: false);
+          Provider.of<ProfileProvider>(context, listen: false)
+              .loadUserProfile(context);
 
       if (token != null && userId != null) {
         Provider.of<UserProvider>(context, listen: false).fetchUser(context);
@@ -62,7 +65,9 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
           Widget page;
           switch (settings.name) {
             case '/':
-              page = _currentIndex == 0 ? const HomeScreen() : const ProfileScreen();
+              page = _currentIndex == 0
+                  ? const HomeScreen()
+                  : const ProfileScreen();
               break;
             case '/edituser':
               page = const EditUserScreen();
@@ -77,7 +82,9 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
               page = const EditIdentificationScreen();
               break;
             default:
-              page = _currentIndex == 0 ? const HomeScreen() : const ProfileScreen();
+              page = _currentIndex == 0
+                  ? const HomeScreen()
+                  : const ProfileScreen();
           }
           return MaterialPageRoute(builder: (_) => page);
         },

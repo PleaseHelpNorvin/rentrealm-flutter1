@@ -3,14 +3,16 @@ import 'package:rentealm_flutter/models/user_model.dart';
 import 'create_profile_screen3.dart';
 
 class CreateProfileScreen2 extends StatefulWidget {
-  final UserResponse user;
+  final String userToken;
+  final int userId;
   final String phoneNumberController;
   final String socialMediaLinkController;
   final String occupationController;
 
   CreateProfileScreen2({
     super.key,
-    required this.user,
+    required this.userToken,
+    required this.userId,
     required this.phoneNumberController,
     required this.socialMediaLinkController,
     required this.occupationController,
@@ -58,7 +60,8 @@ class CreateProfileScreenState2 extends State<CreateProfileScreen2> {
                       child: Form(
                         key: _formKey,
                         child: FieldWidget(
-                          user: widget.user,
+                          userId: widget.userId,
+                          userToken: widget.userToken,
                           formKey: _formKey,
                           line1Controller: _line1Controller,
                           line2Controller: _line2Controller,
@@ -92,7 +95,8 @@ class CreateProfileScreenState2 extends State<CreateProfileScreen2> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => CreateProfileScreen3(
-                        user: widget.user,
+                        userId: widget.userId,
+                        userToken: widget.userToken,
                         phoneNumberController: widget.phoneNumberController,
                         socialMediaLinkController:
                             widget.socialMediaLinkController,
@@ -128,7 +132,8 @@ class CreateProfileScreenState2 extends State<CreateProfileScreen2> {
 }
 
 class FieldWidget extends StatefulWidget {
-  final UserResponse user;
+  final String userToken;
+  final int userId;
   final GlobalKey<FormState> formKey;
   final TextEditingController line1Controller;
   final TextEditingController line2Controller;
@@ -138,7 +143,8 @@ class FieldWidget extends StatefulWidget {
 
   const FieldWidget({
     super.key,
-    required this.user,
+    required this.userId,
+    required this.userToken,
     required this.formKey,
     required this.line1Controller,
     required this.line2Controller,

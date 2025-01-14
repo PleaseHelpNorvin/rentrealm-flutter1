@@ -6,7 +6,8 @@ import 'package:rentealm_flutter/models/user_model.dart';
 import '../../../PROVIDERS/profile_provider.dart';
 
 class CreateProfileScreen3 extends StatefulWidget {
-  final UserResponse user;
+  final String userToken;
+  final int userId;
   final String phoneNumberController;
   final String socialMediaLinkController;
   final String occupationController;
@@ -18,7 +19,8 @@ class CreateProfileScreen3 extends StatefulWidget {
 
   CreateProfileScreen3({
     super.key,
-    required this.user,
+    required this.userId,
+    required this.userToken,
     required this.phoneNumberController,
     required this.socialMediaLinkController,
     required this.occupationController,

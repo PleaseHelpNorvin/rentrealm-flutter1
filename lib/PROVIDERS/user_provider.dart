@@ -11,9 +11,9 @@ import '../CUSTOMS/alert_utils.dart';
 // import '../MODELS/user_model.dart';
 
 import '../NETWORKS/apiservice.dart';
-import '../SCREENS/homelogged.dart';
+// import '../SCREENS/homelogged.dart';
 
-class UserProvider extends ChangeNotifier{
+class UserProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -21,39 +21,41 @@ class UserProvider extends ChangeNotifier{
   UserResponse? _user;
   UserResponse? get user => _user;
 
+  String? get userName => _user?.data?.user.name;
+  String? get userEmail => _user?.data?.user.email;
+  String? get userToken => _user?.data?.token;
+
   void setUser(UserResponse? user) {
     _user = user;
     notifyListeners();
   }
 
-
   Future<void> fetchUser(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     int? userId = authProvider.user?.data?.user.id;
     String? token = authProvider.token;
-    
-    if (token != null && userId!= null) {
 
+    if (token != null && userId != null) {
       print("fetchUser(): $userId");
       print("fetchUser(): $token");
-      
-      try {
-      final response = await apiService.getUser(token: token, userId: userId);
 
-      if (response != null && response.success) {
-        setUser(response);
-        print("fetchUser(): ${response.message}");
-      } else {
-        print("Failed to fetch user data");
-        AlertUtils.showErrorAlert(context, message: "Failed to fetch user data");
+      try {
+        final response = await apiService.getUser(token: token, userId: userId);
+
+        if (response != null && response.success) {
+          setUser(response);
+          print("fetchUser(): ${response.message}");
+        } else {
+          print("Failed to fetch user data");
+          AlertUtils.showErrorAlert(context,
+              message: "Failed to fetch user data");
+        }
+      } catch (e) {
+        print("Error: $e");
+        AlertUtils.showErrorAlert(context,
+            title: "Exception", message: "Something went wrong: $e");
       }
-    } catch (e) {
-      print("Error: $e");
-      AlertUtils.showErrorAlert(context, title: "Exception", message: "Something went wrong: $e");
-    }
-    } else {
-      
-    }
+    } else {}
   }
 
   Future<void> logoutUser(BuildContext context) async {
@@ -106,24 +108,26 @@ class UserProvider extends ChangeNotifier{
         password: password,
       );
 
-       if (response?.success == true) {
-      setUser(response);
-      AlertUtils.showSuccessAlert(
-        context,
-        title: "Update Success",
-        message: "Your user updated successfully",
-        onConfirmBtnTap: () {
-          // If you want to navigate to the profile screen after updating:
-          // You can directly use Navigator.pop() to go back to the previous screen
-          Navigator.pop(context); // Go back to ProfileScreen if it was opened via Navigator
+      if (response?.success == true) {
+        setUser(response);
+        AlertUtils.showSuccessAlert(
+          context,
+          title: "Update Success",
+          message: "Your user updated successfully",
+          onConfirmBtnTap: () {
+            // If you want to navigate to the profile screen after updating:
+            // You can directly use Navigator.pop() to go back to the previous screen
+            Navigator.pop(
+                context); // Go back to ProfileScreen if it was opened via Navigator
 
-          // Alternatively, you can directly update the index if using a bottom navigation bar
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            // Navigate back to Profile screen
-            Navigator.pop(context);  // This will go back to the previous screen, which is Profile.
-          });
-        },
-      );
+            // Alternatively, you can directly update the index if using a bottom navigation bar
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              // Navigate back to Profile screen
+              Navigator.pop(
+                  context); // This will go back to the previous screen, which is Profile.
+            });
+          },
+        );
         print('onUpdateUser: $response');
       } else {
         print('onUpdateUser: $response');

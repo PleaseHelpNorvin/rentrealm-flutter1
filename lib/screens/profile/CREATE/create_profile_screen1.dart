@@ -1,24 +1,15 @@
-import 'dart:ui';
+// import 'dart:ui';
 
 import 'package:flutter/material.dart';
-// import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/user_provider.dart';
-// import 'package:rentealm_flutter/controllers/auth_controller.dart';
-
-// import 'package:rentealm_flutter/screens/profile/CREATE/create_profile_screen2.dart';
-
-// import '../../../controllers/auth_controller.dart';
-// import '../../../MODELS/user_model.dart';
-import '../../../MODELS/user_model.dart';
-// import '../../../PROVIDERS/auth_provider.dart';
 // import 'package:rentealm_flutter/MODELS/user_model.dart';
 
-// import '../../../controllers/profile_controller.dart';
+import '../../../PROVIDERS/auth_provider.dart';
 import '../../../PROVIDERS/profile_provider.dart';
-// import '../../../controllers/user_controller.dart';
-// import '../../../PROVIDERS/user_provider.dart';
+
 import 'create_profile_screen2.dart';
 
 class CreateProfileScreen1 extends StatefulWidget {
@@ -38,19 +29,14 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = Provider.of<UserProvider>(context);
-    final user = userProvider.user; // Fetch the logged-in user
+    final authProvider = Provider.of<AuthProvider>(context);
+    final userId = authProvider.userId;
+    final userToken = authProvider.token;
 
-    if (user == null) {
+    if (userToken == null || userId == null) {
       return Center(child: Text("User is not logged in."));
     }
 
-    // print('from profile main widget: ${user.data?.user.id}');
-    // print('from profile main widget: ${user.data?.user.name}');
-    // print('from profile main widget: ${user.data?.user.email}');
-    // print('from profile main widget: ${user.data?.user.role}');
-    // print('from profile main widget: ${user.data?.user.createdAt}');
-    // print('from profile main widget: ${user.data?.token}');
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -66,13 +52,14 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: <Widget>[
-                  PictureWidget(userResponseModel: user),
+                  PictureWidget(userId: userId, userToken: userToken),
                   Padding(
                     padding: const EdgeInsets.all(0),
                     child: Form(
                       key: _formKey, // Pass the form key to FieldWidget
                       child: FieldWidget(
-                        userResponseModel: user,
+                        userId: userId,
+                        userToken: userToken,
                         formKey: _formKey,
                         phoneNumberController: _phoneNumberController,
                         socialMediaLinkController: _socialMediaLinkController,
@@ -99,17 +86,18 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
                   print("Phone number: $phoneNumber");
                   print("Occupation: $occupation");
 
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(
-                  //     builder: (context) => CreateProfileScreen2(
-                  //       user: user,
-                  //       phoneNumberController: phoneNumber,
-                  //       socialMediaLinkController: socialMediaLink,
-                  //       occupationController: occupation,
-                  //     ),
-                  //   ),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CreateProfileScreen2(
+                        userId: userId,
+                        userToken: userToken,
+                        phoneNumberController: phoneNumber,
+                        socialMediaLinkController: socialMediaLink,
+                        occupationController: occupation,
+                      ),
+                    ),
+                  );
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Valid!')),
                   );
@@ -139,10 +127,12 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
 }
 
 class PictureWidget extends StatefulWidget {
-  final UserResponse userResponseModel;
-  
-
-  PictureWidget({required this.userResponseModel});
+  final String userToken;
+  final int userId;
+  PictureWidget({
+    required this.userToken,
+    required this.userId,
+  });
 
   @override
   _PictureWidgetState createState() => _PictureWidgetState();
@@ -153,8 +143,8 @@ class _PictureWidgetState extends State<PictureWidget> {
   Widget build(BuildContext context) {
     final profileProvider = Provider.of<ProfileProvider>(context);
     // print("User token: ${widget.user.data?.token??'no user token'}");
-    print("User ID: ${widget.userResponseModel.data?.user.id}");
-
+    print("User ID: ${widget.userId}");
+    print("user TOKEN: ${widget.userId}");
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -195,7 +185,8 @@ class _PictureWidgetState extends State<PictureWidget> {
 }
 
 class FieldWidget extends StatefulWidget {
-  final UserResponse userResponseModel;
+  final String userToken;
+  final int userId;
   final GlobalKey<FormState> formKey;
   final TextEditingController phoneNumberController;
   final TextEditingController socialMediaLinkController;
@@ -203,7 +194,8 @@ class FieldWidget extends StatefulWidget {
 
   const FieldWidget({
     super.key,
-    required this.userResponseModel,
+    required this.userToken,
+    required this.userId,
     required this.formKey,
     required this.phoneNumberController,
     required this.socialMediaLinkController,
