@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/MODELS/user_model.dart';
+
 // import 'package:rentrealm_flutter2/PROVIDERS/auth_provider.dart';
 // import 'package:rentrealm_flutter2/SCREENS/PROFILE/profile.dart';
 import '../PROVIDERS/auth_provider.dart';
-import '../SCREENS/PROFILE/profile.dart';
+// import '../SCREENS/PROFILE/profile.dart';
 
 import '../CUSTOMS/alert_utils.dart';
-import '../MODELS/user_model.dart';
+// import '../MODELS/user_model.dart';
+
 import '../NETWORKS/apiservice.dart';
 import '../SCREENS/homelogged.dart';
 
 class UserProvider extends ChangeNotifier{
   final ApiService apiService = ApiService();
   bool _isLoading = false;
-  UserResponse? _user;
-
-  UserResponse? get user => _user;
   bool get isLoading => _isLoading;
+
+  UserResponse? _user;
+  UserResponse? get user => _user;
 
   void setUser(UserResponse? user) {
     _user = user;

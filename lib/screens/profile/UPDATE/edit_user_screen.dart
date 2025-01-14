@@ -7,7 +7,7 @@ import '../../../MODELS/user_model.dart';
 import '../../../PROVIDERS/user_provider.dart';
 
 class EditUserScreen extends StatefulWidget {
-  EditUserScreen({
+  const EditUserScreen({
     super.key,
   });
 
@@ -42,6 +42,7 @@ class EditUserScreenState extends State<EditUserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: true,
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         title: Text("Edit User"),

@@ -6,7 +6,7 @@ import '../../../PROVIDERS/profile_provider.dart';
 import '../../../PROVIDERS/user_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  EditProfileScreen({
+  const EditProfileScreen({
     super.key,
   });
 
@@ -44,11 +44,11 @@ class EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text("Edit User Profile"),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text("Edit User Profile"),
+      // ),
       body: Column(
         children: <Widget>[
           Padding(

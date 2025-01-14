@@ -11,6 +11,7 @@ import '../PROVIDERS/auth_provider.dart';
 import '../CUSTOMS/alert_utils.dart';
 import '../MODELS/profile_model.dart';
 import '../NETWORKS/apiservice.dart';
+import '../SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
 
 class ProfileProvider extends ChangeNotifier{
   final ApiService apiService = ApiService();
@@ -261,7 +262,7 @@ class ProfileProvider extends ChangeNotifier{
           title: "Profile Not Found",
           message: "Please create your profile first!",
           onConfirmBtnTap: () {
-            Navigator.pushReplacementNamed(context, '/createprofile1');
+            Navigator.pushReplacementNamed(context, '/createprofile1'); // Then navigate
           },
         );
       }

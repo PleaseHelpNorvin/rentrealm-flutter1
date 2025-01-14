@@ -6,7 +6,7 @@ import '../../../MODELS/user_model.dart';
 import '../../../PROVIDERS/user_provider.dart';
 
 class EditAddressScreen extends StatefulWidget {
-  EditAddressScreen({
+  const EditAddressScreen({
     super.key,
   });
 
@@ -50,11 +50,11 @@ class EditAddressScreenState extends State<EditAddressScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text("Edit Address"),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text("Edit Address"),
+      // ),
       body: Column(
         children: <Widget>[
           Padding(

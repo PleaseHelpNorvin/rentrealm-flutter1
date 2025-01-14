@@ -22,6 +22,7 @@ import './SCREENS/PROFILE/UPDATE/edit_user_screen.dart';
 import 'PROVIDERS/auth_provider.dart';
 import 'PROVIDERS/theme_provider.dart';
 import 'SCREENS/AUTH/register.dart';
+import 'SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
 import 'SCREENS/get_started.dart';
 
 void main() {
@@ -57,7 +58,8 @@ class MyApp extends StatelessWidget {
               '/edituser':(context) => EditUserScreen(),
               '/editprofile':(context) => EditProfileScreen(),
               '/editaddress': (context) => EditAddressScreen(),
-              '/editidentification': (context) =>EditIdentificationScreen()
+              '/editidentification': (context) =>EditIdentificationScreen(),
+              '/createprofile1': (context) => CreateProfileScreen1(),
             },
           );
         },

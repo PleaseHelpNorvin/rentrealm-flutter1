@@ -5,7 +5,7 @@ import '../../../PROVIDERS/profile_provider.dart';
 import '../../../PROVIDERS/user_provider.dart';
 
 class EditIdentificationScreen extends StatefulWidget {
-  EditIdentificationScreen({
+  const EditIdentificationScreen({
     super.key,
   });
 
@@ -49,11 +49,11 @@ class EditIdentificationScreenState extends State<EditIdentificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text("Edit Identifications"),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text("Edit Identifications"),
+      // ),
       body: Column(
         children: <Widget>[
           Padding(

@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../PROVIDERS/user_provider.dart';
 import '../../PROVIDERS/profile_provider.dart';
+import 'UPDATE/edit_user_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -118,6 +119,12 @@ class ListTiles extends StatelessWidget {
               title: const Text('Edit User Data'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(builder: (context) => EditUserScreen()),
+                // );
+                // Navigator.of(context).pushNamed('/edituser');
+
                 Navigator.pushNamed(context, '/edituser');
               },
             ),
