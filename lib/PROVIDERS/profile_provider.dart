@@ -1,28 +1,29 @@
-import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
-import 'package:http_parser/http_parser.dart';
-import 'package:image/image.dart' as img;
-import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:image/image.dart' as img;
 import 'package:provider/provider.dart';
-import '../components/alert_utils.dart';
-import '../controllers/auth_controller.dart';
-import '../models/profile_model.dart';
-import '../networks/apiservice.dart';
+import 'package:path_provider/path_provider.dart';
+import '../PROVIDERS/auth_provider.dart';
 
-class ProfileController with ChangeNotifier {
+
+import '../CUSTOMS/alert_utils.dart';
+import '../MODELS/profile_model.dart';
+import '../NETWORKS/apiservice.dart';
+
+class ProfileProvider extends ChangeNotifier{
   final ApiService apiService = ApiService();
-
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+  
   File? _image;
   File? get image => _image;
 
-  bool _isLoading = false;
+  String? _token;
+  String? get token => _token;
+  
   UserProfileResponse? _userProfile;
-
-  bool get isLoading => _isLoading;
   UserProfileResponse? get userProfile => _userProfile;
 
   void setLoading(bool value) {
@@ -37,11 +38,10 @@ class ProfileController with ChangeNotifier {
 
   void setUserProfile(UserProfileResponse? profile) {
     _userProfile = profile;
-
     notifyListeners();
   }
 
-  // Function to pick image from camera
+
   Future<void> pickImage(BuildContext context, ImageSource source) async {
     final ImagePicker _picker = ImagePicker();
 
@@ -82,9 +82,9 @@ class ProfileController with ChangeNotifier {
 
   Future<void> sendProfilePicture(
       BuildContext context, File compressedFile) async {
-    final authController = Provider.of<AuthController>(context, listen: false);
-    int? userId = authController.user?.data?.user.id;
-    String? token = authController.token;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    int? userId = authProvider.user?.data?.user.id;
+    String? token = authProvider.token;
 
     // Check if token and userId are null
     if (userId == null || token == null) {
@@ -145,9 +145,9 @@ class ProfileController with ChangeNotifier {
       String countryController,
       String postalCodeController,
       List<Map<String, dynamic>> identificationData) async {
-    final authController = Provider.of<AuthController>(context, listen: false);
-    int? userId = authController.user?.data?.user.id;
-    String? token = authController.token;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    int? userId = authProvider.user?.data?.user.id;
+    String? token = authProvider.token;
     String? driverLicenseNumber;
     String? nationalIdNumber;
     String? passportNumber;
@@ -221,11 +221,11 @@ class ProfileController with ChangeNotifier {
     }
   }
 
-  /// Load user profile
+
   Future<bool> loadUserProfile(BuildContext context) async {
-    final authController = Provider.of<AuthController>(context, listen: false);
-    int? userId = authController.user?.data?.user.id;
-    String? token = authController.token;
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    int? userId = authProvider.user?.data?.user.id;
+    String? token = authProvider.token;
 
     if (token != null && userId != null) {
       try {
@@ -243,7 +243,6 @@ class ProfileController with ChangeNotifier {
     }
   }
 
-  /// Fetch user profile data
   Future<void> fetchUserProfile(context,
       {required String token, required int userId}) async {
     try {
@@ -275,53 +274,6 @@ class ProfileController with ChangeNotifier {
     }
   }
 
-  Future<void> onUpdateUserProfile(
-    BuildContext context,
-    String phoneNumberController,
-    String socialMediaLinksController,
-    String occupationController,
-  ) async {
-    final authController = Provider.of<AuthController>(context, listen: false);
-    final userId = authController.user?.data?.user.id ?? 0;
-    final token = authController.token ?? 'no token';
-
-    print('User_id: $userId');
-    print('token: $token');
-    print('Phone Number: $phoneNumberController');
-    print('Social Media Links: $socialMediaLinksController');
-    print('Occupation: $occupationController');
-
-    try {
-      _isLoading = true;
-      notifyListeners();
-
-      final response = await apiService.updateUserProfile(
-        userId: userId,
-        token: token,
-        phoneNumberController: phoneNumberController,
-        socialMediaLinkController: socialMediaLinksController,
-        occupationController: occupationController,
-      );
-
-      if (response != null && response.success) {
-        setUserProfile(response);
-
-        // await loadUserProfile(context);
-        AlertUtils.showSuccessAlert(
-          context,
-          title: "Update Success",
-          message: "your Profile updated successfully",
-          onConfirmBtnTap: () {
-            Navigator.pushReplacementNamed(context, '/home');
-          },
-        );
-        print('response: $response');
-      } else {
-        print('Error: $response');
-      }
-    } catch (e) {}
-  }
-
   Future<void> onUpdateUserAddress(
     BuildContext context,
     String line1Controller,
@@ -330,9 +282,9 @@ class ProfileController with ChangeNotifier {
     String countryController,
     String postalCodeController,
   ) async {
-    final authController = Provider.of<AuthController>(context, listen: false);
-    final userId = authController.user?.data?.user.id ?? 0;
-    final token = authController.token ?? 'no token';
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userId = authProvider.user?.data?.user.id ?? 0;
+    final token = authProvider.token ?? 'no token';
 
     // print('User_id: $userId');
     // print('token: $token');
@@ -363,14 +315,110 @@ class ProfileController with ChangeNotifier {
           title: "Update Success",
           message: "your address updated successfully",
           onConfirmBtnTap: () {
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pop(context); // Go back to ProfileScreen if it was opened via Navigator
+
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+            // Navigate back to Profile screen
+              Navigator.pop(context);  // This will go back to the previous screen, which is Profile.
+            });   
           },
         );
       } else {}
     } catch (e) {}
   }
 
-  Future<void> onUpdateUserIdentifications(
+  Future<void> onUpdateUserProfile(
     BuildContext context,
-  ) async {}
+    String phoneNumberController,
+    String socialMediaLinksController,
+    String occupationController,
+  ) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userId = authProvider.user?.data?.user.id ?? 0;
+    final token = authProvider.token ?? 'no token';
+
+    print('User_id: $userId');
+    print('token: $token');
+    print('Phone Number: $phoneNumberController');
+    print('Social Media Links: $socialMediaLinksController');
+    print('Occupation: $occupationController');
+
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      final response = await apiService.updateUserProfile(
+        userId: userId,
+        token: token,
+        phoneNumberController: phoneNumberController,
+        socialMediaLinkController: socialMediaLinksController,
+        occupationController: occupationController,
+      );
+
+      if (response != null && response.success) {
+        setUserProfile(response);
+
+        // await loadUserProfile(context);
+        AlertUtils.showSuccessAlert(
+          context,
+          title: "Update Success",
+          message: "your Profile updated successfully",
+          onConfirmBtnTap: () {
+            Navigator.pop(context);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pop(context);
+            });
+          },
+        );
+        print('response: $response');
+      } else {
+        print('Error: $response');
+      }
+    } catch (e) {}
+  } 
+
+  Future<void> onUpdateIdentifications(
+    BuildContext context,
+    String driverLicenseNumber,
+    String nationalIdNumber,
+    String passportNumber,
+    String socialSecurityNumber,
+  ) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userId = authProvider.user?.data?.user.id ?? 0;
+    final token = authProvider.token ?? 'no token';
+    
+    try {
+      final response = await apiService.updateUserIdentifications(
+        userId: userId, 
+        token: token, 
+        driverLicenseNumber: driverLicenseNumber, 
+        nationalIdNumber: nationalIdNumber, 
+        passportNumber: passportNumber, 
+        socialSecurityNumber: socialSecurityNumber,
+      );
+      if (response != null && response.success) {
+        setUserProfile(response);
+        AlertUtils.showSuccessAlert(
+          context,
+          title: "Update Success",
+          message: "your Identificaitons updated successfully",
+          onConfirmBtnTap: () {
+            Navigator.pop(context);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pop(context);
+            });
+          },
+        );
+        print('response: $response');
+      } else {
+        print('response: $response');
+      }
+    } catch (e) {
+      // Catch any error and print it to the console.
+      print("Error in onUpdateIdentifications: $e");
+    }
+  }
+  
+  
 }

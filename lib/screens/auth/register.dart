@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 // import 'package:flutter/src/foundation/diagnostics.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/controllers/auth_controller.dart';
-import 'package:rentealm_flutter/controllers/user_controller.dart';
-import './login.dart';
+import '../../PROVIDERS/auth_provider.dart';
+// import 'package:rentealm_flutter/controllers/user_controller.dart';
+import 'login.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -41,8 +41,8 @@ class RegisterScreenState extends State<RegisterScreen> {
         automaticallyImplyLeading: false,
         title: const Text("Register"),
       ),
-      body: Consumer<AuthController>(
-        builder: (context, authController, child) {
+      body: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Form(
@@ -121,12 +121,12 @@ class RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 40),
                   ElevatedButton(
-                    onPressed: authController.isLoading
+                    onPressed: authProvider.isLoading
                         ? null // Disable button if loading
                         : () {
                             if (_formKey.currentState!.validate()) {
                               // Call loginUser method from provider with email and password
-                              authController.registerUser(
+                              authProvider.registerUser(
                                 name: nameController.text,
                                 email: emailController.text,
                                 password: passwordController.text,
@@ -142,7 +142,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                       ),
                       foregroundColor: Colors.white,
                     ),
-                    child: authController.isLoading
+                    child: authProvider.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text("Submit Register"),
                   ),

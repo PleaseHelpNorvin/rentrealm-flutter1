@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:provider/provider.dart'; // Import provider
-import 'package:rentealm_flutter/controllers/auth_controller.dart';
+import '../../PROVIDERS/auth_provider.dart';
 // import '../../components/alertutils.dart';
 // import '../../utils/https.dart';
-import './register.dart';
-import '../../controllers/user_controller.dart';
-import '../home.dart';
 // import '../providers/user_provider.dart'; // Import the UserProvider
 
 class LoginScreen extends StatefulWidget {
@@ -45,8 +42,8 @@ class _LoginScreenState extends State<LoginScreen> {
         automaticallyImplyLeading: false,
         title: const Text("Login"),
       ),
-      body: Consumer<AuthController>(
-        builder: (context, authController, child) {
+      body: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
             child: Form(
@@ -109,15 +106,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
                   ElevatedButton(
-                    onPressed: authController.isLoading
+                    onPressed: authProvider.isLoading
                         ? null // Disable button if loading
                         : () {
                             if (_formKey.currentState!.validate()) {
                               // Call loginUser method from provider with email and password
-                              authController.loginUser(
+                              authProvider.loginUser(
                                 email: emailController.text,
                                 password: passwordController.text,
-                                context: context,
+                                context: context
                               );
                             }
                           },
@@ -129,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       foregroundColor: Colors.white,
                     ),
-                    child: authController.isLoading
+                    child: authProvider.isLoading
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text("Login"),
                   ),
@@ -139,9 +136,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.pushNamed(context, '/register');
                     },
                     child: RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         text: "Don't have an account? ",
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.black, // Default text color
                         ),
                         children: <TextSpan>[

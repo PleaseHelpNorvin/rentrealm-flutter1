@@ -1,4 +1,7 @@
-import '../models/user_model.dart';
+// import 'user_model.dart';
+
+// import '../MODELS/user_model.dart';
+
 
 class UserProfile {
   final int userId;

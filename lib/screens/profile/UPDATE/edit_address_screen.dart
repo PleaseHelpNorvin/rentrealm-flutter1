@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/controllers/profile_controller.dart';
-import 'package:rentealm_flutter/models/user_model.dart';
-
-import '../../../controllers/user_controller.dart';
+import '../../../PROVIDERS/profile_provider.dart';
+// import 'package:rentealm_flutter/models/user_model.dart';
+import '../../../MODELS/user_model.dart';
+import '../../../PROVIDERS/user_provider.dart';
 
 class EditAddressScreen extends StatefulWidget {
   EditAddressScreen({
@@ -26,13 +26,13 @@ class EditAddressScreenState extends State<EditAddressScreen> {
   @override
   void initState() {
     super.initState();
-    final profileController =
-        Provider.of<ProfileController>(context, listen: false);
-    final line1 = profileController.userProfile?.data.line_1 ?? '';
-    final line2 = profileController.userProfile?.data.line_2 ?? '';
-    final province = profileController.userProfile?.data.province ?? '';
-    final country = profileController.userProfile?.data.country ?? '';
-    final postalCode = profileController.userProfile?.data.postalCode ?? '';
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
+    final line1 = profileProvider.userProfile?.data.line_1 ?? '';
+    final line2 = profileProvider.userProfile?.data.line_2 ?? '';
+    final province = profileProvider.userProfile?.data.province ?? '';
+    final country = profileProvider.userProfile?.data.country ?? '';
+    final postalCode = profileProvider.userProfile?.data.postalCode ?? '';
 
     _line1Controller.text = line1;
     _line2Controller.text = line2;
@@ -76,7 +76,8 @@ class EditAddressScreenState extends State<EditAddressScreen> {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: ElevatedButton(
-              onPressed: () {
+              
+              onPressed: () async {
                 if (_formKey.currentState?.validate() ?? false) {
                   String line1Controller = _line1Controller.text.trim();
                   String line2Controller = _line2Controller.text.trim();
@@ -85,9 +86,9 @@ class EditAddressScreenState extends State<EditAddressScreen> {
                   String postalCodeController =
                       _postalCodeController.text.trim();
 
-                  final profileController =
-                      Provider.of<ProfileController>(context, listen: false);
-                  profileController.onUpdateUserAddress(
+                  final profileProvider =
+                      Provider.of<ProfileProvider>(context, listen: false);
+                  profileProvider.onUpdateUserAddress(
                     context,
                     line1Controller,
                     line2Controller,
