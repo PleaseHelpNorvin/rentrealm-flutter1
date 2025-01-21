@@ -41,12 +41,12 @@ class EditUserScreenState extends State<EditUserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text("Edit User"),
-      ),
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: true,
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text("Edit User"),
+      // ),
       body: Column(
         children: <Widget>[
           Padding(
