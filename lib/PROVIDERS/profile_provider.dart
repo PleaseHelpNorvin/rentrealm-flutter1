@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rentealm_flutter/screens/HOME/home.dart';
 import 'package:rentealm_flutter/screens/homelogged.dart';
 import '../PROVIDERS/auth_provider.dart';
 
@@ -12,6 +13,7 @@ import '../CUSTOMS/alert_utils.dart';
 import '../MODELS/profile_model.dart';
 import '../NETWORKS/apiservice.dart';
 import '../SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
+import '../SCREENS/PROFILE/profile.dart';
 
 class ProfileProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
@@ -44,16 +46,15 @@ class ProfileProvider extends ChangeNotifier {
 
   Future<void> pickImage(BuildContext context, ImageSource source) async {
     final ImagePicker _picker = ImagePicker();
-
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+
     if (pickedFile != null) {
       _image = File(pickedFile.path);
       notifyListeners();
+
       setImage(_image);
       print("picked Image : $_image");
-      // Notify UI to update when the image is picked
-      // You can perform image compression and send it here if needed
-      // await compressAndSendImage(_image!);
+
       File compressedFile =
           await imageCompression(context, File(pickedFile.path));
       sendProfilePicture(context, compressedFile);
@@ -266,7 +267,8 @@ class ProfileProvider extends ChangeNotifier {
           message: "Please create your profile first!",
           onConfirmBtnTap: () {
             Navigator.pushReplacementNamed(
-                context, '/createprofile1'); // Then navigate
+              context, '/createprofile1'
+            ); // Then navigate
           },
         );
       }
@@ -291,14 +293,6 @@ class ProfileProvider extends ChangeNotifier {
     final userId = authProvider.user?.data?.user.id ?? 0;
     final token = authProvider.token ?? 'no token';
 
-    // print('User_id: $userId');
-    // print('token: $token');
-    // print('Line 1 Address: $line1Controller');
-    // print('Line 2 Address: $line2Controller');
-    // print('Province: $provinceController');
-    // print('Country: $countryController');
-    // print('Postal Code Controller: $postalCodeController');
-
     try {
       _isLoading = true;
       notifyListeners();
@@ -318,20 +312,16 @@ class ProfileProvider extends ChangeNotifier {
         AlertUtils.showSuccessAlert(
           context,
           title: "Update Success",
-          message: "your address updated successfully",
-          onConfirmBtnTap: () {
-            Navigator.pop(
-                context); // Go back to ProfileScreen if it was opened via Navigator
-
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              // Navigate back to Profile screen
-              Navigator.pop(
-                  context); // This will go back to the previous screen, which is Profile.
-            });
-          },
+          message: "Your address was updated successfully",
+          
         );
-      } else {}
-    } catch (e) {}
+      } else {
+        // Handle any errors or unsuccessful response
+      }
+    } catch (e) {
+      // Handle error
+      print('Error updating user address: $e');
+    }
   }
 
   Future<void> onUpdateUserProfile(
@@ -410,12 +400,7 @@ class ProfileProvider extends ChangeNotifier {
           context,
           title: "Update Success",
           message: "your Identificaitons updated successfully",
-          onConfirmBtnTap: () {
-            Navigator.pop(context);
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pop(context);
-            });
-          },
+
         );
         print('response: $response');
       } else {

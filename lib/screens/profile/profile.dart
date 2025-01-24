@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../PROVIDERS/user_provider.dart';
 import '../../PROVIDERS/profile_provider.dart';
 import 'UPDATE/edit_user_screen.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -56,9 +58,13 @@ class _ProfilePictureState extends State<ProfilePicture> {
         "https://www.w3schools.com/w3images/avatar2.png";
 
     String email = userController.user?.data?.user.email ?? 'No email fetched';
-    String address = profileController.userProfile?.data.address ?? 'No address fetched';
+    String address = profileController.userProfile?.data.address != null
+    ? '${profileController.userProfile?.data.address.line1}, ${profileController.userProfile?.data.address.line2}, ${profileController.userProfile?.data.address.province}, ${profileController.userProfile?.data.address.country}, ${profileController.userProfile?.data.address.postalCode}'
+    : 'No address available';
 
     File? profilePicture = profileController.image;
+    bool isLoading = profileController.isLoading;
+
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -71,7 +77,11 @@ class _ProfilePictureState extends State<ProfilePicture> {
             radius: 100.0,
             backgroundImage: profilePicture != null
                 ? FileImage(profilePicture)
-                : NetworkImage(profilePictureUrl) as ImageProvider,
+                : CachedNetworkImageProvider(profilePictureUrl),
+                // : NetworkImage(profilePictureUrl),
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())  // Show loading spinner
+                : null,
           ),
         ),
         const SizedBox(height: 10),

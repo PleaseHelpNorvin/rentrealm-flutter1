@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:quickalert/quickalert.dart';
 
+import '../SCREENS/homelogged.dart';
+
 class AlertUtils {
   // Success Alert
-  static void showSuccessAlert(BuildContext context,
+   static void showSuccessAlert(BuildContext context,
       {String? title, String? message, VoidCallback? onConfirmBtnTap}) {
     QuickAlert.show(
       context: context,
       type: QuickAlertType.success,
       title: title ?? 'Success',
       text: message ?? 'Operation completed successfully!',
-      onConfirmBtnTap: onConfirmBtnTap,
+      onConfirmBtnTap: () {
+        // Ensure that Navigator pops from the correct context
+        Navigator.of(context, rootNavigator: true).pop(); // Ensure using rootNavigator to pop dialogs
+      if (onConfirmBtnTap != null) {
+          onConfirmBtnTap(); // Execute the provided callback
+      }
+
+      },
     );
   }
 
@@ -22,7 +31,12 @@ class AlertUtils {
       type: QuickAlertType.error,
       title: title ?? 'Error',
       text: message ?? 'Something went wrong!',
-      onConfirmBtnTap: onConfirmBtnTap,
+       onConfirmBtnTap: () {
+        Navigator.of(context).pop(); // Close the dialog
+        if (onConfirmBtnTap != null) {
+          onConfirmBtnTap(); // Execute additional logic if provided
+        }
+      },
     );
   }
 
@@ -34,7 +48,12 @@ class AlertUtils {
       type: QuickAlertType.info,
       title: title ?? 'Information',
       text: message ?? 'Here is some information!',
-      onConfirmBtnTap: onConfirmBtnTap,
+       onConfirmBtnTap: () {
+        Navigator.of(context).pop(); // Close the dialog
+        if (onConfirmBtnTap != null) {
+          onConfirmBtnTap(); // Execute additional logic if provided
+        }
+      },
     );
   }
 
@@ -46,7 +65,12 @@ class AlertUtils {
       type: QuickAlertType.warning,
       title: title ?? 'Warning',
       text: message ?? 'Please be cautious!',
-      onConfirmBtnTap: onConfirmBtnTap,
+       onConfirmBtnTap: () {
+        Navigator.of(context).pop(); // Close the dialog
+        if (onConfirmBtnTap != null) {
+          onConfirmBtnTap(); // Execute additional logic if provided
+        }
+      },
     );
   }
 

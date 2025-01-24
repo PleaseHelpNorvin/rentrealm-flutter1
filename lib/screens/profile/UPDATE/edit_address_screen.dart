@@ -4,6 +4,7 @@ import '../../../PROVIDERS/profile_provider.dart';
 // import 'package:rentealm_flutter/models/user_model.dart';
 import '../../../MODELS/user_model.dart';
 import '../../../PROVIDERS/user_provider.dart';
+import '../../../MODELS/address_model.dart';
 
 class EditAddressScreen extends StatefulWidget {
   const EditAddressScreen({
@@ -28,17 +29,29 @@ class EditAddressScreenState extends State<EditAddressScreen> {
     super.initState();
     final profileProvider =
         Provider.of<ProfileProvider>(context, listen: false);
-    final line1 = profileProvider.userProfile?.data.line_1 ?? '';
-    final line2 = profileProvider.userProfile?.data.line_2 ?? '';
-    final province = profileProvider.userProfile?.data.province ?? '';
-    final country = profileProvider.userProfile?.data.country ?? '';
-    final postalCode = profileProvider.userProfile?.data.postalCode ?? '';
+    // Extract address information correctly from the profile
+    
+    final address = profileProvider.userProfile?.data?.address ?? Address(
+      line1: '',
+      line2: '',
+      province: '',
+      country: '',
+      postalCode: '',
+    );
+        
 
-    _line1Controller.text = line1;
-    _line2Controller.text = line2;
-    _provinceController.text = province;
-    _countryController.text = country;
-    _postalCodeController.text = postalCode;
+    // final line1 = profileProvider.userProfile?.data.line_1 ?? '';
+    // final line2 = profileProvider.userProfile?.data.line_2 ?? '';
+    // final province = profileProvider.userProfile?.data.province ?? '';
+    // final country = profileProvider.userProfile?.data.country ?? '';
+    // final postalCode = profileProvider.userProfile?.data.postalCode ?? '';
+    
+
+    _line1Controller.text = address.line1;
+    _line2Controller.text = address.line2;
+    _provinceController.text = address.province;
+    _countryController.text = address.country;
+    _postalCodeController.text = address.postalCode;
 
     print('editAddressScreen: $_line1Controller');
     print('editAddressScreen: $_line2Controller');
