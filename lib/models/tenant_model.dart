@@ -65,3 +65,46 @@ class Tenant {
     );
   }
 }
+
+
+class TenantResponse {
+  final bool success;
+  final String message;
+  final Tenant data;
+
+  TenantResponse({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  factory TenantResponse.fromJson(Map<String, dynamic> json) {
+    return TenantResponse(
+      success: json['success'],
+      message: json ['message'],
+      data: json['data'] != null && json['data']['tenant'] != null 
+          ? Tenant.fromJson(json['data']['tenant'])
+          : Tenant(
+            id: 0, // Default values for missing tenant data
+            profileId: 0,
+            roomId: 0,
+            rentalAgreementId: 0,
+            startDate: '',
+            endDate: '',
+            rentPrice: '',
+            deposit: '',
+            paymentStatus: '',
+            status: '',
+            emergencyContactName: '',
+            emergencyContactPhone: '',
+            hasPets: false,
+            wifiEnabled: false,
+            hasLaundryAccess: false,
+            hasPrivateFridge: false,
+            hasTv: false,
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          )
+    );
+  }
+}
