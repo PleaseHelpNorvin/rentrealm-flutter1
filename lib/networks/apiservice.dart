@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:rentealm_flutter/models/tenant_model.dart';
 
 
 import '../API/rest.dart';
@@ -469,4 +471,38 @@ class ApiService {
       return null;
     }
   }
+
+Future<TenantResponse?> getTenant({
+    required int profileId,
+    required String token,
+}) async {
+  print("getTenant(): token $token");
+  print("getTenant(): profile id $profileId");
+
+  final uri = Uri.parse('$rest/tenant/tenant/showbyprofile_id/$profileId');
+
+  try {
+    final response = await http.get(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      print("responseData from getTenant Call: $responseData");
+      return TenantResponse.fromJson(responseData);  // Corrected this line
+    } else if (response.statusCode == 404){
+      print('Error: ${response.statusCode} - ${response.body}');
+      print('navigating to create tenant screen');
+      return null;
+    }
+  } catch (e) {
+    print('Exception: $e');
+    return null;
+  }
+}
 }

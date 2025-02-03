@@ -1,3 +1,5 @@
+import './address_model.dart';
+
 class PropertyResponse {
   final bool success;
   final String message;
@@ -9,8 +11,78 @@ class PropertyResponse {
     required this.data
   });
 
+  factory PropertyResponse.fromJson(Map<String, dynamic> json) {
+    return PropertyResponse(
+      success: json['success'] ?? false, 
+      message: json['message'] ?? '' , 
+      data: json['data'] != null && json['data']['properties'] != null
+      ? Property.fromJson(json['data']['properties'])
+      : Property(
+        id: 0, 
+        name: '', 
+        propertyPictureUrl: '', 
+        genderAllowed: '', 
+        petsAllowed: false, 
+        type: '', 
+        status: '', 
+        createdAt: '',
+        updatedAt: '', 
+        address: Address(
+          line1: '',
+          line2: '',
+          province: '',
+          country: '',
+          postalCode: '',
+        )
+      )
+    );
+  }
+
 }
 
 class Property {
-  
+  final int id;
+  final String name;
+  String propertyPictureUrl;
+  final String genderAllowed;
+  final bool petsAllowed;
+  final String type;
+  final String status;
+  final String createdAt;
+  final String updatedAt;  
+  final Address address;
+
+  Property({
+    required this.id,
+    required this.name,
+    required this.propertyPictureUrl,
+    required this.genderAllowed,
+    required this.petsAllowed,
+    required this.type,
+    required this.status,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.address,
+  });
+
+  factory Property.fromJson(Map<String, dynamic> json) {
+    return Property(
+      id: json['id'],
+      name: json['name'] ?? '',
+      propertyPictureUrl: json['property_picture_url'] ?? '',
+      genderAllowed: json['gender_allowed'] ?? '',
+      petsAllowed: json['pets_allowed'] == 1,
+      type: json['type'] ?? '',
+      status: json['status'] ?? '',
+      createdAt: json['created_at'] ?? '',
+      updatedAt: json['updated_at'],
+        address: json['address'] != null ? Address.fromJson(json['address']) : Address(
+        line1: '',
+        line2: '',
+        province: '',
+        country: '',
+        postalCode: '',
+      ), // Default Address if null
+    );
+  }
 }

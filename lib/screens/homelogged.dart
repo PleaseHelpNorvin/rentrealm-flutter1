@@ -2,6 +2,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
 import 'package:rentealm_flutter/SCREENS/PROFILE/UPDATE/edit_address_screen.dart';
 import 'package:rentealm_flutter/screens/CONTRACT/contract.dart';
 import 'package:rentealm_flutter/screens/RENT/rent.dart';
@@ -31,11 +32,17 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.token;
       final userId = authProvider.userId;
-
+  
       final profileProvider =
           // Provider.of<ProfileProvider>(context, listen: false);
           Provider.of<ProfileProvider>(context, listen: false)
               .loadUserProfile(context);
+
+              
+
+
+      Provider.of<TenantProvider>(context, listen: false)
+      .fetchTenant(context);
 
       if (token != null && userId != null) {
         Provider.of<UserProvider>(context, listen: false).fetchUser(context);

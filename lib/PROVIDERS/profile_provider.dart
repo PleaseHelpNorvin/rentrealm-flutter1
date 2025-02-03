@@ -26,6 +26,9 @@ class ProfileProvider extends ChangeNotifier {
   String? _token;
   String? get token => _token;
 
+  // int? _profileId;
+  // int? get profileId => _profileId;
+
   UserProfileResponse? _userProfile;
   UserProfileResponse? get userProfile => _userProfile;
 

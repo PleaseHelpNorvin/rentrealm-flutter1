@@ -53,7 +53,8 @@ class UserProvider extends ChangeNotifier {
       } catch (e) {
         print("Error: $e");
         AlertUtils.showErrorAlert(context,
-            title: "Exception", message: "Something went wrong: $e");
+          title: "Exception", message: "Something went wrong: $e"
+        );
       }
     } else {}
   }

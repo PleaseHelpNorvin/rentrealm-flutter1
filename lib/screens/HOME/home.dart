@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../PROVIDERS/profile_provider.dart';
+import '../../PROVIDERS/tenant_provider.dart';
 import '../../PROVIDERS/user_provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -20,7 +21,11 @@ class _HomeScreenState extends State<HomeScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<ProfileProvider>(context, listen: false);
 
+      // Provider.of<TenantProvider>(context, listen: false)
+      // .fetchTenant(context);
+
       Provider.of<UserProvider>(context, listen: false).fetchUser(context);
+
     });
   }
 
