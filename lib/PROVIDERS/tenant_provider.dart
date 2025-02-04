@@ -16,14 +16,16 @@ class TenantProvider extends ChangeNotifier {
   TenantResponse? _tenant; // Nullable type here
   TenantResponse? get tenant => _tenant;
 
-  void setTenant(TenantResponse? tenant) { // Nullable type here
+  void setTenant(TenantResponse? tenant) {
+    // Nullable type here
     _tenant = tenant;
     notifyListeners();
   }
 
   Future<void> fetchTenant(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
     int? profileId = profileProvider.userProfile?.data.id;
     String? token = authProvider.token;
 
@@ -32,23 +34,24 @@ class TenantProvider extends ChangeNotifier {
       print("fetchTenant(): token: $token");
 
       // try {
-        // _isLoading = true;
-        // notifyListeners();
+      // _isLoading = true;
+      // notifyListeners();
 
-        // Make API call
-        final response = await apiService.getTenant(profileId: profileId, token: token);
+      // Make API call
+      final response =
+          await apiService.getTenant(profileId: profileId, token: token);
 
-        if (response != null && response.success) {
-          setTenant(response as TenantResponse?);
-          // setTenant(response); // Here, response is of type TenantResponse, which is nullable
-          print("fetchTenant(): ${response.message}");
-        } else {
-          print("Failed to fetch tenant data");
-          // setTenant(null); // Handle failure by setting tenant to null
-          Future.microtask(() {
-            Navigator.pushNamed(context, '/createtenant1');
-          });
-        }
+      if (response != null && response.success) {
+        setTenant(response as TenantResponse?);
+        // setTenant(response); // Here, response is of type TenantResponse, which is nullable
+        print("fetchTenant(): ${response.message}");
+      } else {
+        print("Failed to fetch tenant data");
+        // setTenant(null); // Handle failure by setting tenant to null
+        Future.microtask(() {
+          Navigator.pushNamed(context, '/createtenant1');
+        });
+      }
       // } catch (e) {
       //   print("Error: $e");
       //   // setTenant(null); // Handle errors by setting tenant to null

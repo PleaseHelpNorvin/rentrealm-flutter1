@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../PROVIDERS/property_provider.dart';
 
 class CreateTenantScreen1 extends StatefulWidget {
   const CreateTenantScreen1({super.key});
@@ -8,6 +11,14 @@ class CreateTenantScreen1 extends StatefulWidget {
 }
 
 class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch properties when the screen initializes
+    Future.microtask(() => Provider.of<PropertyProvider>(context, listen: false)
+        .fetchProperty(context));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +49,10 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                     color: Colors.white, // Set the color of the hint text
                   ),
                   border: InputBorder.none,
-                  prefixIcon: Icon(Icons.search, color: Colors.white,),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -50,8 +64,10 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
               child: Container(
                 color: Color(0xFFDAEFFF), // Background color (optional)
                 child: ListView.builder(
-                  padding: EdgeInsets.symmetric(horizontal: 10), // Adds padding on left and right
-                  shrinkWrap: true, // Prevent ListView from taking up extra space
+                  padding: EdgeInsets.symmetric(
+                      horizontal: 10), // Adds padding on left and right
+                  shrinkWrap:
+                      true, // Prevent ListView from taking up extra space
                   itemCount: 21, // Replace with actual apartment count
                   itemBuilder: (context, index) {
                     return Card(
@@ -60,7 +76,8 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                       child: Padding(
                         padding: EdgeInsets.all(10), // Padding inside the Card
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start, // Align text with the top
+                          crossAxisAlignment: CrossAxisAlignment
+                              .start, // Align text with the top
                           children: [
                             // Left Side: Apartment Image
                             Container(
@@ -70,7 +87,8 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                 borderRadius: BorderRadius.circular(8),
                                 // border: Border.all(),
                                 image: DecorationImage(
-                                  image: AssetImage("assets/images/rentrealm_logo.png"),
+                                  image: AssetImage(
+                                      "assets/images/rentrealm_logo.png"),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -84,7 +102,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                 children: [
                                   // Top Part: Apartment ID
                                   Text(
-                                    "Apartment-12312312",  // Apartment ID
+                                    "Apartment-12312312", // Apartment ID
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -94,12 +112,13 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                   SizedBox(height: 5),
 
                                   // Middle Part: Apartment details (Girls Only, Available, Location)
-                                   Text(
+                                  Text(
                                     "Appartment",
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w400,
-                                      color: Color(0xFFDAEFFF), // To highlight specific details
+                                      color: Color(
+                                          0xFFDAEFFF), // To highlight specific details
                                     ),
                                   ),
 
@@ -108,29 +127,33 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFFFF005D), // To highlight specific details
+                                      color: Color(
+                                          0xFFFF005D), // To highlight specific details
                                     ),
                                   ),
                                   Text(
                                     "Available",
                                     style: TextStyle(
                                       fontSize: 14,
-                                      color: Color(0xFF00FF26), // Mark as available
+                                      color: Color(
+                                          0xFF00FF26), // Mark as available
                                     ),
                                   ),
-                                  Text(
-                                    "Saac 1 Buaya Lapu Lapu City\nCebu 6015",
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFFDAEFFF), // Light grey color for location
-                                    ),
-                                    maxLines: 3
-                                  ),
-                                  SizedBox(height: 10), // Space between details and buttons
+                                  Text("Saac 1 Buaya Lapu Lapu City\nCebu 6015",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Color(
+                                            0xFFDAEFFF), // Light grey color for location
+                                      ),
+                                      maxLines: 3),
+                                  SizedBox(
+                                      height:
+                                          10), // Space between details and buttons
 
                                   // Bottom Part: Two clickable boxes (acting as buttons)
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: ElevatedButton(
@@ -138,41 +161,52 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                             // Action for the button
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            padding: EdgeInsets.symmetric(vertical: 10),
-                                            backgroundColor: Color(0xFFDAEFFF), // Button color
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            backgroundColor: Color(
+                                                0xFFDAEFFF), // Button color
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(5), // Set the border radius
+                                              borderRadius: BorderRadius.circular(
+                                                  5), // Set the border radius
                                             ),
                                           ),
-
                                           child: Icon(
-                                            Icons.pin_drop, // Google Map pin icon
-                                            color: Color(0xff2196F3), // Icon color
+                                            Icons
+                                                .pin_drop, // Google Map pin icon
+                                            color:
+                                                Color(0xff2196F3), // Icon color
                                           ),
                                         ),
                                       ),
-                                      SizedBox(width: 10), // Space between the two buttons
+                                      SizedBox(
+                                          width:
+                                              10), // Space between the two buttons
                                       Expanded(
                                         child: ElevatedButton(
                                           onPressed: () {
                                             // Action for second button
                                           },
                                           style: ElevatedButton.styleFrom(
-                                            padding: EdgeInsets.symmetric(vertical: 10),
-                                            backgroundColor: Color(0xff2196F3), // Button color
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10),
+                                            backgroundColor: Color(
+                                                0xff2196F3), // Button color
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(5), // Set the border radius
+                                              borderRadius: BorderRadius.circular(
+                                                  5), // Set the border radius
                                             ),
                                           ).copyWith(
-                                            side: MaterialStateProperty.all(BorderSide(
-                                              color: Color(0xFFDAEFFF), // Border color
+                                            side: MaterialStateProperty.all(
+                                                BorderSide(
+                                              color: Color(
+                                                  0xFFDAEFFF), // Border color
                                               width: 2, // Border width
                                             )),
                                           ),
-
                                           child: Text(
                                             "Contact",
-                                            style: TextStyle(color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       )
@@ -194,6 +228,4 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
       ),
     );
   }
-
-
 }

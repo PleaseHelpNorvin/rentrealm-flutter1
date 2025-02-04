@@ -23,6 +23,7 @@ import './SCREENS/PROFILE/UPDATE/edit_user_screen.dart';
 import 'PROVIDERS/auth_provider.dart';
 import 'PROVIDERS/theme_provider.dart';
 import 'PROVIDERS/tenant_provider.dart';
+import 'PROVIDERS/property_provider.dart';
 
 import 'SCREENS/AUTH/register.dart';
 import 'SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => TenantProvider()),
+        ChangeNotifierProvider(create: (_) => PropertyProvider()),
       ],
       child: Builder(
         builder: (context) {
@@ -59,11 +61,11 @@ class MyApp extends StatelessWidget {
             home: const GetStartedScreen(),
             routes: {
               '/register': (context) => RegisterScreen(),
-              '/login':(context) => LoginScreen(),
-              '/edituser':(context) => EditUserScreen(),
-              '/editprofile':(context) => EditProfileScreen(),
+              '/login': (context) => LoginScreen(),
+              '/edituser': (context) => EditUserScreen(),
+              '/editprofile': (context) => EditProfileScreen(),
               '/editaddress': (context) => EditAddressScreen(),
-              '/editidentification': (context) =>EditIdentificationScreen(),
+              '/editidentification': (context) => EditIdentificationScreen(),
               '/createprofile1': (context) => CreateProfileScreen1(),
               '/createtenant1': (context) => CreateTenantScreen1()
             },

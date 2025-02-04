@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:rentealm_flutter/models/property_model.dart';
 import 'package:rentealm_flutter/models/tenant_model.dart';
-
 
 import '../API/rest.dart';
 
@@ -12,7 +12,6 @@ import '../MODELS/user_model.dart';
 
 class ApiService {
   final String rest = Rest.baseUrl;
-
 
   Future<UserResponse?> loginUser({
     required String email,
@@ -51,13 +50,14 @@ class ApiService {
       return null;
     }
   }
-    Future<UserResponse?> registerUser({
+
+  Future<UserResponse?> registerUser({
     required String name,
     required String email,
     required String password,
   }) async {
-    final url = Uri.parse(
-        '$rest/create/tenant'); // Replace with your API endpoint
+    final url =
+        Uri.parse('$rest/create/tenant'); // Replace with your API endpoint
 
     try {
       // Prepare request body
@@ -123,9 +123,8 @@ class ApiService {
       return null;
     }
   }
-  
 
-    Future<bool> postLogout(String token) async {
+  Future<bool> postLogout(String token) async {
     final uri = Uri.parse('$rest/logout');
     print("logoutUser() $uri");
 
@@ -285,7 +284,7 @@ class ApiService {
       return null;
     }
   }
-  
+
   Future<UserResponse?> updateUser({
     required int id,
     required String token,
@@ -423,7 +422,7 @@ class ApiService {
     }
   }
 
-  Future<UserProfileResponse?>updateUserIdentifications({
+  Future<UserProfileResponse?> updateUserIdentifications({
     required int userId,
     required String token,
     required String driverLicenseNumber,
@@ -442,10 +441,10 @@ class ApiService {
 
     try {
       final requestBody = {
-        "driver_license_number" : driverLicenseNumber,
-        "national_id" : nationalIdNumber,
+        "driver_license_number": driverLicenseNumber,
+        "national_id": nationalIdNumber,
         "passport_number": passportNumber,
-        "social_security_number":socialSecurityNumber,
+        "social_security_number": socialSecurityNumber,
       };
 
       final request = await http.post(
@@ -472,37 +471,68 @@ class ApiService {
     }
   }
 
-Future<TenantResponse?> getTenant({
+  Future<TenantResponse?> getTenant({
     required int profileId,
     required String token,
-}) async {
-  print("getTenant(): token $token");
-  print("getTenant(): profile id $profileId");
+  }) async {
+    print("getTenant(): token $token");
+    print("getTenant(): profile id $profileId");
 
-  final uri = Uri.parse('$rest/tenant/tenant/showbyprofile_id/$profileId');
+    final uri = Uri.parse('$rest/tenant/tenant/showbyprofile_id/$profileId');
 
-  try {
-    final response = await http.get(
-      uri,
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-      },
-    );
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-      print("responseData from getTenant Call: $responseData");
-      return TenantResponse.fromJson(responseData);  // Corrected this line
-    } else if (response.statusCode == 404){
-      print('Error: ${response.statusCode} - ${response.body}');
-      print('navigating to create tenant screen');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getTenant Call: $responseData");
+        return TenantResponse.fromJson(responseData); // Corrected this line
+      } else if (response.statusCode == 404) {
+        print('Error: ${response.statusCode} - ${response.body}');
+        print('navigating to create tenant screen');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
       return null;
     }
-  } catch (e) {
-    print('Exception: $e');
-    return null;
   }
-}
+
+  Future<PropertyResponse?> getProperty({
+    required String token,
+  }) async {
+    print("getProperty(): token $token");
+
+    final uri = Uri.parse('$rest/tenant/property/index');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getProperty Call: $responseData");
+        return PropertyResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
 }

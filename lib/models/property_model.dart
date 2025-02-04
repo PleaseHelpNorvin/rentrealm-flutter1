@@ -5,39 +5,35 @@ class PropertyResponse {
   final String message;
   final Property data;
 
-  PropertyResponse({
-    required this.success,
-    required this.message,
-    required this.data
-  });
+  PropertyResponse(
+      {required this.success, required this.message, required this.data});
 
   factory PropertyResponse.fromJson(Map<String, dynamic> json) {
     return PropertyResponse(
-      success: json['success'] ?? false, 
-      message: json['message'] ?? '' , 
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
       data: json['data'] != null && json['data']['properties'] != null
-      ? Property.fromJson(json['data']['properties'])
-      : Property(
-        id: 0, 
-        name: '', 
-        propertyPictureUrl: '', 
-        genderAllowed: '', 
-        petsAllowed: false, 
-        type: '', 
-        status: '', 
-        createdAt: '',
-        updatedAt: '', 
-        address: Address(
-          line1: '',
-          line2: '',
-          province: '',
-          country: '',
-          postalCode: '',
-        )
-      )
+          ? Property.fromJson(json['data']['properties'])
+          : Property(
+              id: 0,
+              name: '',
+              propertyPictureUrl: '',
+              genderAllowed: '',
+              petsAllowed: false,
+              type: '',
+              status: '',
+              createdAt: '',
+              updatedAt: '',
+              address: Address(
+                line1: '',
+                line2: '',
+                province: '',
+                country: '',
+                postalCode: '',
+              ),
+            ),
     );
   }
-
 }
 
 class Property {
@@ -49,7 +45,7 @@ class Property {
   final String type;
   final String status;
   final String createdAt;
-  final String updatedAt;  
+  final String updatedAt;
   final Address address;
 
   Property({
@@ -76,13 +72,15 @@ class Property {
       status: json['status'] ?? '',
       createdAt: json['created_at'] ?? '',
       updatedAt: json['updated_at'],
-        address: json['address'] != null ? Address.fromJson(json['address']) : Address(
-        line1: '',
-        line2: '',
-        province: '',
-        country: '',
-        postalCode: '',
-      ), // Default Address if null
+      address: json['address'] != null
+          ? Address.fromJson(json['address'])
+          : Address(
+              line1: '',
+              line2: '',
+              province: '',
+              country: '',
+              postalCode: '',
+            ), // Default Address if null
     );
   }
 }
