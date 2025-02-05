@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
+
 import './address_model.dart';
 
 class PropertyResponse {
   final bool success;
   final String message;
-  final Property data;
+  final List<Property> data;
 
   PropertyResponse(
       {required this.success, required this.message, required this.data});
@@ -12,26 +14,9 @@ class PropertyResponse {
     return PropertyResponse(
       success: json['success'] ?? false,
       message: json['message'] ?? '',
-      data: json['data'] != null && json['data']['properties'] != null
-          ? Property.fromJson(json['data']['properties'])
-          : Property(
-              id: 0,
-              name: '',
-              propertyPictureUrl: '',
-              genderAllowed: '',
-              petsAllowed: false,
-              type: '',
-              status: '',
-              createdAt: '',
-              updatedAt: '',
-              address: Address(
-                line1: '',
-                line2: '',
-                province: '',
-                country: '',
-                postalCode: '',
-              ),
-            ),
+      data: (json['data']?['properties'] as List<dynamic>?)
+              ?.map((property) => Property.fromJson(property))
+              .toList() ?? [], // Make sure you're accessing 'data' and then 'properties'
     );
   }
 }
@@ -47,7 +32,7 @@ class Property {
   final String createdAt;
   final String updatedAt;
   final Address address;
-
+  
   Property({
     required this.id,
     required this.name,
@@ -84,3 +69,27 @@ class Property {
     );
   }
 }
+
+//gender
+final Map<String ,Color> genderColors = {
+  "boys-only": Color.fromARGB(255, 30, 0, 253),
+  "girls-only": Color(0xFFFF005D)
+};
+
+final Map<String, String> genderLabels = {
+  "boys-only" : "Boys",
+  "girls-only" : "Girls"
+};
+
+//status
+final Map<String, Color> statusColors = {
+  "available": Color(0xFF00FF26), // Green
+  "rented": Color(0xFFFFA500), // Orange
+  "full": Color(0xFFFF005D), // Red
+};
+
+final Map<String, String> statusLabels = {
+  "available": "Available",
+  "rented": "Rented",
+  "full": "Full",
+};

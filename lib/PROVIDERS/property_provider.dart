@@ -12,44 +12,44 @@ class PropertyProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  PropertyResponse? _property;
-  PropertyResponse? get property => _property;
+  List<Property> _properties = [];
+  List<Property> get properties => _properties;
 
-  void setProperty(PropertyResponse? property) {
-    _property = property;
+  // Fetch property data from API
+  Future<void> fetchProperties(BuildContext context) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);    
+    String? token = authProvider.token;
+
+    if (token == null) {
+      print('Token is null, cannot fetch properties');
+      return;
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Use the token from authProvider here
+      final response = await apiService.getProperty(token: token);
+
+      if (response != null) {
+        if (response is PropertyResponse) {
+          _properties = response.data as List<Property>; 
+        } else {
+          print('Unexpected response type: ${response.runtimeType}');
+          _properties = []; // Fallback to empty list
+        }
+      } else {
+        print('Response is null');
+        _properties = [];
+      }
+    } catch (error) {
+      print('Error fetching properties: $error');
+      _properties = [];
+    }
+
+    _isLoading = false;
     notifyListeners();
   }
 
-  Future<void> fetchProperty(BuildContext context) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    int? userId = authProvider.user?.data?.user.id;
-    String? token = authProvider.token;
-
-    if (token != null && userId != null) {
-      print("fetchUser(): $userId");
-      print("fetchUser(): $token");
-
-      try {
-        final response = await apiService.getProperty(token: token);
-        if (response != null && response.success) {
-          setProperty(property);
-        } else {
-          print("failed to fetch properties");
-          setProperty(null);
-        }
-      } catch (e) {
-        print("Error: $e");
-        setProperty(null);
-
-        AlertUtils.showErrorAlert(context,
-            title: "Exception", message: "Something went wrong: $e");
-      } finally {
-        _isLoading = false;
-        notifyListeners();
-      }
-    } else {
-      print("Token is null");
-      setProperty(null);
-    }
-  }
 }
