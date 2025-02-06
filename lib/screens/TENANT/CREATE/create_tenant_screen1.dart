@@ -91,12 +91,14 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
                                     image: DecorationImage(
-                                      image: AssetImage(
-                                          "assets/images/rentrealm_logo.png"),
+                                      image: property.propertyPictureUrl.isNotEmpty 
+                                          ? NetworkImage(property.propertyPictureUrl) 
+                                          : AssetImage('assets/images/rentrealm_logo.png') as ImageProvider, // Fallback image
                                       fit: BoxFit.cover,
                                     ),
                                   ),
                                 ),
+
                                 SizedBox(width: 10),
 
                                 // Apartment Details
@@ -138,7 +140,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                         ),
                                       ),
                                       Text(
-                                        "${property.address.line1}${property.address.line2}${property.address.province}${property.address.postalCode}" ,
+                                        "${property.address.line1}${property.address.line2} ${property.address.province} ${property.address.postalCode}" ,
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Color(0xFFDAEFFF),

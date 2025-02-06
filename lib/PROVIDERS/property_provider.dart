@@ -17,7 +17,7 @@ class PropertyProvider extends ChangeNotifier {
 
   // Fetch property data from API
   Future<void> fetchProperties(BuildContext context) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);    
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     String? token = authProvider.token;
 
     if (token == null) {
@@ -30,15 +30,31 @@ class PropertyProvider extends ChangeNotifier {
 
     try {
       // Use the token from authProvider here
-      final response = await apiService.getProperty(token: token);
+      final response = await apiService.getProperty(token: token).timeout(Duration(seconds: 15));
 
       if (response != null) {
-        if (response is PropertyResponse) {
-          _properties = response.data as List<Property>; 
-        } else {
-          print('Unexpected response type: ${response.runtimeType}');
-          _properties = []; // Fallback to empty list
-        }
+        // Clean the URLs before assigning to the properties list
+        _properties = response.data.map((property) {
+          // Clean URL
+          // print(property.propertyPictureUrl);
+          String imageUrl = property.propertyPictureUrl.isNotEmpty
+            ? property.propertyPictureUrl // Get the first URL from the list
+            : ''; // Default to empty if no URL is present
+
+          imageUrl = imageUrl
+            .replaceAll(RegExp(r'http:\/\/127\.0\.0\.1:8000'), '') // Remove localhost part
+            .replaceAll(RegExp(r'\/\/+'), '/') // Replace multiple slashes with a single slash
+            .replaceAll(RegExp(r'[\[\]""]'), '') // Remove square brackets or double quotes if present
+            .replaceAll(RegExp(r'\\+'), '') // Remove any backslashes
+            .replaceAll(RegExp(r'\\\/'), '/'); // Handle escaped forward slashes
+
+
+        property.propertyPictureUrl = imageUrl; // Assign cleaned URL back to the property
+        print("Cleaned URL: $imageUrl"); 
+        return property;
+        
+      }).toList();
+        print("Fetched properties: $_properties");
       } else {
         print('Response is null');
         _properties = [];
@@ -52,4 +68,22 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<Image> _loadImage(String url) async {
+    try {
+      // Try loading the image
+      final image = Image.network(url);
+      return image;
+    } catch (e) {
+      print('Error loading image: $e');
+      return Image.asset('assets/placeholder.png'); // Fallback image in case of an error
+    }
+  }
+
+  // You can use this method to get images for your properties
+  ImageProvider getPropertyImage(String url) {
+    return NetworkImage(url); // Return a NetworkImage directly
+  }
 }
+
+
+
