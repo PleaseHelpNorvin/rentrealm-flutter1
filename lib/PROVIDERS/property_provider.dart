@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/API/rest.dart';
 import 'package:rentealm_flutter/models/property_model.dart';
 import 'package:rentealm_flutter/networks/apiservice.dart';
 
@@ -8,6 +9,7 @@ import 'auth_provider.dart';
 
 class PropertyProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
+  final Rest restUrl = Rest();
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -30,7 +32,9 @@ class PropertyProvider extends ChangeNotifier {
 
     try {
       // Use the token from authProvider here
-      final response = await apiService.getProperty(token: token).timeout(Duration(seconds: 15));
+      final response = await apiService
+          .getProperty(token: token)
+          .timeout(Duration(seconds: 15));
 
       if (response != null) {
         // Clean the URLs before assigning to the properties list
@@ -38,22 +42,25 @@ class PropertyProvider extends ChangeNotifier {
           // Clean URL
           // print(property.propertyPictureUrl);
           String imageUrl = property.propertyPictureUrl.isNotEmpty
-            ? property.propertyPictureUrl // Get the first URL from the list
-            : ''; // Default to empty if no URL is present
+              ? property.propertyPictureUrl // Get the first URL from the list
+              : ''; // Default to empty if no URL is present
 
           imageUrl = imageUrl
-            .replaceAll(RegExp(r'http:\/\/127\.0\.0\.1:8000'), '') // Remove localhost part
-            .replaceAll(RegExp(r'\/\/+'), '/') // Replace multiple slashes with a single slash
-            .replaceAll(RegExp(r'[\[\]""]'), '') // Remove square brackets or double quotes if present
-            .replaceAll(RegExp(r'\\+'), '') // Remove any backslashes
-            .replaceAll(RegExp(r'\\\/'), '/'); // Handle escaped forward slashes
+              .replaceAll(RegExp(r'\/\/+'),
+                  '/') // Replace multiple slashes with a single slash
+              .replaceAll(RegExp(r'[\[\]""]'),
+                  '') // Remove square brackets or double quotes if present
+              .replaceAll(RegExp(r'\\+'), '') // Remove any backslashes
+              .replaceAll(
+                  RegExp(r'\\\/'), '/') // Handle escaped forward slashes
+              .replaceAll('http://127.0.0.1:8000', Rest.baseUrl)
+              .replaceAll('/api', '');
 
-
-        property.propertyPictureUrl = imageUrl; // Assign cleaned URL back to the property
-        print("Cleaned URL: $imageUrl"); 
-        return property;
-        
-      }).toList();
+          property.propertyPictureUrl =
+              imageUrl; // Assign cleaned URL back to the property
+          print("Cleaned URL: $imageUrl");
+          return property;
+        }).toList();
         print("Fetched properties: $_properties");
       } else {
         print('Response is null');
@@ -75,7 +82,8 @@ class PropertyProvider extends ChangeNotifier {
       return image;
     } catch (e) {
       print('Error loading image: $e');
-      return Image.asset('assets/placeholder.png'); // Fallback image in case of an error
+      return Image.asset(
+          'assets/placeholder.png'); // Fallback image in case of an error
     }
   }
 
@@ -84,6 +92,3 @@ class PropertyProvider extends ChangeNotifier {
     return NetworkImage(url); // Return a NetworkImage directly
   }
 }
-
-
-

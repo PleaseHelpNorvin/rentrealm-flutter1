@@ -29,8 +29,19 @@ import 'SCREENS/AUTH/register.dart';
 import 'SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
 import 'SCREENS/get_started.dart';
 import 'SCREENS/TENANT/CREATE/create_tenant_screen1.dart';
+import 'dart:io';
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
 
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 

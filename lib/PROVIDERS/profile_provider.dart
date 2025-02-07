@@ -270,8 +270,7 @@ class ProfileProvider extends ChangeNotifier {
           message: "Please create your profile first!",
           onConfirmBtnTap: () {
             Navigator.pushReplacementNamed(
-              context, '/createprofile1'
-            ); // Then navigate
+                context, '/createprofile1'); // Then navigate
           },
         );
       }
@@ -316,7 +315,6 @@ class ProfileProvider extends ChangeNotifier {
           context,
           title: "Update Success",
           message: "Your address was updated successfully",
-          
         );
       } else {
         // Handle any errors or unsuccessful response
@@ -403,7 +401,6 @@ class ProfileProvider extends ChangeNotifier {
           context,
           title: "Update Success",
           message: "your Identificaitons updated successfully",
-
         );
         print('response: $response');
       } else {

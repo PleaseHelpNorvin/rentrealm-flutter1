@@ -7,8 +7,8 @@ import '../NETWORKS/apiservice.dart';
 import '../SCREENS/homelogged.dart';
 import 'user_provider.dart';
 
-class AuthProvider extends ChangeNotifier{
-  final ApiService apiService = ApiService(); 
+class AuthProvider extends ChangeNotifier {
+  final ApiService apiService = ApiService();
   final UserProvider userProvider = UserProvider();
   // setters
   bool _isLoading = false;
@@ -23,13 +23,11 @@ class AuthProvider extends ChangeNotifier{
   int? get userId => _userId;
   bool isAuthenticated() => _isAuthenticated;
 
-
-
   void setUser(UserResponse? user) {
     _user = user;
     _token = user?.data?.token;
     _userId = user?.data?.user.id;
-    notifyListeners(); 
+    notifyListeners();
   }
 
   void setAuthenticationStatus(bool status) {
@@ -37,17 +35,19 @@ class AuthProvider extends ChangeNotifier{
     notifyListeners();
   }
 
-  Future<void> loginUser({required String email, required String password, required BuildContext context}) async {
+  Future<void> loginUser(
+      {required String email,
+      required String password,
+      required BuildContext context}) async {
     try {
       _isLoading = true;
       notifyListeners();
 
-      final response = await apiService.loginUser(email: email, password: password);
+      final response =
+          await apiService.loginUser(email: email, password: password);
 
       if (response != null && response.success) {
         setUser(response);
-
-      
 
         if (token != null && userId != null) {
           Navigator.pushReplacement(
@@ -55,7 +55,8 @@ class AuthProvider extends ChangeNotifier{
             MaterialPageRoute(builder: (context) => const HomeLoggedScreen()),
           );
         } else {
-          AlertUtils.showErrorAlert(context, message: "Token or UserId is missing.");
+          AlertUtils.showErrorAlert(context,
+              message: "Token or UserId is missing.");
         }
       } else {
         setAuthenticationStatus(false);
@@ -63,16 +64,22 @@ class AuthProvider extends ChangeNotifier{
       }
     } catch (e) {
       setAuthenticationStatus(false);
-      AlertUtils.showErrorAlert(context, title: "Exception", message: "Something went wrong: $e");
+      AlertUtils.showErrorAlert(context,
+          title: "Exception", message: "Something went wrong: $e");
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-    Future<void> registerUser({required String name, required String email, required String password, required BuildContext context}) async {
+  Future<void> registerUser(
+      {required String name,
+      required String email,
+      required String password,
+      required BuildContext context}) async {
     try {
-      final response = await apiService.registerUser(name: name, email: email, password: password);
+      final response = await apiService.registerUser(
+          name: name, email: email, password: password);
 
       if (response != null && response.success) {
         setAuthenticationStatus(true);
@@ -83,6 +90,4 @@ class AuthProvider extends ChangeNotifier{
       setAuthenticationStatus(false);
     }
   }
-
-
 }

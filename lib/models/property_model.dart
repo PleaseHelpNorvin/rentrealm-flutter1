@@ -16,7 +16,8 @@ class PropertyResponse {
       message: json['message'] ?? '',
       data: (json['data']?['properties'] as List<dynamic>?)
               ?.map((property) => Property.fromJson(property))
-              .toList() ?? [], // Make sure you're accessing 'data' and then 'properties'
+              .toList() ??
+          [], // Make sure you're accessing 'data' and then 'properties'
     );
   }
 }
@@ -32,7 +33,7 @@ class Property {
   final String createdAt;
   final String updatedAt;
   final Address address;
-  
+
   Property({
     required this.id,
     required this.name,
@@ -71,14 +72,14 @@ class Property {
 }
 
 //gender
-final Map<String ,Color> genderColors = {
+final Map<String, Color> genderColors = {
   "boys-only": Color.fromARGB(255, 30, 0, 253),
   "girls-only": Color(0xFFFF005D)
 };
 
 final Map<String, String> genderLabels = {
-  "boys-only" : "Boys",
-  "girls-only" : "Girls"
+  "boys-only": "Boys",
+  "girls-only": "Girls"
 };
 
 //status

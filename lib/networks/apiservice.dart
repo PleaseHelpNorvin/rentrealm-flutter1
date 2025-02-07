@@ -171,7 +171,7 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        // print('response body ${response.body}');
+        print('response body ${response.body}');
         return UserProfileResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
@@ -527,7 +527,7 @@ class ApiService {
         print("responseData from getProperty Call: $responseData");
         return PropertyResponse.fromJson(responseData);
       } else {
-        print('Error: ${response.statusCode } - ${response.body}');
+        print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {

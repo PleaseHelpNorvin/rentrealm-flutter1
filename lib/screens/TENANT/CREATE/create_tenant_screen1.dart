@@ -16,9 +16,8 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
   void initState() {
     super.initState();
     // Fetch properties when the screen initializes
-    Future.microtask(() =>
-        Provider.of<PropertyProvider>(context, listen: false)
-            .fetchProperties(context));
+    Future.microtask(() => Provider.of<PropertyProvider>(context, listen: false)
+        .fetchProperties(context));
   }
 
   @override
@@ -90,13 +89,20 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                   height: 180,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
-                                    image: DecorationImage(
-                                      image: property.propertyPictureUrl.isNotEmpty 
-                                          ? NetworkImage(property.propertyPictureUrl) 
-                                          : AssetImage('assets/images/rentrealm_logo.png') as ImageProvider, // Fallback image
-                                      fit: BoxFit.cover,
-                                    ),
                                   ),
+                                  child: property.propertyPictureUrl.isNotEmpty
+                                      ? Image.network(
+                                          property.propertyPictureUrl,
+                                          fit: BoxFit.cover,
+                                          width: 150,
+                                          height: 180,
+                                        )
+                                      : Image.asset(
+                                          'assets/images/rentrealm_logo.png',
+                                          fit: BoxFit.cover,
+                                          width: 150,
+                                          height: 180,
+                                        ),
                                 ),
 
                                 SizedBox(width: 10),
@@ -108,7 +114,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Apartment-${property.name}" ,
+                                        "Apartment-${property.name}",
                                         style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
@@ -125,22 +131,28 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                         ),
                                       ),
                                       Text(
-                                        genderLabels[property.genderAllowed] ?? "unknown",
+                                        genderLabels[property.genderAllowed] ??
+                                            "unknown",
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
-                                          color: genderColors[property.genderAllowed] ?? Colors.grey,
+                                          color: genderColors[
+                                                  property.genderAllowed] ??
+                                              Colors.grey,
                                         ),
                                       ),
                                       Text(
-                                        statusLabels[property.status] ?? "Unknown",
+                                        statusLabels[property.status] ??
+                                            "Unknown",
                                         style: TextStyle(
                                           fontSize: 14,
-                                          color: statusColors[property.status] ?? Colors.grey,
+                                          color:
+                                              statusColors[property.status] ??
+                                                  Colors.grey,
                                         ),
                                       ),
                                       Text(
-                                        "${property.address.line1}${property.address.line2} ${property.address.province} ${property.address.postalCode}" ,
+                                        "${property.address.line1}${property.address.line2} ${property.address.province} ${property.address.postalCode}",
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Color(0xFFDAEFFF),
@@ -191,15 +203,14 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                                       BorderRadius.circular(5),
                                                 ),
                                               ).copyWith(
-                                                side:
-                                                    WidgetStateProperty.all(
-                                                        BorderSide(
+                                                side: WidgetStateProperty.all(
+                                                    BorderSide(
                                                   color: Color(0xFFDAEFFF),
                                                   width: 2,
                                                 )),
                                               ),
                                               child: Text(
-                                                "View Rooms",
+                                                "Rooms",
                                                 style: TextStyle(
                                                     color: Colors.white),
                                               ),
