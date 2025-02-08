@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
 // import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
 // import 'package:rentrealm_flutter2/PROVIDERS/profile_provider.dart';
 import './PROVIDERS/profile_provider.dart';
@@ -58,6 +59,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => TenantProvider()),
         ChangeNotifierProvider(create: (_) => PropertyProvider()),
+        ChangeNotifierProvider(create: (_) => RoomProvider()),
+
       ],
       child: Builder(
         builder: (context) {

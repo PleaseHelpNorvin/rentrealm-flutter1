@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../../MODELS/property_model.dart';
 import '../../../PROVIDERS/property_provider.dart';
+import '../../../PROVIDERS/room_provider.dart';
+import 'create_tenant_screen2.dart';
 
 class CreateTenantScreen1 extends StatefulWidget {
   const CreateTenantScreen1({super.key});
@@ -106,7 +108,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                 ),
 
                                 SizedBox(width: 10),
-
+  
                                 // Apartment Details
                                 Expanded(
                                   child: Column(
@@ -190,8 +192,21 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                           SizedBox(width: 10),
                                           Expanded(
                                             child: ElevatedButton(
-                                              onPressed: () {
-                                                // Contact Action
+                                              onPressed: () async  {
+                                                final roomProvider = Provider.of<RoomProvider>(context, listen: false);
+                                                await roomProvider.fetchRoom(context, property.id);
+                                                if (roomProvider.room.isNotEmpty) {
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => CreateTenantScreen2(propertyId: property.id),
+                                                    ),
+                                                  );
+                                                } else {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text("No rooms available for this property")),
+                                                  );
+                                                }
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 padding: EdgeInsets.symmetric(

@@ -9,7 +9,7 @@ import 'auth_provider.dart';
 
 class PropertyProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
-  final Rest restUrl = Rest();
+  // final Rest restUrl = Rest();
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;

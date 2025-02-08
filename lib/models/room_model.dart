@@ -1,44 +1,56 @@
 import 'dart:convert';
 
+import '../API/rest.dart';
 
 class RoomResponse {
   final bool success;
   final String message;
-  final Room data;
+  final RoomData data;
 
   RoomResponse({
     required this.success,
     required this.message,
     required this.data,
-  }); 
+  });
 
   factory RoomResponse.fromJson(Map<String, dynamic> json) {
     return RoomResponse(
-      success: json['success'] ?? false,
-      message: json['message'] ?? '',
-      data: Room.fromJson(json['data']['rooms']),
+      success: json['success'],
+      message: json['message'],
+      data: RoomData.fromJson(json['data']),
     );
   }
+}
 
+class RoomData {
+  final List<Room> rooms;
+
+  RoomData({required this.rooms});
+
+  factory RoomData.fromJson(Map<String, dynamic> json) {
+    return RoomData(
+      rooms: List<Room>.from(json['rooms'].map((x) => Room.fromJson(x))),
+    );
+  }
 }
 
 class Room {
   final int id;
   final int propertyId;
-  final List<String> roomPictureUrls;  // URLs should be a list of strings
+  final List<String> roomPictureUrls;
   final String roomCode;
   final String description;
   final String roomDetails;
   final String category;
-  final double rentPrice;  // Can be a numeric value (double)
-  final int capacity;  // Must be an integer
-  final int currentOccupants;  // Nullable integer
-  final int minLease;  // Must be an integer
-  final String size;  // String with a max length of 20
-  final String status;  // One of the predefined statuses
-  final String unitType;  // One of the predefined unit types
-  final String createdAt;
-  final String updatedAt;
+  final String rentPrice;
+  final int capacity;
+  final int currentOccupants;
+  final int minLease;
+  final String size;
+  final String status;
+  final String unitType;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   Room({
     required this.id,
@@ -60,44 +72,62 @@ class Room {
   });
 
   factory Room.fromJson(Map<String, dynamic> json) {
-    return Room(
-      id: json['id'] ?? 0,
-      propertyId: int.tryParse(json['property_id'].toString()) ?? 0,  // Convert to integer
-      roomPictureUrls: json['room_picture_url'] != null
-          ? List<String>.from(jsonDecode(json['room_picture_url']))
-          : [],
-      roomCode: json['room_code'] ?? '',
-      description: json['description'] ?? '',
-      roomDetails: json['room_details'] ?? '',
-      category: json['category'] ?? '',
-      rentPrice: double.tryParse(json['rent_price'].toString()) ?? 0.0,  // Ensure numeric format
-      capacity: int.tryParse(json['capacity'].toString()) ?? 0,
-      currentOccupants: int.tryParse(json['current_occupants'].toString()) ?? 0,  // Nullable integer
-      minLease: int.tryParse(json['min_lease'].toString()) ?? 0,
-      size: json['size'] ?? '',
-      status: json['status'] ?? '',
-      unitType: json['unit_type'] ?? '',
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
-    );
+  return Room(
+    id: json['id'],
+    propertyId: json['property_id'],
+    roomPictureUrls: _parseRoomPictureUrls(json['room_picture_url']), // Fix here
+    roomCode: json['room_code'],
+    description: json['description'],
+    roomDetails: json['room_details'],
+    category: json['category'],
+    rentPrice: json['rent_price'].toString(), // Ensure it's a string
+    capacity: json['capacity'],
+    currentOccupants: json['current_occupants']?? 0,
+    minLease: json['min_lease'],
+    size: json['size'],
+    status: json['status'],
+    unitType: json['unit_type'],
+    createdAt: DateTime.parse(json['created_at']),
+    updatedAt: DateTime.parse(json['updated_at']),
+  );
+}
+
+// Helper function to properly parse `room_picture_url`
+static List<String> _parseRoomPictureUrls(dynamic url) {
+  print("URL FROM ROOMPICTUREURLS: $url");
+
+  // Define the correct base URL
+  const String correctBaseUrl = "http://192.168.0.25:8000/storage/";
+
+  if (url == null) {
+    return []; // Return empty list if `room_picture_url` is null
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'property_id': propertyId,  // Send as integer
-      'room_picture_url': jsonEncode(roomPictureUrls),  // Convert list of URLs to JSON string
-      'description': description,
-      'room_details': roomDetails,
-      'category': category,
-      'rent_price': rentPrice.toString(),  // Ensure rent price is a string for backend
-      'capacity': capacity,
-      'current_occupants': currentOccupants ?? 0,  // Ensure it's an integer or nullable
-      'min_lease': minLease,
-      'size': size,
-      'status': status,
-      'unit_type': unitType,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-    };
+  if (url is List) {
+    // If it's already a list, clean up the URLs and ensure it's cast to List<String>
+    return url
+        .map((e) => e.toString().replaceAll("http://127.0.0.1:8000/storage/", correctBaseUrl))
+        .toList()
+        .cast<String>(); // ✅ Explicitly cast to List<String>
+  } else if (url is String) {
+    try {
+      // Extract JSON array from the string if needed
+      final match = RegExp(r"\[(.*?)\]").firstMatch(url);
+      if (match != null) {
+        String cleanedJson = "[${match.group(1)}]".replaceAll("\\/", "/");
+        List<dynamic> decoded = jsonDecode(cleanedJson);
+
+        return decoded
+            .map((e) => e.toString().replaceAll("http://127.0.0.1:8000/storage/", correctBaseUrl))
+            .toList()
+            .cast<String>(); // ✅ Ensure correct type
+      }
+    } catch (e) {
+      print("Error parsing room_picture_url: $e");
+    }
   }
+  return []; // Return empty list if parsing fails
+}
+
+
 }

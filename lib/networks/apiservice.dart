@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:rentealm_flutter/MODELS/room_model.dart';
 import 'package:rentealm_flutter/models/property_model.dart';
 import 'package:rentealm_flutter/models/tenant_model.dart';
 
@@ -535,4 +536,74 @@ class ApiService {
       return null;
     }
   }
+
+  Future<RoomResponse?>getRoomsByPropertyId({
+    required int propertyId, 
+    required String token 
+  }) async {
+    print("getRoomsByPropertyId(): $propertyId");
+    print("getRoomsByPropertyId(): $token");
+
+    final uri = Uri.parse('$rest/tenant/room/property/$propertyId');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if(response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getRoomsByPropertyId() Call: $responseData");
+        return RoomResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
+
+  Future<RoomResponse?>getRoomById({
+    required int roomId,
+    required String token,
+  }) async {
+
+    print("getRoomById(): $roomId");
+    print("getRoomById(): $token");
+    
+    final uri = Uri.parse('$rest/tenant/room/show/$roomId');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        }
+      );  
+
+       if(response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getRoomById() Call: $responseData");
+        return RoomResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
 }
