@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rentealm_flutter/PROVIDERS/property_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
 
@@ -76,25 +77,38 @@ class _CreateTenantScreen2State extends State<CreateTenantScreen2> {
                                   padding: EdgeInsets.all(10),
                                   child: Row(crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Container(
+                                    Container(
                                         width: 150,
                                         height: 180,
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(8),
                                         ),
                                         child: room.roomPictureUrls.isNotEmpty
-                                        ? Image.network(
-                                          room.roomPictureUrls.first,
-                                          fit: BoxFit.cover,
-                                          width: 150,
-                                          height: 180,
-                                        )
-                                        : Image.asset("assets/images/rentrealm_logo.png",
-                                          fit: BoxFit.cover,
-                                          width: 150,
-                                          height: 180,
-                                        ),
+                                            ? CachedNetworkImage(
+                                                imageUrl: room.roomPictureUrls.first, // Loads the first image in the list
+                                                fit: BoxFit.cover,
+                                                width: 150,
+                                                height: 180,
+                                                placeholder: (context, url) => Center(
+                                                  child: CircularProgressIndicator(), // Loading indicator
+                                                ),
+                                                errorWidget: (context, url, error) => Center(
+                                                  child: Text(
+                                                    'Failed to load image',
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(fontSize: 12, color: Colors.red),
+                                                  ),
+                                                ),
+                                                fadeInDuration: Duration(milliseconds: 500), // Smooth fade-in effect
+                                              )
+                                            : Image.asset(
+                                                "assets/images/rentrealm_logo.png",
+                                                fit: BoxFit.cover,
+                                                width: 150,
+                                                height: 180,
+                                              ),
                                       ),
+
                                       SizedBox(width: 10),
                                       Expanded(
                                         child: Column(

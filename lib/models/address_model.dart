@@ -4,13 +4,18 @@ class Address {
   final String province;
   final String country;
   final String postalCode;
+  final double lat;  // Try renaming
+  final double long;  
+
 
   Address({
     required this.line1,
     required this.line2,
     required this.province,
     required this.country,
-    required this.postalCode,
+    required this.postalCode, 
+    required this.lat,  // Renamed
+    required this.long,
   });
 
   factory Address.fromJson(Map<String, dynamic> json) {
@@ -20,6 +25,8 @@ class Address {
       province: json['province'] ?? '',
       country: json['country'] ?? '',
       postalCode: json['postal_code'] ?? '',
+      lat: (json['latitude'] ?? 0.0).toDouble(),  // Ensure it's a double
+      long: (json['longitude'] ?? 0.0).toDouble(),
     );
   }
 
@@ -30,6 +37,10 @@ class Address {
       'province': province,
       'country': country,
       'postal_code': postalCode,
+      'latitude': lat,
+      'longitude': long,
     };
   }
+
+  toLowerCase() {}
 }

@@ -15,7 +15,11 @@ class PropertyProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   List<Property> _properties = [];
-  List<Property> get properties => _properties;
+  // List<Property> get properties => _properties;
+  List<Property> get properties => _filteredProperties.isNotEmpty ? _filteredProperties : _properties;
+
+  List<Property> _filteredProperties = []; // Filtered list
+
 
   // Fetch property data from API
   Future<void> fetchProperties(BuildContext context) async {
@@ -91,4 +95,42 @@ class PropertyProvider extends ChangeNotifier {
   ImageProvider getPropertyImage(String url) {
     return NetworkImage(url); // Return a NetworkImage directly
   }
+
+
+  void searchProperties(String query)
+  {
+    if (query.isEmpty) {
+      _filteredProperties = _properties;
+    } else {
+      _filteredProperties = _properties
+          .where((property) =>
+              property.name.toLowerCase().contains(query.toLowerCase()) ||
+              property.genderAllowed.toLowerCase().contains(query.toLowerCase()) ||
+              // property.petsAllowed.lo
+
+              property.address.line1.toLowerCase().contains(query.toLowerCase()) || // Use `address.line1`
+              property.address.line2.toLowerCase().contains(query.toLowerCase()) ||
+              property.address.province.toLowerCase().contains(query.toLowerCase()) ||
+              property.address.country.toLowerCase().contains(query.toLowerCase()) ||
+              property.address.postalCode.toLowerCase().contains(query.toLowerCase())
+          ) // You can also use `province`
+          .toList();
+    }
+    notifyListeners();
+  }
+
+
+//   void searchProperties(String query) {
+//   if (query.isEmpty) {
+//     _filteredProperties = _properties;
+//   } else {
+//     _filteredProperties = _properties
+//         .where((property) =>
+//             property.name.toLowerCase().contains(query.toLowerCase()) ||
+//             property.address.line1.toLowerCase().contains(query.toLowerCase()) || // Use `address.line1`
+//             property.address.province.toLowerCase().contains(query.toLowerCase())) // You can also use `province`
+//         .toList();
+//   }
+//   notifyListeners();
+// }
 }

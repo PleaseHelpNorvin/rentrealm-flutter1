@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../../MODELS/property_model.dart';
 import '../../../PROVIDERS/property_provider.dart';
@@ -14,6 +15,8 @@ class CreateTenantScreen1 extends StatefulWidget {
 }
 
 class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
+  String searchQuery = '';
+
   @override
   void initState() {
     super.initState();
@@ -50,6 +53,11 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                   border: InputBorder.none,
                   prefixIcon: Icon(Icons.search, color: Colors.white),
                 ),
+                onChanged: (value) {
+                  setState(() {
+                    searchQuery = value.toLowerCase();
+                  });
+                },
               ),
             ),
 
@@ -61,14 +69,24 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                 color: Color(0xFFDAEFFF), // Background color
                 child: Consumer<PropertyProvider>(
                   builder: (context, propertyProvider, child) {
-                    final properties = propertyProvider.properties;
+                    final properties = propertyProvider.properties
+                        .where((property) =>
+                            property.name.toLowerCase().contains(searchQuery) ||
+                            property.status.toLowerCase().contains(searchQuery) ||
+                            property.genderAllowed.toLowerCase().contains(searchQuery) ||
+                            property.address.line1.toLowerCase().contains(searchQuery) ||
+                            property.address.line2.toLowerCase().contains(searchQuery) ||
+                            property.address.province.toLowerCase().contains(searchQuery) ||
+                            property.address.postalCode.toLowerCase().contains(searchQuery)
+                        ).toList();
 
                     if (properties.isEmpty) {
                       return Center(
-                          child: Text(
-                        "No apartments available.",
-                        style: TextStyle(color: Colors.black54),
-                      ));
+                        child: Text(
+                          "No apartments available.",
+                          style: TextStyle(color: Colors.black54),
+                        ),
+                      );
                     }
 
                     return ListView.builder(
@@ -93,11 +111,27 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: property.propertyPictureUrl.isNotEmpty
-                                      ? Image.network(
-                                          property.propertyPictureUrl,
+                                      ? CachedNetworkImage(
+                                          imageUrl: property.propertyPictureUrl,
                                           fit: BoxFit.cover,
                                           width: 150,
                                           height: 180,
+                                          placeholder: (context, url) => Center(
+                                            child:
+                                                CircularProgressIndicator(), // Shows while loading
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              Center(
+                                            child: Text(
+                                              'Failed to load image',
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Colors.red),
+                                            ),
+                                          ),
+                                          fadeInDuration:
+                                              Duration(milliseconds: 500),
                                         )
                                       : Image.asset(
                                           'assets/images/rentrealm_logo.png',
@@ -108,7 +142,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                 ),
 
                                 SizedBox(width: 10),
-  
+
                                 // Apartment Details
                                 Expanded(
                                   child: Column(
@@ -154,7 +188,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                         ),
                                       ),
                                       Text(
-                                        "${property.address.line1}${property.address.line2} ${property.address.province} ${property.address.postalCode}",
+                                        "${property.address.line1} ${property.address.line2} ${property.address.province} ${property.address.postalCode}",
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Color(0xFFDAEFFF),
@@ -192,19 +226,30 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                           SizedBox(width: 10),
                                           Expanded(
                                             child: ElevatedButton(
-                                              onPressed: () async  {
-                                                final roomProvider = Provider.of<RoomProvider>(context, listen: false);
-                                                await roomProvider.fetchRoom(context, property.id);
-                                                if (roomProvider.room.isNotEmpty) {
+                                              onPressed: () async {
+                                                final roomProvider =
+                                                    Provider.of<RoomProvider>(
+                                                        context,
+                                                        listen: false);
+                                                await roomProvider.fetchRoom(
+                                                    context, property.id);
+                                                if (roomProvider
+                                                    .room.isNotEmpty) {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => CreateTenantScreen2(propertyId: property.id),
+                                                      builder: (context) =>
+                                                          CreateTenantScreen2(
+                                                              propertyId:
+                                                                  property.id),
                                                     ),
                                                   );
                                                 } else {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(content: Text("No rooms available for this property")),
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                        content: Text(
+                                                            "No rooms available for this property")),
                                                   );
                                                 }
                                               },
@@ -217,12 +262,10 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                                   borderRadius:
                                                       BorderRadius.circular(5),
                                                 ),
-                                              ).copyWith(
-                                                side: WidgetStateProperty.all(
-                                                    BorderSide(
+                                                side: BorderSide(
                                                   color: Color(0xFFDAEFFF),
                                                   width: 2,
-                                                )),
+                                                ),
                                               ),
                                               child: Text(
                                                 "Rooms",

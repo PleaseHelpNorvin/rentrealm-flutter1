@@ -37,6 +37,8 @@ class EditAddressScreenState extends State<EditAddressScreen> {
       province: '',
       country: '',
       postalCode: '',
+      lat: 0.0,
+      long: 0.0,
     );
         
 

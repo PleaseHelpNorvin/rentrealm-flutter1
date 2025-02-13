@@ -50,6 +50,8 @@ class UserProfile {
           province: '',
           country: '',
           postalCode: '',
+          lat: 0.0,
+          long: 0.0,
         ), // Default Address if null
 
 
@@ -97,6 +99,8 @@ class UserProfileResponse {
                 province: '',
                 country: '',
                 postalCode: '',
+                lat: 0.0,
+                long: 0.0,
               ),
               driverLicenseNumber: '',
               nationalId: '',
