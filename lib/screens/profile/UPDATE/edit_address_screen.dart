@@ -31,7 +31,7 @@ class EditAddressScreenState extends State<EditAddressScreen> {
         Provider.of<ProfileProvider>(context, listen: false);
     // Extract address information correctly from the profile
     
-    final address = profileProvider.userProfile?.data?.address ?? Address(
+    final address = profileProvider.userProfile?.data.address ?? Address(
       line1: '',
       line2: '',
       province: '',

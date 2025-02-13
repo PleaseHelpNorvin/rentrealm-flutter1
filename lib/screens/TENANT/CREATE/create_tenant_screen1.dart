@@ -1,6 +1,9 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/property_map_screen.dart';
 
 import '../../../MODELS/property_model.dart';
 import '../../../PROVIDERS/property_provider.dart';
@@ -159,7 +162,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                       ),
                                       SizedBox(height: 5),
                                       Text(
-                                        property.type,
+                                        property.type ,
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
@@ -205,7 +208,17 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                           Expanded(
                                             child: ElevatedButton(
                                               onPressed: () {
-                                                // Google Map Action
+                                              
+                                                Navigator.push(
+                                                  context, 
+                                                  MaterialPageRoute(
+                                                    builder: (context) => 
+                                                    PropertyMapScreen(
+                                                      lat: property.address.lat, 
+                                                      long: property.address.long,
+                                                    )
+                                                  )
+                                                );
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 padding: EdgeInsets.symmetric(
