@@ -570,44 +570,44 @@ class ApiService {
     }
   }
 
-  Future<PropertyResponse?> searchProperty({
-    required String token,
-    String? address,
-    String? type,
-    String? status,
-    String? genderAllowed,
-  }) async {
-    print("getProperty(): token $token");
+  // Future<PropertyResponse?> searchProperty({
+  //   required String token,
+  //   String? address,
+  //   String? type,
+  //   String? status,
+  //   String? genderAllowed,
+  // }) async {
+  //   print("getProperty(): token $token");
     
-    final uri = Uri.parse('$rest/tenant/property/search');
+  //   final uri = Uri.parse('$rest/tenant/property/search');
 
-    try {
-      final response = await http.get(
-        uri,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Bearer $token",
-        }
-      );
+  //   try {
+  //     final response = await http.get(
+  //       uri,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Accept": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       }
+  //     );
 
       
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print("responseData from getProperty Call: $responseData");
-        return PropertyResponse.fromJson(responseData);
-      } else {
-        print('Error: ${response.statusCode} - ${response.body}');
-        return null;
-      }
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       final Map<String, dynamic> responseData = jsonDecode(response.body);
+  //       print("responseData from getProperty Call: $responseData");
+  //       return PropertyResponse.fromJson(responseData);
+  //     } else {
+  //       print('Error: ${response.statusCode} - ${response.body}');
+  //       return null;
+  //     }
 
-    } catch (e) {
+  //   } catch (e) {
 
-      print('Exception: $e');
-      return null;
-    }
+  //     print('Exception: $e');
+  //     return null;
+  //   }
 
-  }
+  // }
 
 
   Future<RoomResponse?>getRoomById({
@@ -634,6 +634,7 @@ class ApiService {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getRoomById() Call: $responseData");
         return RoomResponse.fromJson(responseData);
+        
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;

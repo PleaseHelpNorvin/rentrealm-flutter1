@@ -8,16 +8,17 @@ class PropertyResponse {
   final List<Property> data;
 
   PropertyResponse(
-      {required this.success, required this.message, required this.data});
+      {required this.success, required this.message, required this.data}
+  );
 
   factory PropertyResponse.fromJson(Map<String, dynamic> json) {
     return PropertyResponse(
       success: json['success'] ?? false,
       message: json['message'] ?? '',
       data: (json['data']?['properties'] as List<dynamic>?)
-              ?.map((property) => Property.fromJson(property))
-              .toList() ??
-          [], // Make sure you're accessing 'data' and then 'properties'
+        ?.map((property) => Property.fromJson(property))
+        .toList() ??
+      [], // Make sure you're accessing 'data' and then 'properties'
     );
   }
 }
@@ -96,3 +97,4 @@ final Map<String, String> statusLabels = {
   "rented": "Rented",
   "full": "Full",
 };
+

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/API/rest.dart';
 import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
@@ -15,6 +16,9 @@ class RoomProvider extends ChangeNotifier {
 
   List<Room> _room = [];
   List<Room> get room => _room;
+  
+  Room? _sinleRoom;
+  Room? get sinleRoom => _sinleRoom;
   
   Future<void> fetchRoom(BuildContext context, int propertyId) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -33,8 +37,8 @@ class RoomProvider extends ChangeNotifier {
 
     try {
       final response = await apiService
-          .getRoomsByPropertyId(propertyId: propertyId, token: token)
-          .timeout(const Duration(seconds: 15));
+        .getRoomsByPropertyId(propertyId: propertyId, token: token)
+        .timeout(const Duration(seconds: 15));
 
       if (response != null) {
         _room = response.data.rooms.map((room) {
@@ -85,6 +89,40 @@ class RoomProvider extends ChangeNotifier {
     }).toList();
   }
 
+    // getRoomById
+  Future<void> fetchRoomById(BuildContext context, int roomId) async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    String? token = authProvider.token;
+
+    print("Token: $token");
+    print("Room ID: $roomId");
+
+    if (token == null) {
+      print('Token is null, cannot fetch Room $roomId');
+      return;
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await apiService
+          .getRoomById(roomId: roomId, token: token)
+          .timeout(const Duration(seconds: 15));
+
+      if (response != null && response.data.rooms != null) {
+        _sinleRoom = response.data.rooms.first; // ✅ Assign the first (only) room
+        print("Room fetched successfully: ${_sinleRoom?.roomPictureUrls}");
+      } else {
+        print("No rooms found in response.");
+      }
+    } catch (e) {
+      print('Exception fetching Room: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
 
 }

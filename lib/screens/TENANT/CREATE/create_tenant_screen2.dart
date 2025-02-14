@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:rentealm_flutter/MODELS/room_model.dart';
 import 'package:rentealm_flutter/PROVIDERS/property_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
 import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/create_tenant_screen3.dart';
@@ -174,8 +175,8 @@ class _CreateTenantScreen2State extends State<CreateTenantScreen2> {
                                                 children: [
                                                   Expanded(child: ElevatedButton(
                                                     onPressed: () {
-                                                      
 
+                                                      roomProvider.fetchRoomById(context, room.id);
                                                       Navigator.push(
                                                         context,
                                                         MaterialPageRoute(

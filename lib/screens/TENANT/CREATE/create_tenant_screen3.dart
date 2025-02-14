@@ -1,5 +1,8 @@
 import 'dart:async';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
 
 class CreateTenantScreen3 extends StatefulWidget {
   final int roomId;
@@ -14,12 +17,15 @@ class CreateTenantScreen3 extends StatefulWidget {
 }
 
 class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
-  final List<String> imagePaths = [
-    "assets/images/rentrealm_logo.png",
-    "assets/images/profile_placeholder.png",
-  ];
+  //for static testing
+  // final List<String> imagePaths = [
+  //   "assets/images/rentrealm_logo.png",
+  //   "assets/images/profile_placeholder.png",
+  // ];
 
-  late List<Widget> _pages;
+  late List<String> imagePaths = [];
+  // late List<Widget> _pages;
+late List<Widget> _pages = []; 
   int _activePage = 0;
   final PageController _pageController = PageController(initialPage: 0);
   Timer? _timer;
@@ -42,14 +48,26 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    _pages = List.generate(
-      imagePaths.length,
-      (index) => ImagePlaceHolder(imagePath: imagePaths[index]),
-    );
-    startTimer();
-  }
+    void initState() {
+      super.initState();
+      
+      Future.microtask(() {
+        final roomProvider = Provider.of<RoomProvider>(context, listen: false);
+        roomProvider.fetchRoomById(context, widget.roomId).then((_) {
+          setState(() {
+            imagePaths = roomProvider.sinleRoom?.roomPictureUrls ?? [];
+            _pages = imagePaths.isNotEmpty
+                ? List.generate(
+                    imagePaths.length,
+                    (index) => ImagePlaceHolder(imagePath: imagePaths[index]),
+                  )
+                : [const Center(child: Text("No images available"))]; // ✅ Fallback value
+          });
+        });
+      });
+
+      startTimer();
+    }
 
   @override
   void dispose() {
@@ -60,6 +78,20 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
 
   @override
   Widget build(BuildContext context) {
+   final roomProvider = Provider.of<RoomProvider>(context);
+     
+  // Ensure that _pages is initialized and not empty
+    if (_pages.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Test Room Details"),
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Test Room Details"),
@@ -118,8 +150,8 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
           ),
           const SizedBox(height: 10),
 
-          const Text(
-            "Room-code123123",
+          Text(
+            roomProvider.sinleRoom?.roomCode ?? 'N/A',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
@@ -150,10 +182,29 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Padding(
+                   Padding(
                     padding: EdgeInsets.only(left: 20),
                     child: Text(
-                      "This room is available for rent. It has a great view and is spacious...",
+                      roomProvider.sinleRoom?.description ?? 'N/A',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                   const SizedBox(height: 5),
+                  const Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      "Room Category",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                   Padding(
+                    padding: EdgeInsets.only(left: 0),
+                    child: Text(
+                      roomProvider.sinleRoom?.category ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -169,10 +220,10 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      "1 bed, Shared Bathroom",
+                      roomProvider.sinleRoom?.roomDetails ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -188,10 +239,10 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      "12 x 12 Square feet",
+                      roomProvider.sinleRoom?.size ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -207,10 +258,10 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      "4",
+                      roomProvider.sinleRoom?.capacity.toString() ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -218,7 +269,7 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Occupants",
+                      "Current Occupants",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -226,13 +277,15 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
                     ),
                   ),
                   const SizedBox(height: 5),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      "2",
+                      roomProvider.sinleRoom?.currentOccupants.toString() ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
+                  const SizedBox(height: 5),
+
                 ],
               ),
             ),
@@ -250,9 +303,9 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        "P1200/month",
+                        "₱${roomProvider.sinleRoom?.rentPrice?? 0}/month",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -297,9 +350,20 @@ class ImagePlaceHolder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      imagePath,
+    //for static testing
+    // return Image.asset(
+    //   imagePath,
+    //   fit: BoxFit.cover,
+    // );
+
+    return CachedNetworkImage(
+      imageUrl: imagePath,
+      placeholder: (context, url) => const Center(
+        child: CircularProgressIndicator(),
+      ),
+      errorWidget: (context, url, error) => const Icon(Icons.error),
       fit: BoxFit.cover,
     );
+
   }
 }

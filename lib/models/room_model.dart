@@ -22,17 +22,43 @@ class RoomResponse {
   }
 }
 
+
 class RoomData {
   final List<Room> rooms;
 
   RoomData({required this.rooms});
 
   factory RoomData.fromJson(Map<String, dynamic> json) {
-    return RoomData(
-      rooms: List<Room>.from(json['rooms'].map((x) => Room.fromJson(x))),
-    );
+    var roomsJson = json['rooms'];
+
+    if (roomsJson is List) {
+      // ✅ If "rooms" is a list, parse normally
+      return RoomData(
+        rooms: List<Room>.from(roomsJson.map((x) => Room.fromJson(x))),
+      );
+    } else if (roomsJson is Map<String, dynamic>) {
+      // ✅ If "rooms" is a single object, wrap it in a list
+      return RoomData(
+        rooms: [Room.fromJson(roomsJson)],
+      );
+    } else {
+      throw Exception('Invalid room data format');
+    }
   }
 }
+
+
+// class RoomData {
+//   final List<Room> rooms;
+
+//   RoomData({required this.rooms});
+
+//   factory RoomData.fromJson(Map<String, dynamic> json) {
+//     return RoomData(
+//       rooms: List<Room>.from(json['rooms'].map((x) => Room.fromJson(x))),
+//     );
+//   }
+// }
 
 class Room {
   final int id;
@@ -92,42 +118,42 @@ class Room {
   );
 }
 
-// Helper function to properly parse `room_picture_url`
-static List<String> _parseRoomPictureUrls(dynamic url) {
-  print("URL FROM ROOMPICTUREURLS: $url");
+  // Helper function to properly parse `room_picture_url`
+  static List<String> _parseRoomPictureUrls(dynamic url) {
+    print("URL FROM ROOMPICTUREURLS: $url");
 
-  // Define the correct base URL
-  const String correctBaseUrl = "http://192.168.0.25:8000/storage/";
+    // Define the correct base URL
+    const String correctBaseUrl = "http://192.168.0.25:8000/storage/";
 
-  if (url == null) {
-    return []; // Return empty list if `room_picture_url` is null
-  }
+    if (url == null) {
+      return []; // Return empty list if `room_picture_url` is null
+    }
 
-  if (url is List) {
-    // If it's already a list, clean up the URLs and ensure it's cast to List<String>
-    return url
+    if (url is List) {
+      // If it's already a list, clean up the URLs and ensure it's cast to List<String>
+      return url
         .map((e) => e.toString().replaceAll("http://127.0.0.1:8000/storage/", correctBaseUrl))
         .toList()
         .cast<String>(); // ✅ Explicitly cast to List<String>
-  } else if (url is String) {
-    try {
-      // Extract JSON array from the string if needed
-      final match = RegExp(r"\[(.*?)\]").firstMatch(url);
-      if (match != null) {
-        String cleanedJson = "[${match.group(1)}]".replaceAll("\\/", "/");
-        List<dynamic> decoded = jsonDecode(cleanedJson);
+    } else if (url is String) {
+      try {
+        // Extract JSON array from the string if needed
+        final match = RegExp(r"\[(.*?)\]").firstMatch(url);
+        if (match != null) {
+          String cleanedJson = "[${match.group(1)}]".replaceAll("\\/", "/");
+          List<dynamic> decoded = jsonDecode(cleanedJson);
 
-        return decoded
+          return decoded
             .map((e) => e.toString().replaceAll("http://127.0.0.1:8000/storage/", correctBaseUrl))
             .toList()
             .cast<String>(); // ✅ Ensure correct type
+        }
+      } catch (e) {
+        print("Error parsing room_picture_url: $e");
       }
-    } catch (e) {
-      print("Error parsing room_picture_url: $e");
     }
+    return []; // Return empty list if parsing fails
   }
-  return []; // Return empty list if parsing fails
-}
 
 
 }
