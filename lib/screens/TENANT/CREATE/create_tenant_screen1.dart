@@ -216,6 +216,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                                     PropertyMapScreen(
                                                       lat: property.address.lat, 
                                                       long: property.address.long,
+                                                      propertyName: property.name,
                                                     )
                                                   )
                                                 );

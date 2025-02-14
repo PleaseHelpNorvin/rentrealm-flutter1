@@ -15,10 +15,9 @@ class PropertyProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   List<Property> _properties = [];
-  // List<Property> get properties => _properties;
   List<Property> get properties => _filteredProperties.isNotEmpty ? _filteredProperties : _properties;
 
-  List<Property> _filteredProperties = []; // Filtered list
+  List<Property> _filteredProperties = [];
 
 
   // Fetch property data from API
@@ -35,28 +34,23 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Use the token from authProvider here
       final response = await apiService
           .getProperty(token: token)
           .timeout(Duration(seconds: 15));
 
       if (response != null) {
-        // Clean the URLs before assigning to the properties list
         _properties = response.data.map((property) {
           // Clean URL
           // print(property.propertyPictureUrl);
           String imageUrl = property.propertyPictureUrl.isNotEmpty
-              ? property.propertyPictureUrl // Get the first URL from the list
-              : ''; // Default to empty if no URL is present
-
+              ? property.propertyPictureUrl 
+              : ''; 
+          //for cleaning the image url
           imageUrl = imageUrl
-              .replaceAll(RegExp(r'\/\/+'),
-                  '/') // Replace multiple slashes with a single slash
-              .replaceAll(RegExp(r'[\[\]""]'),
-                  '') // Remove square brackets or double quotes if present
-              .replaceAll(RegExp(r'\\+'), '') // Remove any backslashes
-              .replaceAll(
-                  RegExp(r'\\\/'), '/') // Handle escaped forward slashes
+              .replaceAll(RegExp(r'\/\/+'),'/') 
+              .replaceAll(RegExp(r'[\[\]""]'),'') 
+              .replaceAll(RegExp(r'\\+'), '')
+              .replaceAll(RegExp(r'\\\/'), '/')
               .replaceAll('http://127.0.0.1:8000', Rest.baseUrl)
               .replaceAll('/api', '');
 
@@ -87,11 +81,10 @@ class PropertyProvider extends ChangeNotifier {
     } catch (e) {
       print('Error loading image: $e');
       return Image.asset(
-          'assets/placeholder.png'); // Fallback image in case of an error
+          'assets/placeholder.png'); 
     }
   }
 
-  // You can use this method to get images for your properties
   ImageProvider getPropertyImage(String url) {
     return NetworkImage(url); // Return a NetworkImage directly
   }
@@ -118,19 +111,4 @@ class PropertyProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-
-//   void searchProperties(String query) {
-//   if (query.isEmpty) {
-//     _filteredProperties = _properties;
-//   } else {
-//     _filteredProperties = _properties
-//         .where((property) =>
-//             property.name.toLowerCase().contains(query.toLowerCase()) ||
-//             property.address.line1.toLowerCase().contains(query.toLowerCase()) || // Use `address.line1`
-//             property.address.province.toLowerCase().contains(query.toLowerCase())) // You can also use `province`
-//         .toList();
-//   }
-//   notifyListeners();
-// }
 }

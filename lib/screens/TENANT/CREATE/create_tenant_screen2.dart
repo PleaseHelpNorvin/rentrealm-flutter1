@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:rentealm_flutter/PROVIDERS/property_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
+import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/create_tenant_screen3.dart';
 
 class CreateTenantScreen2 extends StatefulWidget {
   final int propertyId;
@@ -172,7 +173,17 @@ class _CreateTenantScreen2State extends State<CreateTenantScreen2> {
                                               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Expanded(child: ElevatedButton(
-                                                    onPressed: () {},
+                                                    onPressed: () {
+                                                      
+
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) => 
+                                                          CreateTenantScreen3(roomId: room.id)
+                                                        )
+                                                      );
+                                                    },
                                                     style: ElevatedButton.styleFrom(
                                                       padding: EdgeInsets.symmetric(
                                                         vertical: 10),

@@ -43,6 +43,9 @@ dependencies:
   http_parser: ^4.0.2
   curved_navigation_bar: ^1.0.6
   cached_network_image: ^3.4.1
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:

@@ -41,7 +41,7 @@ class RoomProvider extends ChangeNotifier {
           return Room(
             id: room.id,
             propertyId: room.propertyId,
-            roomPictureUrls: _cleanRoomPictureUrls(room.roomPictureUrls), // Ensure URLs are cleaned
+            roomPictureUrls: _cleanRoomPictureUrls(room.roomPictureUrls), 
             roomCode: room.roomCode,
             description: room.description,
             roomDetails: room.roomDetails,
