@@ -13,6 +13,8 @@ import 'create_tenant_screen2.dart';
 class CreateTenantScreen1 extends StatefulWidget {
   const CreateTenantScreen1({super.key});
 
+  // Property List Ui
+
   @override
   State<CreateTenantScreen1> createState() => _CreateTenantScreen1State();
 }

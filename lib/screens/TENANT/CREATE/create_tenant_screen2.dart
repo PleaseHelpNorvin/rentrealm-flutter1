@@ -8,6 +8,8 @@ import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/create_tenant_screen3.dar
 
 class CreateTenantScreen2 extends StatefulWidget {
   final int propertyId;
+  //Room List by Property Id UI
+
   const CreateTenantScreen2({
     super.key, 
     required this.propertyId

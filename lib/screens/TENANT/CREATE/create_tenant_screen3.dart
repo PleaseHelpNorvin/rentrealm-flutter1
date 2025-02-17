@@ -3,10 +3,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
+import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/create_tenant_screen4.dart';
 
 class CreateTenantScreen3 extends StatefulWidget {
   final int roomId;
 
+  //Room Details UI
+  
   const CreateTenantScreen3({
     super.key,
     required this.roomId,
@@ -55,7 +58,7 @@ late List<Widget> _pages = [];
         final roomProvider = Provider.of<RoomProvider>(context, listen: false);
         roomProvider.fetchRoomById(context, widget.roomId).then((_) {
           setState(() {
-            imagePaths = roomProvider.sinleRoom?.roomPictureUrls ?? [];
+            imagePaths = roomProvider.singleRoom?.roomPictureUrls ?? [];
             _pages = imagePaths.isNotEmpty
                 ? List.generate(
                     imagePaths.length,
@@ -151,7 +154,7 @@ late List<Widget> _pages = [];
           const SizedBox(height: 10),
 
           Text(
-            roomProvider.sinleRoom?.roomCode ?? 'N/A',
+            roomProvider.singleRoom?.roomCode ?? 'N/A',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),
@@ -185,7 +188,7 @@ late List<Widget> _pages = [];
                    Padding(
                     padding: EdgeInsets.only(left: 20),
                     child: Text(
-                      roomProvider.sinleRoom?.description ?? 'N/A',
+                      roomProvider.singleRoom?.description ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -204,7 +207,7 @@ late List<Widget> _pages = [];
                    Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      roomProvider.sinleRoom?.category ?? 'N/A',
+                      roomProvider.singleRoom?.category ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -223,7 +226,7 @@ late List<Widget> _pages = [];
                   Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      roomProvider.sinleRoom?.roomDetails ?? 'N/A',
+                      roomProvider.singleRoom?.roomDetails ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -242,7 +245,7 @@ late List<Widget> _pages = [];
                   Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      roomProvider.sinleRoom?.size ?? 'N/A',
+                      roomProvider.singleRoom?.size ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -261,7 +264,7 @@ late List<Widget> _pages = [];
                   Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      roomProvider.sinleRoom?.capacity.toString() ?? 'N/A',
+                      roomProvider.singleRoom?.capacity.toString() ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -280,7 +283,7 @@ late List<Widget> _pages = [];
                   Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      roomProvider.sinleRoom?.currentOccupants.toString() ?? 'N/A',
+                      roomProvider.singleRoom?.currentOccupants.toString() ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -305,7 +308,7 @@ late List<Widget> _pages = [];
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "₱${roomProvider.sinleRoom?.rentPrice?? 0}/month",
+                        "₱${roomProvider.singleRoom?.rentPrice?? 0}/month",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -317,7 +320,15 @@ late List<Widget> _pages = [];
                 ),
 
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                        CreateTenantScreen4(roomId: widget.roomId) 
+                      )
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.blue,
@@ -329,7 +340,10 @@ late List<Widget> _pages = [];
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
-                  child: const Text("Rent Now!"),
+                  child: Padding(
+                    padding: EdgeInsets.all(5), 
+                    child: const Text("Rent Now!"),
+                  ),
                 ),
               ],
             ),
