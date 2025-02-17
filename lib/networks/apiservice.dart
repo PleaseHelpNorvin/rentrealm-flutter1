@@ -1,23 +1,24 @@
-import 'dart:io';
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
-import 'package:http_parser/http_parser.dart'; // Import this for MediaType
+import 'package:rentealm_flutter/MODELS/room_model.dart';
+import 'package:rentealm_flutter/models/property_model.dart';
 import 'package:rentealm_flutter/models/tenant_model.dart';
-import '../models/profile_model.dart';
-import '../apis/api.dart';
-import '../models/profile_model.dart';
-import '../models/user_model.dart';
+
+import '../API/rest.dart';
+
+import '../MODELS/profile_model.dart';
+import '../MODELS/user_model.dart';
 
 class ApiService {
-  final String api = Api.baseUrl;
+  final String rest = Rest.baseUrl;
 
-  //login api call
   Future<UserResponse?> loginUser({
     required String email,
     required String password,
   }) async {
-    final uri = Uri.parse('${Api.baseUrl}/login');
+    final uri = Uri.parse('$rest/login');
     print("loginUser() $uri");
     try {
       // Prepare request body
@@ -51,41 +52,13 @@ class ApiService {
     }
   }
 
-  Future<bool> postLogout(String token) async {
-    final uri = Uri.parse('${Api.baseUrl}/logout');
-    print("logoutUser() $uri");
-
-    try {
-      final response = await http.get(
-        uri,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization":
-              "Bearer $token", // Pass the token to authenticate the request
-        },
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        print('Logout successful: ${response.body}');
-        return true; // Return true if logout is successful
-      } else {
-        print('Error: ${response.statusCode} - ${response.body}');
-        return false; // Return false if logout fails
-      }
-    } catch (e) {
-      print('Exception: $e');
-      return false; // Return false if there is an exception
-    }
-  }
-
   Future<UserResponse?> registerUser({
     required String name,
     required String email,
     required String password,
   }) async {
-    final url = Uri.parse(
-        '${Api.baseUrl}/create/tenant'); // Replace with your API endpoint
+    final url =
+        Uri.parse('$rest/create/tenant'); // Replace with your API endpoint
 
     try {
       // Prepare request body
@@ -125,7 +98,7 @@ class ApiService {
     required int userId,
     required String token,
   }) async {
-    final uri = Uri.parse('${Api.baseUrl}/tenant/user/show/$userId');
+    final uri = Uri.parse('$rest/tenant/user/show/$userId');
 
     print("getUser() token: $token");
     try {
@@ -152,12 +125,40 @@ class ApiService {
     }
   }
 
+  Future<bool> postLogout(String token) async {
+    final uri = Uri.parse('$rest/logout');
+    print("logoutUser() $uri");
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization":
+              "Bearer $token", // Pass the token to authenticate the request
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Logout successful: ${response.body}');
+        return true; // Return true if logout is successful
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return false; // Return false if logout fails
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return false; // Return false if there is an exception
+    }
+  }
+
   Future<UserProfileResponse?> getUserProfile({
     required int userId,
     required String token,
     // required context,
   }) async {
-    final uri = Uri.parse('${Api.baseUrl}/tenant/profile/show/$userId');
+    final uri = Uri.parse('$rest/tenant/profile/show/$userId');
     print(uri);
     try {
       final response = await http.get(
@@ -171,7 +172,7 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        // print('response body ${response.body}');
+        print('response body ${response.body}');
         return UserProfileResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
@@ -192,7 +193,7 @@ class ApiService {
     print("token: $token");
     print("compressedFilePath: ${compressedFile.path}");
 
-    final uri = Uri.parse('${Api.baseUrl}/tenant/profile/storepicture/$userId');
+    final uri = Uri.parse('$rest/tenant/profile/storepicture/$userId');
     final request = http.MultipartRequest('POST', uri)
       ..headers['Authorization'] = 'Bearer $token'
       ..files.add(await http.MultipartFile.fromPath(
@@ -246,7 +247,7 @@ class ApiService {
     print('From Api call Passport Number: $passportNumber');
     print('From Api call Social Security Number: $socialSecurityNumber');
 
-    final uri = Uri.parse('${Api.baseUrl}/tenant/profile/store/$userId');
+    final uri = Uri.parse('$rest/tenant/profile/store/$userId');
     try {
       final requestBody = {
         "phone_number": phoneNumberController,
@@ -292,7 +293,7 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    final uri = Uri.parse('${Api.baseUrl}/tenant/user/update/$id');
+    final uri = Uri.parse('$rest/tenant/user/update/$id');
     try {
       final requestBody = {
         "name": name,
@@ -336,7 +337,7 @@ class ApiService {
         'From updateUserProfile() Social Media Link: $socialMediaLinkController');
     print('From updateUserProfile() Occupation: $occupationController');
 
-    final uri = Uri.parse('${Api.baseUrl}/tenant/profile/update/$userId');
+    final uri = Uri.parse('$rest/tenant/profile/update/$userId');
     try {
       final requestBody = {
         "phone_number": phoneNumberController,
@@ -387,7 +388,7 @@ class ApiService {
     print('From updateUserProfile() Country: $countryController');
     print(
         'From updateUserProfile() Postal Code Controller: $postalCodeController');
-    final uri = Uri.parse('${Api.baseUrl}/tenant/profile/update/$userId');
+    final uri = Uri.parse('$rest/tenant/profile/update/$userId');
 
     try {
       final requestBody = {
@@ -422,38 +423,227 @@ class ApiService {
     }
   }
 
-  Future<UserProfileResponse?> updateUserIdentification({
+  Future<UserProfileResponse?> updateUserIdentifications({
     required int userId,
     required String token,
-    // required String phoneNumberController,
-    // required String socialMediaLinkController,
-    // required String occupationController,
-    // required String line1Controller,
-    // required String line2Controller,
-    // required String provinceController,
-    // required String countryController,
-    // required String postalCodeController,
     required String driverLicenseNumber,
     required String nationalIdNumber,
     required String passportNumber,
     required String socialSecurityNumber,
   }) async {
-    print('From updateUserProfile() User_id: $userId');
-    print('From updateUserProfile() token: $token');
+    print("updateUserIdentifications(): $userId");
+    print("updateUserIdentifications(): $token");
+    print("updateUserIdentifications(): $driverLicenseNumber");
+    print("updateUserIdentifications(): $nationalIdNumber");
+    print("updateUserIdentifications(): $passportNumber");
+    print("updateUserIdentifications(): $socialSecurityNumber");
 
-    print(
-        'From updateUserProfile() Driver License Number: $driverLicenseNumber');
-    print('From updateUserProfile() National ID Number: $nationalIdNumber');
-    print('From updateUserProfile() Passport Number: $passportNumber');
-    print(
-        'From updateUserProfile() Social Security Number: $socialSecurityNumber');
+    final uri = Uri.parse('$rest/tenant/profile/update/$userId');
+
+    try {
+      final requestBody = {
+        "driver_license_number": driverLicenseNumber,
+        "national_id": nationalIdNumber,
+        "passport_number": passportNumber,
+        "social_security_number": socialSecurityNumber,
+      };
+
+      final request = await http.post(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      if (request.statusCode == 200 || request.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(request.body);
+        print('from ApiService.updateUserProfile:  $responseData');
+        return UserProfileResponse.fromJson(responseData);
+      } else {
+        print('Error: ${request.statusCode} - ${request.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
   }
 
-  Future<Tenant?> getTenant({
+  Future<TenantResponse?> getTenant({
+    required int profileId,
     required String token,
-    required int? userId,
   }) async {
-    print('getTenant(): $token');
-    print('getTenant(): $userId');
+    print("getTenant(): token $token");
+    print("getTenant(): profile id $profileId");
+
+    final uri = Uri.parse('$rest/tenant/tenant/showbyprofile_id/$profileId');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getTenant Call: $responseData");
+        return TenantResponse.fromJson(responseData); // Corrected this line
+      } else if (response.statusCode == 404) {
+        print('Error: ${response.statusCode} - ${response.body}');
+        print('navigating to create tenant screen');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
   }
+
+  Future<PropertyResponse?> getProperty({
+    required String token,
+  }) async {
+    print("getProperty(): token $token");
+
+    final uri = Uri.parse('$rest/tenant/property/index');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getProperty Call: $responseData");
+        return PropertyResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
+  Future<RoomResponse?>getRoomsByPropertyId({
+    required int propertyId, 
+    required String token 
+  }) async {
+    print("getRoomsByPropertyId(): $propertyId");
+    print("getRoomsByPropertyId(): $token");
+
+    final uri = Uri.parse('$rest/tenant/room/property/$propertyId');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        },
+      );
+
+      if(response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getRoomsByPropertyId() Call: $responseData");
+        return RoomResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
+  // Future<PropertyResponse?> searchProperty({
+  //   required String token,
+  //   String? address,
+  //   String? type,
+  //   String? status,
+  //   String? genderAllowed,
+  // }) async {
+  //   print("getProperty(): token $token");
+    
+  //   final uri = Uri.parse('$rest/tenant/property/search');
+
+  //   try {
+  //     final response = await http.get(
+  //       uri,
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "Accept": "application/json",
+  //         "Authorization": "Bearer $token",
+  //       }
+  //     );
+
+      
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       final Map<String, dynamic> responseData = jsonDecode(response.body);
+  //       print("responseData from getProperty Call: $responseData");
+  //       return PropertyResponse.fromJson(responseData);
+  //     } else {
+  //       print('Error: ${response.statusCode} - ${response.body}');
+  //       return null;
+  //     }
+
+  //   } catch (e) {
+
+  //     print('Exception: $e');
+  //     return null;
+  //   }
+
+  // }
+
+
+  Future<RoomResponse?>getRoomById({
+    required int roomId,
+    required String token,
+  }) async {
+
+    print("getRoomById(): $roomId");
+    print("getRoomById(): $token");
+    
+    final uri = Uri.parse('$rest/tenant/room/show/$roomId');
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": "Bearer $token",
+        }
+      );  
+
+       if(response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getRoomById() Call: $responseData");
+        return RoomResponse.fromJson(responseData);
+        
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
 }

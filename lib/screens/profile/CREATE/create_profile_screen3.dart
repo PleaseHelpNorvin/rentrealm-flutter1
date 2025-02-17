@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/models/user_model.dart';
 
-import '../../../controllers/profile_controller.dart';
+// import '../../../controllers/profile_controller.dart';
+import '../../../PROVIDERS/profile_provider.dart';
 
 class CreateProfileScreen3 extends StatefulWidget {
-  final UserResponse user;
+  final String userToken;
+  final int userId;
   final String phoneNumberController;
   final String socialMediaLinkController;
   final String occupationController;
@@ -17,7 +19,8 @@ class CreateProfileScreen3 extends StatefulWidget {
 
   CreateProfileScreen3({
     super.key,
-    required this.user,
+    required this.userId,
+    required this.userToken,
     required this.phoneNumberController,
     required this.socialMediaLinkController,
     required this.occupationController,
@@ -185,10 +188,10 @@ class CreateProfileScreenState3 extends State<CreateProfileScreen3> {
                           'Type: ${idData['type']}, Value: ${idData['controller'].text}');
                     }
 
-                    final profileController =
-                        Provider.of<ProfileController>(context, listen: false);
+                    final profileProvider =
+                        Provider.of<ProfileProvider>(context, listen: false);
 
-                    profileController.onCreateUserProfile(
+                    profileProvider.onCreateUserProfile(
                         context,
                         widget.phoneNumberController,
                         widget.socialMediaLinkController,

@@ -2,12 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/models/user_model.dart';
+import '../../../MODELS/user_model.dart';
 
-import '../../../controllers/user_controller.dart';
+import '../../../PROVIDERS/user_provider.dart';
 
 class EditUserScreen extends StatefulWidget {
-  EditUserScreen({
+  const EditUserScreen({
     super.key,
   });
 
@@ -24,10 +24,10 @@ class EditUserScreenState extends State<EditUserScreen> {
   @override
   void initState() {
     super.initState();
-    final userController = Provider.of<UserController>(context, listen: false);
-    final token = userController.user?.data?.token ?? '';
-    final name = userController.user?.data?.user.name ?? '';
-    final email = userController.user?.data?.user.email ?? '';
+    final userProvider = Provider.of<UserProvider>(context, listen: false);
+    final token = userProvider.user?.data?.token ?? '';
+    final name = userProvider.user?.data?.user.name ?? '';
+    final email = userProvider.user?.data?.user.email ?? '';
 
     // Set the initial text values for the controllers
     _nameController.text = name;
@@ -41,11 +41,12 @@ class EditUserScreenState extends State<EditUserScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text("Edit User"),
-      ),
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: true,
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text("Edit User"),
+      // ),
       body: Column(
         children: <Widget>[
           Padding(
@@ -76,15 +77,15 @@ class EditUserScreenState extends State<EditUserScreen> {
                   print("this is password: $email");
                   print("this is password: $password");
 
-                  final userController =
-                      Provider.of<UserController>(context, listen: false);
-                  userController.onUpdateUser(context, name, email, password);
+                  final userProvider =
+                      Provider.of<UserProvider>(context, listen: false);
+                  userProvider.onUpdateUser(context, name, email, password);
                 }
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue, // Set text color to white
-                minimumSize: Size(
+                minimumSize: const Size(
                     double.infinity, 50), // Set full width and height to 50
                 shape: RoundedRectangleBorder(
                   borderRadius:

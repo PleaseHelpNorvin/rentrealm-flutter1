@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/controllers/profile_controller.dart';
-import 'package:rentealm_flutter/models/user_model.dart';
+import '../../../MODELS/user_model.dart';
 
-import '../../../controllers/user_controller.dart';
+import '../../../PROVIDERS/profile_provider.dart';
+import '../../../PROVIDERS/user_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
-  EditProfileScreen({
+  const EditProfileScreen({
     super.key,
   });
 
@@ -25,12 +25,12 @@ class EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    final profileController =
-        Provider.of<ProfileController>(context, listen: false);
-    final phoneNumber = profileController.userProfile?.data.phoneNumber ?? '';
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
+    final phoneNumber = profileProvider.userProfile?.data.phoneNumber ?? '';
     final SocialMediaLinks =
-        profileController.userProfile?.data.socialMediaLinks ?? '';
-    final occupation = profileController.userProfile?.data.occupation ?? '';
+        profileProvider.userProfile?.data.socialMediaLinks ?? '';
+    final occupation = profileProvider.userProfile?.data.occupation ?? '';
 
     _phoneNumberController.text = phoneNumber;
     _socialMediaLinksController.text = SocialMediaLinks;
@@ -44,11 +44,11 @@ class EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text("Edit User Profile"),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text("Edit User Profile"),
+      // ),
       body: Column(
         children: <Widget>[
           Padding(
@@ -78,9 +78,9 @@ class EditProfileScreenState extends State<EditProfileScreen> {
                   String occupationController =
                       _occupationController.text.trim();
 
-                  final profileController =
-                      Provider.of<ProfileController>(context, listen: false);
-                  profileController.onUpdateUserProfile(
+                  final profileProvider =
+                    Provider.of<ProfileProvider>(context, listen: false);
+                  profileProvider.onUpdateUserProfile(
                       context,
                       phoneNumberController,
                       socialMediaLinksController,

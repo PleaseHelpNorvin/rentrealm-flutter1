@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/models/user_model.dart';
-
-import '../../../controllers/profile_controller.dart';
-import '../../../controllers/user_controller.dart';
+import '../../../MODELS/user_model.dart';
+import '../../../PROVIDERS/profile_provider.dart';
+import '../../../PROVIDERS/user_provider.dart';
 
 class EditIdentificationScreen extends StatefulWidget {
-  EditIdentificationScreen({
+  const EditIdentificationScreen({
     super.key,
   });
 
@@ -29,42 +28,38 @@ class EditIdentificationScreenState extends State<EditIdentificationScreen> {
   @override
   void initState() {
     super.initState();
-    final profileController =
-        Provider.of<ProfileController>(context, listen: false);
-    profileController.loadUserProfile(context);
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
+    profileProvider.loadUserProfile(context);
     final driverLicenseNumber =
-        profileController.userProfile?.data.driverLicenseNumber ?? '';
+        profileProvider.userProfile?.data.driverLicenseNumber ?? '';
     final nationalIdNumber =
-        profileController.userProfile?.data.nationalId ?? '';
+        profileProvider.userProfile?.data.nationalId ?? '';
     final passportNumber =
-        profileController.userProfile?.data.passportNumber ?? '';
+        profileProvider.userProfile?.data.passportNumber ?? '';
     final socialSecuritySystemNumber =
-        profileController.userProfile?.data.socialSecurityNumber ?? '';
+        profileProvider.userProfile?.data.socialSecurityNumber ?? '';
 
     _driverLicenseNumberController.text = driverLicenseNumber;
     _nationalIdNumberController.text = nationalIdNumber;
     _passportNumberController.text = passportNumber;
     _socialSecuritySystemNumberController.text = socialSecuritySystemNumber;
-
-    // print('editIdentification: $_driverLicenseNumberController');
-    // print('editIdentification: $_nationalIdNumberController');
-    // print('editIdentification: $_passportNumberController');
-    // print('editIdentification: $_socialSecuritySystemNumberController');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text("Edit Identifications"),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text("Edit Identifications"),
+      // ),
       body: Column(
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Form(
+              key: _formKey, // Attach the form key
               child: FieldWidget(
                 formKey: _formKey,
                 driverLicenseNumber: _driverLicenseNumberController,
@@ -83,17 +78,38 @@ class EditIdentificationScreenState extends State<EditIdentificationScreen> {
             child: ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState?.validate() ?? false) {
-                  // String
+                  String driverLicenseNumber =
+                      _driverLicenseNumberController.text.trim();
+                  String nationalIdNumber =
+                      _nationalIdNumberController.text.trim();
+                  String passportNumber =
+                      _passportNumberController.text.trim();
+                  String socialSecurityNumber =
+                      _socialSecuritySystemNumberController.text.trim();
+
+                  // Debugging print statements to check if the data is being populated
+                  print("Driver License Number: $driverLicenseNumber");
+                  print("National ID Number: $nationalIdNumber");
+                  print("Passport Number: $passportNumber");
+                  print("Social Security Number: $socialSecurityNumber");
+
+                  // Call the method to update identifications
+                  final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+                  profileProvider.onUpdateIdentifications(
+                    context,
+                    driverLicenseNumber,
+                    nationalIdNumber,
+                    passportNumber,
+                    socialSecurityNumber,
+                  );
                 }
               },
               style: ElevatedButton.styleFrom(
                 foregroundColor: Colors.white,
                 backgroundColor: Colors.blue, // Set text color to white
-                minimumSize: Size(
-                    double.infinity, 50), // Set full width and height to 50
+                minimumSize: Size(double.infinity, 50), // Set full width and height to 50
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.circular(8), // Optional: rounded corners
+                  borderRadius: BorderRadius.circular(8), // Optional: rounded corners
                 ),
               ),
               child: const Text('Update Your Identifications'),
@@ -111,6 +127,7 @@ class FieldWidget extends StatefulWidget {
   final TextEditingController nationalIdNumber;
   final TextEditingController passportNumber;
   final TextEditingController socialSecuritySystemNumber;
+
   const FieldWidget({
     super.key,
     required this.formKey,
@@ -144,6 +161,12 @@ class FieldWidgetState extends State<FieldWidget> {
                         "Enter your new Driver License Number if Available ",
                     border: OutlineInputBorder(),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a Driver License Number';
+                    }
+                    return null; // Valid input
+                  },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
@@ -153,6 +176,12 @@ class FieldWidgetState extends State<FieldWidget> {
                     hintText: "Enter your new National Id Number if Available ",
                     border: OutlineInputBorder(),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your National ID Number';
+                    }
+                    return null; // Valid input
+                  },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
@@ -162,6 +191,12 @@ class FieldWidgetState extends State<FieldWidget> {
                     hintText: "Enter your new Passport Number if Available",
                     border: OutlineInputBorder(),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your Passport Number';
+                    }
+                    return null; // Valid input
+                  },
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
@@ -172,6 +207,12 @@ class FieldWidgetState extends State<FieldWidget> {
                         "Enter your new Social Security System Number if Available",
                     border: OutlineInputBorder(),
                   ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your Social Security Number';
+                    }
+                    return null; // Valid input
+                  },
                 ),
                 const SizedBox(height: 20),
               ],

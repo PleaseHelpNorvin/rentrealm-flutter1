@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/controllers/profile_controller.dart';
-import 'package:rentealm_flutter/models/user_model.dart';
-
-import '../../../controllers/user_controller.dart';
+import '../../../PROVIDERS/profile_provider.dart';
+// import 'package:rentealm_flutter/models/user_model.dart';
+import '../../../MODELS/user_model.dart';
+import '../../../PROVIDERS/user_provider.dart';
+import '../../../MODELS/address_model.dart';
 
 class EditAddressScreen extends StatefulWidget {
-  EditAddressScreen({
+  const EditAddressScreen({
     super.key,
   });
 
@@ -26,19 +27,33 @@ class EditAddressScreenState extends State<EditAddressScreen> {
   @override
   void initState() {
     super.initState();
-    final profileController =
-        Provider.of<ProfileController>(context, listen: false);
-    final line1 = profileController.userProfile?.data.line_1 ?? '';
-    final line2 = profileController.userProfile?.data.line_2 ?? '';
-    final province = profileController.userProfile?.data.province ?? '';
-    final country = profileController.userProfile?.data.country ?? '';
-    final postalCode = profileController.userProfile?.data.postalCode ?? '';
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
+    // Extract address information correctly from the profile
+    
+    final address = profileProvider.userProfile?.data.address ?? Address(
+      line1: '',
+      line2: '',
+      province: '',
+      country: '',
+      postalCode: '',
+      lat: 0.0,
+      long: 0.0,
+    );
+        
 
-    _line1Controller.text = line1;
-    _line2Controller.text = line2;
-    _provinceController.text = province;
-    _countryController.text = country;
-    _postalCodeController.text = postalCode;
+    // final line1 = profileProvider.userProfile?.data.line_1 ?? '';
+    // final line2 = profileProvider.userProfile?.data.line_2 ?? '';
+    // final province = profileProvider.userProfile?.data.province ?? '';
+    // final country = profileProvider.userProfile?.data.country ?? '';
+    // final postalCode = profileProvider.userProfile?.data.postalCode ?? '';
+    
+
+    _line1Controller.text = address.line1;
+    _line2Controller.text = address.line2;
+    _provinceController.text = address.province;
+    _countryController.text = address.country;
+    _postalCodeController.text = address.postalCode;
 
     print('editAddressScreen: $_line1Controller');
     print('editAddressScreen: $_line2Controller');
@@ -50,11 +65,11 @@ class EditAddressScreenState extends State<EditAddressScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text("Edit Address"),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text("Edit Address"),
+      // ),
       body: Column(
         children: <Widget>[
           Padding(
@@ -76,7 +91,8 @@ class EditAddressScreenState extends State<EditAddressScreen> {
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: ElevatedButton(
-              onPressed: () {
+              
+              onPressed: () async {
                 if (_formKey.currentState?.validate() ?? false) {
                   String line1Controller = _line1Controller.text.trim();
                   String line2Controller = _line2Controller.text.trim();
@@ -85,9 +101,9 @@ class EditAddressScreenState extends State<EditAddressScreen> {
                   String postalCodeController =
                       _postalCodeController.text.trim();
 
-                  final profileController =
-                      Provider.of<ProfileController>(context, listen: false);
-                  profileController.onUpdateUserAddress(
+                  final profileProvider =
+                      Provider.of<ProfileProvider>(context, listen: false);
+                  profileProvider.onUpdateUserAddress(
                     context,
                     line1Controller,
                     line2Controller,

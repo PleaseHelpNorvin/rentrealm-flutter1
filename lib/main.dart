@@ -1,39 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/controllers/tenant_controller.dart';
+import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
+// import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
+// import 'package:rentrealm_flutter2/PROVIDERS/profile_provider.dart';
+import './PROVIDERS/profile_provider.dart';
+// import 'package:rentrealm_flutter2/PROVIDERS/user_provider.dart';
+import './PROVIDERS/user_provider.dart';
 
-//personal screens
-import './screens/home.dart';
-import './screens/get_started.dart';
-import './screens/auth/login.dart';
-import './screens/auth/register.dart';
-import 'screens/profile/CREATE/create_profile_screen1.dart';
-import 'screens/profile/CREATE/create_profile_screen2.dart';
-import './screens/profile/UPDATE/edit_user_screen.dart';
-import './screens/profile/UPDATE/edit_address_screen.dart';
-import './screens/profile/UPDATE/edit_identification_screen.dart';
-//personal providers
-import 'controllers/user_controller.dart';
-import 'controllers/profile_controller.dart';
-import 'controllers/auth_controller.dart';
-import 'screens/profile/UPDATE/edit_profile_screen.dart';
-import 'screens/profile/profile_screen.dart';
-// import '.';
+// import 'package:rentrealm_flutter2/SCREENS/AUTH/login.dart';
+import './SCREENS/AUTH/login.dart';
+// import 'package:rentrealm_flutter2/SCREENS/PROFILE/UPDATE/edit_address_screen.dart';
+import './SCREENS/PROFILE/UPDATE/edit_address_screen.dart';
+import './SCREENS/PROFILE/UPDATE/edit_identification_screen.dart';
+
+import './SCREENS/PROFILE/UPDATE/edit_profile_screen.dart';
+
+import './SCREENS/PROFILE/UPDATE/edit_user_screen.dart';
+
+// import 'package:rentrealm_flutter2/SCREENS/PROFILE/UPDATE/edit_identification_screen.dart';
+// import 'package:rentrealm_flutter2/SCREENS/PROFILE/UPDATE/edit_profile_screen.dart';
+// import 'package:rentrealm_flutter2/SCREENS/PROFILE/UPDATE/edit_user_screen.dart';
+
+import 'PROVIDERS/auth_provider.dart';
+import 'PROVIDERS/theme_provider.dart';
+import 'PROVIDERS/tenant_provider.dart';
+import 'PROVIDERS/property_provider.dart';
+
+import 'SCREENS/AUTH/register.dart';
+import 'SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
+import 'SCREENS/get_started.dart';
+import 'SCREENS/TENANT/CREATE/create_tenant_screen1.dart';
+import 'dart:io';
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
 
 void main() {
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider<AuthController>(create: (_) => AuthController()),
-        ChangeNotifierProvider<UserController>(create: (_) => UserController()),
-        ChangeNotifierProvider<TenantController>(
-            create: (_) => TenantController()),
-        ChangeNotifierProvider<ProfileController>(
-            create: (_) => ProfileController()),
-      ],
-      child: MyApp(),
-    ),
-  );
+  HttpOverrides.global = MyHttpOverrides();
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -41,21 +51,41 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Rent Realm',
-      initialRoute: '/',
-      routes: <String, WidgetBuilder>{
-        '/': (context) => GetstartedScreen(),
-        '/login': (context) => LoginScreen(),
-        '/register': (context) => RegisterScreen(),
-        '/home': (context) => HomeScreen(),
-        '/createprofile1': (context) => CreateProfileScreen1(),
-        '/profile': (context) => ProfileScreen(),
-        '/edituser': (context) => EditUserScreen(),
-        '/editprofile': (context) => EditProfileScreen(),
-        '/editaddress': (context) => EditAddressScreen(),
-        '/editidentification': (context) => EditIdentificationScreen(),
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => TenantProvider()),
+        ChangeNotifierProvider(create: (_) => PropertyProvider()),
+        ChangeNotifierProvider(create: (_) => RoomProvider()),
+
+      ],
+      child: Builder(
+        builder: (context) {
+          return MaterialApp(
+            title: 'Rent Realm',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+              useMaterial3: true,
+            ),
+            darkTheme: ThemeData.dark(),
+            themeMode: context.watch<ThemeProvider>().themeMode,
+            home: const GetStartedScreen(),
+            routes: {
+              '/register': (context) => RegisterScreen(),
+              '/login': (context) => LoginScreen(),
+              '/edituser': (context) => EditUserScreen(),
+              '/editprofile': (context) => EditProfileScreen(),
+              '/editaddress': (context) => EditAddressScreen(),
+              '/editidentification': (context) => EditIdentificationScreen(),
+              '/createprofile1': (context) => CreateProfileScreen1(),
+              '/createtenant1': (context) => CreateTenantScreen1()
+            },
+          );
+        },
+      ),
     );
   }
 }

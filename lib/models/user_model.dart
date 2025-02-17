@@ -26,7 +26,7 @@ class User {
     );
   }
 
-  Map<String, dynamic>toJson() {
+  Map<String, dynamic> toJson() {
     return {
       'name': name,
       'email': email,
@@ -77,7 +77,9 @@ class UserResponse {
     return UserResponse(
       success: responseData['success'],
       message: responseData['message'],
-      data: responseData['data'] != null ? UserData.fromJson(responseData['data']) : null,
+      data: responseData['data'] != null
+          ? UserData.fromJson(responseData['data'])
+          : null,
     );
   }
 
@@ -89,4 +91,3 @@ class UserResponse {
     };
   }
 }
-
