@@ -3,7 +3,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
-import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/create_tenant_screen4.dart';
+
+import 'create_tenant_screen4.dart';
 
 class CreateTenantScreen3 extends StatefulWidget {
   final int roomId;

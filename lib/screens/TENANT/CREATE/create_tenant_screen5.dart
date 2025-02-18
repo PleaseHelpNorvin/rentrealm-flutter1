@@ -1,8 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/create_tenant_screen6.dart';
 import 'package:signature/signature.dart'; // Import the signature package
 
 class CreateTenantScreen5 extends StatefulWidget {
-  const CreateTenantScreen5({super.key});
+  final int roomId;
+  final bool isPetAccess;
+
+  final bool isWifiEnabled;
+  final double wifiCharge;
+
+  final bool isLaundryAccess;
+  final double laundryCharge;
+
+  final bool hasPrivateFridge;
+  final double privateFridgeCharge;
+
+  final bool hasSmartTV;
+  final double smartTVCharge;
+  
+  const CreateTenantScreen5({
+    super.key,
+    required this.roomId,
+    required this.isPetAccess,
+    required this.isWifiEnabled,
+    required this.wifiCharge,
+
+    required this.isLaundryAccess,
+    required this.laundryCharge,
+
+    required this.hasPrivateFridge,
+    required this.privateFridgeCharge,
+
+    required this.hasSmartTV,
+    required this.smartTVCharge,
+
+  });
 
   @override
   State<CreateTenantScreen5> createState() => _CreateTenantScreen5State();
@@ -10,7 +42,7 @@ class CreateTenantScreen5 extends StatefulWidget {
 
 class _CreateTenantScreen5State extends State<CreateTenantScreen5> {
   // Signature controller
-  final SignatureController _controller = SignatureController(
+  final SignatureController _RentalSignatureController = SignatureController(
     penColor: Colors.blue,
     penStrokeWidth: 5,
     exportBackgroundColor: Colors.white,
@@ -18,6 +50,14 @@ class _CreateTenantScreen5State extends State<CreateTenantScreen5> {
 
   @override
   Widget build(BuildContext context) {
+    // Check the constructor values
+    bool isPetAccessAvailable = widget.isPetAccess ? true : false;
+    bool isWifiAvailable = widget.isWifiEnabled ? true : false;
+    bool isLaundryAvailable = widget.isLaundryAccess ? true : false;
+    bool hasPrivateFridgeAvailable = widget.hasPrivateFridge ? true : false;
+    bool hasSmartTVAvailable = widget.hasSmartTV ? true : false;
+
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Sign your Commitment"),
@@ -44,8 +84,9 @@ class _CreateTenantScreen5State extends State<CreateTenantScreen5> {
                   text: TextSpan(
                     children: [
                       // Bold text for "Payment Obligation"
+                      
                       TextSpan(
-                        text: "Payment Obligation: ",
+                        text: "Payment Obligation:  ",
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -98,6 +139,32 @@ class _CreateTenantScreen5State extends State<CreateTenantScreen5> {
                             "The renter agrees to comply with all the rules and regulations stated in this contract. Failure to comply may result in termination of the lease and forfeiture of the security deposit.\n\n",
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
+
+                      TextSpan(
+                        text: "Room: ${widget.roomId}\n",
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      TextSpan(
+                        text: "Pet Access: ${isPetAccessAvailable ? 'Yes' : 'No'}\n",
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      TextSpan(
+                        text: "Wifi Enabled: ${isWifiAvailable ? 'Yes' : 'No'}, ${widget.wifiCharge}\n",
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      TextSpan(
+                        text: "Laundry Access: ${isLaundryAvailable ? 'Yes' : 'No'}, ${widget.laundryCharge}\n",
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      TextSpan(
+                        text: "Has Private Fridge: ${hasPrivateFridgeAvailable ? 'Yes' : 'No'}, ${widget.privateFridgeCharge}\n",
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      TextSpan(
+                        text: "Has Smart TV: ${hasSmartTVAvailable ? 'Yes' : 'No'}, ${widget.smartTVCharge}\n",
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+
                     ],
                   ),
                 ),
@@ -127,7 +194,7 @@ class _CreateTenantScreen5State extends State<CreateTenantScreen5> {
                 borderRadius: BorderRadius.circular(0),
               ),
               child: Signature(
-                controller: _controller,
+                controller: _RentalSignatureController,
                 height: 200,
                 backgroundColor: Colors.white,
               ),
@@ -151,7 +218,7 @@ class _CreateTenantScreen5State extends State<CreateTenantScreen5> {
                     ),
                   ),
                   onPressed: () {
-                    _controller.clear();
+                    _RentalSignatureController.clear();
                   },
                   child: const Text('Clear Signature'),
                 ),
@@ -171,11 +238,32 @@ class _CreateTenantScreen5State extends State<CreateTenantScreen5> {
                       borderRadius: BorderRadius.circular(3),
                     ),
                   ),
-                  onPressed: () {
-                    // You can later extract signature and send it to backend
-                    print("Signature submitted!");
+                  onPressed: () async {
+                    var signatureSvg = await _RentalSignatureController.toRawSVG();
+                    // var signatureSvg = await _RentalSignatureController.toSVG();
+                    print("Signature submitted!$signatureSvg" );
+                    
+                    Navigator.push(
+                      context, 
+                      MaterialPageRoute(
+                        builder: (context) => CreateTenantScreen6(
+                          roomId: widget.roomId, 
+                          isPetAccess: widget.isPetAccess, 
+                          isWifiEnabled: widget.isWifiEnabled, 
+                          wifiCharge: widget.wifiCharge, 
+                          isLaundryAccess: widget.isLaundryAccess, 
+                          laundryCharge: widget.laundryCharge, 
+                          hasPrivateFridge: widget.hasPrivateFridge, 
+                          privateFridgeCharge: widget.privateFridgeCharge, 
+                          hasSmartTV: widget.hasSmartTV, 
+                          smartTVCharge: widget.smartTVCharge,
+                          signatureSvg: signatureSvg
+                        )
+                      )
+                    );
                   },
                   child: const Text('Submit Signature'),
+
                 ),
               ],
             )
