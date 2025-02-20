@@ -123,18 +123,17 @@ class Room {
     print("URL FROM ROOMPICTUREURLS: $url");
 
     // Define the correct base URL
-    const String correctBaseUrl = "http://192.168.0.25:8000/storage/";
+    String correctBaseUrl = Rest.baseUrl.replaceAll('api', 'storage/');
 
     if (url == null) {
       return []; // Return empty list if `room_picture_url` is null
     }
 
     if (url is List) {
-      // If it's already a list, clean up the URLs and ensure it's cast to List<String>
       return url
         .map((e) => e.toString().replaceAll("http://127.0.0.1:8000/storage/", correctBaseUrl))
         .toList()
-        .cast<String>(); // ✅ Explicitly cast to List<String>
+        .cast<String>(); 
     } else if (url is String) {
       try {
         // Extract JSON array from the string if needed
@@ -152,7 +151,7 @@ class Room {
         print("Error parsing room_picture_url: $e");
       }
     }
-    return []; // Return empty list if parsing fails
+    return [];
   }
 
 

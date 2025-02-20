@@ -7,6 +7,9 @@ import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/create_tenant_screen3.dar
 import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/create_tenant_screen4.dart';
 import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/create_tenant_screen5.dart';
 
+import '../../../PROVIDERS/property_provider.dart';
+import '../../../models/property_model.dart';
+
 class CreateTenantScreen6 extends StatefulWidget {
   //Billing UI
   final int roomId;
@@ -57,16 +60,35 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
   String? selectedStartDate;
   int? selectedDuration;
   final List<int> durationOptions = [1, 2, 3, 6, 12];
+  Property? fetchedProperty;
+
 
   @override
   void initState() {
     super.initState();
     Future.microtask(() => Provider.of<RoomProvider>(context, listen: false)
         .fetchRoomById(context, widget.roomId));
-  }
 
+    // Fetch Property Data
+    Future.microtask(() async {
+      final propertyProvider = Provider.of<PropertyProvider>(context, listen: false);
+      Property? property = await propertyProvider.fetchPropertyById(context, 2);
+
+      if (property != null) {
+        setState(() {
+          fetchedProperty = property; // Update the class-level variable
+        });
+        print("Fetched Property: ${fetchedProperty?.name}");
+        print("Property ID: ${fetchedProperty?.id}");
+      } else {
+        print("Failed to fetch property.");
+      }
+    });
+  }
+  
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text("Billing"),
@@ -81,7 +103,13 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
 
             if (room == null) {
               return const Center(child: CircularProgressIndicator());
-            }
+            } 
+
+            // return Consumer<PropertyProvider>(
+            //   builder: (context, propertyProvider, child) {
+            //  final Property? property = propertyProvider.property;
+
+
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -352,39 +380,40 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
                               ),
                             ),
                             //property
-                            const Align(
+                            // if (property != null) 
+                              Align(
                                 alignment: Alignment.centerLeft,
                                 child: Row(
                                   children: [
-                                    Text(
+                                    const Text(
                                       "Property: ",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors
-                                            .white, // Text color white for contrast
+                                        color: Colors.white, 
                                       ),
                                     ),
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     Text(
-                                      "data",
-                                      style: TextStyle(
+                                      fetchedProperty?.name ?? 'No Property Name',  
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.normal,
-                                        color: Colors
-                                            .white, // Text color white for contrast
+                                        color: Colors.white, 
                                       ),
                                     )
                                   ],
-                                )),
+                                ),
+                              ),
+
 
                             //address
                             const SizedBox(height: 5),
-                            const Align(
+                            Align(
                                 alignment: Alignment.centerLeft,
                                 child: Row(
                                   children: [
-                                    Text(
+                                    const Text(
                                       "Address: ",
                                       style: TextStyle(
                                         fontSize: 16,
@@ -393,10 +422,10 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
                                             .white, // Text color white for contrast
                                       ),
                                     ),
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     Text(
-                                      "data",
-                                      style: TextStyle(
+                                      '${fetchedProperty?.address.line1 ?? 'No Property Name'} ${fetchedProperty?.address.line2 ?? 'No Property Name'} ${fetchedProperty?.address.province?? 'no province'}  ${fetchedProperty?.address.postalCode}',
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.normal,
                                         color: Colors
@@ -407,11 +436,11 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
                                 )),
                             //Room
                             const SizedBox(height: 5),
-                            const Align(
+                            Align(
                                 alignment: Alignment.centerLeft,
                                 child: Row(
                                   children: [
-                                    Text(
+                                    const Text(
                                       "Room: ",
                                       style: TextStyle(
                                         fontSize: 16,
@@ -420,10 +449,10 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
                                             .white, // Text color white for contrast
                                       ),
                                     ),
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     Text(
-                                      "data",
-                                      style: TextStyle(
+                                      room.roomCode,
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.normal,
                                         color: Colors
@@ -473,11 +502,11 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
                                 )),
                             //rent price
                             const SizedBox(height: 5),
-                            const Align(
+                            Align(
                                 alignment: Alignment.centerLeft,
                                 child: Row(
                                   children: [
-                                    Text(
+                                    const Text(
                                       "Rent Price: ",
                                       style: TextStyle(
                                         fontSize: 16,
@@ -486,10 +515,10 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
                                             .white, // Text color white for contrast
                                       ),
                                     ),
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     Text(
-                                      "data",
-                                      style: TextStyle(
+                                      room.rentPrice,
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.normal,
                                         color: Colors
@@ -500,12 +529,12 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
                                 )),
                             //Lease Duration
                             const SizedBox(height: 5),
-                            const Align(
+                             Align(
                                 alignment: Alignment.centerLeft,
                                 child: Row(
                                   children: [
                                     Text(
-                                      "Lease Duration: ",
+                                      "Room Minimum Lease Duration: ",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -515,7 +544,34 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
                                     ),
                                     SizedBox(width: 10),
                                     Text(
-                                      "data",
+                                     room.minLease.toString(),
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.normal,
+                                        color: Colors
+                                            .white, // Text color white for contrast
+                                      ),
+                                    )
+                                  ],
+                                )),
+
+                                 const SizedBox(height: 5),
+                             Align(
+                                alignment: Alignment.centerLeft,
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "My Rent Lease Duration: ",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors
+                                            .white, // Text color white for contrast
+                                      ),
+                                    ),
+                                    SizedBox(width: 10),
+                                    Text(
+                                      this.selectedDuration.toString(),
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.normal,
@@ -689,8 +745,7 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
               ],
             );
           },
-        ),
-      ),
-    );
+        )),
+      );
   }
 }

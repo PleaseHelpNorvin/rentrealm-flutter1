@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/API/rest.dart';
 import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
+import 'package:rentealm_flutter/models/property_model.dart';
 import 'package:rentealm_flutter/networks/apiservice.dart';
 import '../MODELS/room_model.dart';
 import '../SCREENS/TENANT/CREATE/create_tenant_screen2.dart';
@@ -19,7 +20,7 @@ class RoomProvider extends ChangeNotifier {
   
   Room? _singleRoom;
   Room? get singleRoom => _singleRoom;
-  
+
   Future<void> fetchRoom(BuildContext context, int propertyId) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     String? token = authProvider.token;
@@ -81,7 +82,7 @@ class RoomProvider extends ChangeNotifier {
     print("cleanedURl: $urls");
     if (urls == null || urls.isEmpty) return [];
     
-    const String correctBaseUrl = "http://192.168.0.25:8000/storage/";
+    String correctBaseUrl = Rest.baseUrl.replaceAll('api', 'storage/');
     
     return urls.map((url) {
       String cleanedUrl = url.replaceFirst(RegExp(r'^https?://[^/]+/storage/'), '');
@@ -124,6 +125,6 @@ class RoomProvider extends ChangeNotifier {
     }
   }
 
-
+  
 }
 

@@ -117,7 +117,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                   ),
                                   child: property.propertyPictureUrl.isNotEmpty
                                       ? CachedNetworkImage(
-                                          imageUrl: property.propertyPictureUrl,
+                                          imageUrl: property.propertyPictureUrl.first,
                                           fit: BoxFit.cover,
                                           width: 150,
                                           height: 180,
@@ -244,20 +244,15 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                             child: ElevatedButton(
                                               onPressed: () async {
                                                 final roomProvider =
-                                                    Provider.of<RoomProvider>(
-                                                        context,
-                                                        listen: false);
-                                                await roomProvider.fetchRoom(
-                                                    context, property.id);
-                                                if (roomProvider
-                                                    .room.isNotEmpty) {
+                                                    Provider.of<RoomProvider>(context,listen: false);
+                                                await roomProvider.fetchRoom(context, property.id);
+
+                                                if (roomProvider.room.isNotEmpty) {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (context) =>
-                                                          CreateTenantScreen2(
-                                                              propertyId:
-                                                                  property.id),
+                                                      CreateTenantScreen2(propertyId: property.id),
                                                     ),
                                                   );
                                                 } else {
@@ -268,6 +263,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                                             "No rooms available for this property")),
                                                   );
                                                 }
+                                                
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 padding: EdgeInsets.symmetric(

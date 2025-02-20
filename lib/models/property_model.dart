@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rentealm_flutter/API/rest.dart';
 
 import './address_model.dart';
 
@@ -12,21 +13,35 @@ class PropertyResponse {
   );
 
   factory PropertyResponse.fromJson(Map<String, dynamic> json) {
+    var rawData = json['data'];
+
+    List<Property> parsedData = [];
+
+    if (rawData == null) {
+      print("Response `data` is null");
+    } else if (rawData is Map<String, dynamic> && rawData.containsKey('properties')) {
+      // ✅ Extract properties list from data
+      parsedData = (rawData['properties'] as List)
+          .map((item) => Property.fromJson(item))
+          .toList();
+    } else {
+      print("Unexpected response format: ${rawData.runtimeType}");
+    }
+
     return PropertyResponse(
       success: json['success'] ?? false,
       message: json['message'] ?? '',
-      data: (json['data']?['properties'] as List<dynamic>?)
-        ?.map((property) => Property.fromJson(property))
-        .toList() ??
-      [], // Make sure you're accessing 'data' and then 'properties'
+      data: parsedData,
     );
   }
+
+
 }
 
 class Property {
   final int id;
   final String name;
-  String propertyPictureUrl;
+  List<String> propertyPictureUrl;
   final String genderAllowed;
   final bool petsAllowed;
   final String type;
@@ -49,16 +64,32 @@ class Property {
   });
 
   factory Property.fromJson(Map<String, dynamic> json) {
+    // Handle property_picture_url properly
+    var propertyPicture = json['property_picture_url'];
+    List<String> propertyPictureUrl;
+
+    // If it's a single string, make it a list
+    if (propertyPicture is String) {
+        propertyPictureUrl = [propertyPicture.replaceAll('http:/127.0.0.1:8000', Rest.baseUrl).replaceAll('api', '')];
+
+    } else if (propertyPicture is List) {
+      propertyPictureUrl = List<String>.from(
+         propertyPicture.map((url) => url.replaceAll('http:/127.0.0.1:8000', Rest.baseUrl).replaceAll('api', ''))
+      );
+    } else {
+      propertyPictureUrl = [];
+    }
+
     return Property(
-      id: json['id'],
+      id: json['id'] ?? 0,
       name: json['name'] ?? '',
-      propertyPictureUrl: json['property_picture_url'] ?? '',
+      propertyPictureUrl: propertyPictureUrl,  // Corrected here
       genderAllowed: json['gender_allowed'] ?? '',
       petsAllowed: json['pets_allowed'] == 1,
       type: json['type'] ?? '',
       status: json['status'] ?? '',
       createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'],
+      updatedAt: json['updated_at'] ?? '',
       address: json['address'] != null
           ? Address.fromJson(json['address'])
           : Address(
@@ -69,9 +100,10 @@ class Property {
               postalCode: '',
               lat: 0.0,
               long: 0.0,
-            ), // Default Address if null
+            ),
     );
   }
+
 }
 
 //gender

@@ -19,59 +19,111 @@ class PropertyProvider extends ChangeNotifier {
 
   List<Property> _filteredProperties = [];
 
+  Property? _property;
+  Property? get property => _property;
 
-  // Fetch property data from API
   Future<void> fetchProperties(BuildContext context) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    String? token = authProvider.token;
+  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  String? token = authProvider.token;
 
-    if (token == null) {
-      print('Token is null, cannot fetch properties');
-      return;
-    }
+  if (token == null) {
+    print('Token is null, cannot fetch properties');
+    return;
+  }
 
-    _isLoading = true;
-    notifyListeners();
+  _isLoading = true;
+  notifyListeners();
 
-    try {
-      final response = await apiService
-          .getProperty(token: token)
-          .timeout(Duration(seconds: 15));
+  try {
+    final response = await apiService
+        .getProperty(token: token)
+        .timeout(Duration(seconds: 15));
 
-      if (response != null) {
-        _properties = response.data.map((property) {
-          // Clean URL
-          // print(property.propertyPictureUrl);
-          String imageUrl = property.propertyPictureUrl.isNotEmpty
-              ? property.propertyPictureUrl 
-              : ''; 
-          //for cleaning the image url
-          imageUrl = imageUrl
-              .replaceAll(RegExp(r'\/\/+'),'/') 
-              .replaceAll(RegExp(r'[\[\]""]'),'') 
-              .replaceAll(RegExp(r'\\+'), '')
-              .replaceAll(RegExp(r'\\\/'), '/')
-              .replaceAll('http://127.0.0.1:8000', Rest.baseUrl)
-              .replaceAll('/api', '');
+    if (response != null) {
+      _properties = response.data.map((property) {
+        // Clean URL
+        String imageUrl = property.propertyPictureUrl is List<String>
+            ? property.propertyPictureUrl[0]  // Access first element of list
+            : property.propertyPictureUrl as String; // Fallback if it's a string
 
-          property.propertyPictureUrl =
-              imageUrl; // Assign cleaned URL back to the property
-          print("Cleaned URL: $imageUrl");
-          return property;
-        }).toList();
-        print("Fetched properties: $_properties");
-      } else {
-        print('Response is null');
-        _properties = [];
-      }
-    } catch (error) {
-      print('Error fetching properties: $error');
+        // Clean the image URL
+        imageUrl = imageUrl
+            .replaceAll(RegExp(r'http://127.0.0.1:8000/'), Rest.baseUrl)  // Correct the pattern here
+            .replaceAll(RegExp(r'api'), '');
+            // .replaceAll(RegExp(r'\/\/+'), '/')
+            // .replaceAll(RegExp(r'[\[\]""]'), '')
+            // .replaceAll(RegExp(r'\\+'), '')
+            // .replaceAll(RegExp(r'\\\/'), '/')
+            // .replaceAll('http://127.0.0.1:8000', Rest.baseUrl)
+            // .replaceAll('/api', '');
+
+        // Reassign cleaned URL as a List<String>
+        property.propertyPictureUrl = [imageUrl]; // Store cleaned URL in a list
+
+        print("Cleaned URL: $imageUrl");
+        return property;
+      }).toList();
+      print("Fetched properties: ${_properties.first.propertyPictureUrl}");
+    } else {
+      print('Response is null');
       _properties = [];
     }
+  } catch (error) {
+    print('Error fetching properties: $error');
+    _properties = [];
+  }
 
+  _isLoading = false;
+  notifyListeners();
+}
+
+
+Future<Property?> fetchPropertyById(BuildContext context, int id) async {
+  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  String? token = authProvider.token;
+
+  if (token == null) {
+    print('Token is null, cannot fetch property');
+    return null;
+  }
+
+  _isLoading = true;
+  notifyListeners();
+
+  try {
+    final response = await apiService.getPropertyById(token: token, propertyId: id);
+
+    if (response != null && response.data != null) {
+      Property property = response.data.first;
+
+        if (property != null) {
+          print("Fetched Property: ${property.name}");
+          print("Property ID: ${property.id}");
+          print("Image URL: ${property.propertyPictureUrl}");
+        } else {
+          print("No property found.");
+        }
+        
+      // Clean URL logic
+      property.propertyPictureUrl = property.propertyPictureUrl;
+
+      _isLoading = false;
+      notifyListeners();
+      return property; // ✅ Return the fetched property
+    } else {
+      print('Response is null');
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    }
+  } catch (error) {
+    print('Error fetching property: $error');
     _isLoading = false;
     notifyListeners();
+    return null;
   }
+}
+
 
   Future<Image> _loadImage(String url) async {
     try {
@@ -113,6 +165,10 @@ class PropertyProvider extends ChangeNotifier {
   }
 
 
+}
+
+extension on List<String> {
+  replaceAll(RegExp regExp, String s) {}
 }
 
 
