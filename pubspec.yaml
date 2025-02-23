@@ -48,6 +48,7 @@ dependencies:
   carousel_slider: ^5.0.0
   signature: ^5.5.0
   flutter_svg: ^2.0.17
+  shared_preferences: ^2.5.2
 
 dev_dependencies:
   flutter_test:
@@ -75,6 +76,8 @@ flutter:
   assets:
     - assets/images/profile_placeholder.png
     - assets/images/rentrealm_logo.png
+    - assets/images/getstartedbg.jpeg
+    - assets/images/getstartbg2.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

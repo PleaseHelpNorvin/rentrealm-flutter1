@@ -112,10 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (_formKey.currentState!.validate()) {
                               // Call loginUser method from provider with email and password
                               authProvider.loginUser(
-                                email: emailController.text,
-                                password: passwordController.text,
-                                context: context
-                              );
+                                  email: emailController.text,
+                                  password: passwordController.text,
+                                  context: context);
                             }
                           },
                     style: ElevatedButton.styleFrom(
@@ -153,6 +152,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                              context, '/outercreatetenantscreen1');
+                        },
+                        child: RichText(
+                          text: const TextSpan(
+                            text: "Back to find apartment? ",
+                            style: TextStyle(
+                              color: Colors.black, // Default text color
+                            ),
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: 'Here',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  // decoration: TextDecoration.underline, // Corrected underline
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),

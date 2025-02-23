@@ -1,10 +1,7 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:rentealm_flutter/SCREENS/TENANT/CREATE/property_map_screen.dart';
-
+import '../../property_map_screen.dart';
 import '../../../MODELS/property_model.dart';
 import '../../../PROVIDERS/property_provider.dart';
 import '../../../PROVIDERS/room_provider.dart';
@@ -77,13 +74,25 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                     final properties = propertyProvider.properties
                         .where((property) =>
                             property.name.toLowerCase().contains(searchQuery) ||
-                            property.status.toLowerCase().contains(searchQuery) ||
-                            property.genderAllowed.toLowerCase().contains(searchQuery) ||
-                            property.address.line1.toLowerCase().contains(searchQuery) ||
-                            property.address.line2.toLowerCase().contains(searchQuery) ||
-                            property.address.province.toLowerCase().contains(searchQuery) ||
-                            property.address.postalCode.toLowerCase().contains(searchQuery)
-                        ).toList();
+                            property.status
+                                .toLowerCase()
+                                .contains(searchQuery) ||
+                            property.genderAllowed
+                                .toLowerCase()
+                                .contains(searchQuery) ||
+                            property.address.line1
+                                .toLowerCase()
+                                .contains(searchQuery) ||
+                            property.address.line2
+                                .toLowerCase()
+                                .contains(searchQuery) ||
+                            property.address.province
+                                .toLowerCase()
+                                .contains(searchQuery) ||
+                            property.address.postalCode
+                                .toLowerCase()
+                                .contains(searchQuery))
+                        .toList();
 
                     if (properties.isEmpty) {
                       return Center(
@@ -117,7 +126,8 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                   ),
                                   child: property.propertyPictureUrl.isNotEmpty
                                       ? CachedNetworkImage(
-                                          imageUrl: property.propertyPictureUrl.first,
+                                          imageUrl:
+                                              property.propertyPictureUrl.first,
                                           fit: BoxFit.cover,
                                           width: 150,
                                           height: 180,
@@ -164,7 +174,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                       ),
                                       SizedBox(height: 5),
                                       Text(
-                                        property.type ,
+                                        property.type,
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
@@ -210,17 +220,18 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                           Expanded(
                                             child: ElevatedButton(
                                               onPressed: () {
-                                              
                                                 Navigator.push(
-                                                  context, 
+                                                  context,
                                                   MaterialPageRoute(
-                                                    builder: (context) => 
-                                                    PropertyMapScreen(
-                                                      lat: property.address.lat, 
-                                                      long: property.address.long,
-                                                      propertyName: property.name,
-                                                    )
-                                                  )
+                                                    builder: (context) =>
+                                                        PropertyMapScreen(
+                                                      lat: property.address.lat,
+                                                      long:
+                                                          property.address.long,
+                                                      propertyName:
+                                                          property.name,
+                                                    ),
+                                                  ),
                                                 );
                                               },
                                               style: ElevatedButton.styleFrom(
@@ -244,15 +255,21 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                             child: ElevatedButton(
                                               onPressed: () async {
                                                 final roomProvider =
-                                                    Provider.of<RoomProvider>(context,listen: false);
-                                                await roomProvider.fetchRoom(context, property.id);
+                                                    Provider.of<RoomProvider>(
+                                                        context,
+                                                        listen: false);
+                                                await roomProvider.fetchRoom(
+                                                    context, property.id);
 
-                                                if (roomProvider.room.isNotEmpty) {
+                                                if (roomProvider
+                                                    .room.isNotEmpty) {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (context) =>
-                                                      CreateTenantScreen2(propertyId: property.id),
+                                                          CreateTenantScreen2(
+                                                              propertyId:
+                                                                  property.id),
                                                     ),
                                                   );
                                                 } else {
@@ -263,7 +280,6 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                                             "No rooms available for this property")),
                                                   );
                                                 }
-                                                
                                               },
                                               style: ElevatedButton.styleFrom(
                                                 padding: EdgeInsets.symmetric(

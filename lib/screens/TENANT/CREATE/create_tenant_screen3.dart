@@ -10,7 +10,7 @@ class CreateTenantScreen3 extends StatefulWidget {
   final int roomId;
 
   //Room Details UI
-  
+
   const CreateTenantScreen3({
     super.key,
     required this.roomId,
@@ -29,7 +29,7 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
 
   late List<String> imagePaths = [];
   // late List<Widget> _pages;
-late List<Widget> _pages = []; 
+  late List<Widget> _pages = [];
   int _activePage = 0;
   final PageController _pageController = PageController(initialPage: 0);
   Timer? _timer;
@@ -52,26 +52,28 @@ late List<Widget> _pages = [];
   }
 
   @override
-    void initState() {
-      super.initState();
-      
-      Future.microtask(() {
-        final roomProvider = Provider.of<RoomProvider>(context, listen: false);
-        roomProvider.fetchRoomById(context, widget.roomId).then((_) {
-          setState(() {
-            imagePaths = roomProvider.singleRoom?.roomPictureUrls ?? [];
-            _pages = imagePaths.isNotEmpty
-                ? List.generate(
-                    imagePaths.length,
-                    (index) => ImagePlaceHolder(imagePath: imagePaths[index]),
-                  )
-                : [const Center(child: Text("No images available"))]; // ✅ Fallback value
-          });
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      final roomProvider = Provider.of<RoomProvider>(context, listen: false);
+      roomProvider.fetchRoomById(context, widget.roomId).then((_) {
+        setState(() {
+          imagePaths = roomProvider.singleRoom?.roomPictureUrls ?? [];
+          _pages = imagePaths.isNotEmpty
+              ? List.generate(
+                  imagePaths.length,
+                  (index) => ImagePlaceHolder(imagePath: imagePaths[index]),
+                )
+              : [
+                  const Center(child: Text("No images available"))
+                ]; // ✅ Fallback value
         });
       });
+    });
 
-      startTimer();
-    }
+    startTimer();
+  }
 
   @override
   void dispose() {
@@ -82,9 +84,9 @@ late List<Widget> _pages = [];
 
   @override
   Widget build(BuildContext context) {
-   final roomProvider = Provider.of<RoomProvider>(context);
-     
-  // Ensure that _pages is initialized and not empty
+    final roomProvider = Provider.of<RoomProvider>(context);
+
+    // Ensure that _pages is initialized and not empty
     if (_pages.isEmpty) {
       return Scaffold(
         appBar: AppBar(
@@ -186,14 +188,14 @@ late List<Widget> _pages = [];
                     ),
                   ),
                   const SizedBox(height: 5),
-                   Padding(
+                  Padding(
                     padding: EdgeInsets.only(left: 20),
                     child: Text(
                       roomProvider.singleRoom?.description ?? 'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
-                   const SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   const Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
@@ -205,7 +207,7 @@ late List<Widget> _pages = [];
                     ),
                   ),
                   const SizedBox(height: 5),
-                   Padding(
+                  Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
                       roomProvider.singleRoom?.category ?? 'N/A',
@@ -284,12 +286,12 @@ late List<Widget> _pages = [];
                   Padding(
                     padding: EdgeInsets.only(left: 0),
                     child: Text(
-                      roomProvider.singleRoom?.currentOccupants.toString() ?? 'N/A',
+                      roomProvider.singleRoom?.currentOccupants.toString() ??
+                          'N/A',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
                   const SizedBox(height: 5),
-
                 ],
               ),
             ),
@@ -309,7 +311,7 @@ late List<Widget> _pages = [];
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "₱${roomProvider.singleRoom?.rentPrice?? 0}/month",
+                        "₱${roomProvider.singleRoom?.rentPrice ?? 0}/month",
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 20,
@@ -319,16 +321,13 @@ late List<Widget> _pages = [];
                     ],
                   ),
                 ),
-
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                        CreateTenantScreen4(roomId: widget.roomId) 
-                      )
-                    );
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                CreateTenantScreen4(roomId: widget.roomId)));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -342,7 +341,7 @@ late List<Widget> _pages = [];
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(5), 
+                    padding: EdgeInsets.all(5),
                     child: const Text("Rent Now!"),
                   ),
                 ),
@@ -379,6 +378,5 @@ class ImagePlaceHolder extends StatelessWidget {
       errorWidget: (context, url, error) => const Icon(Icons.error),
       fit: BoxFit.cover,
     );
-
   }
 }

@@ -19,7 +19,6 @@ class PropertyMapScreen extends StatefulWidget {
 }
 
 class _PropertyMapScreenState extends State<PropertyMapScreen> {
-
   final double staticLat = 10.315397; //remove for dynamic use
   final double staticLong = 123.997458; //remove for dynamic use
   @override
@@ -33,16 +32,15 @@ class _PropertyMapScreenState extends State<PropertyMapScreen> {
       body: FlutterMap(
         options: MapOptions(
           // initialCenter: LatLng(widget.lat, widget.long), // ✅ uncomment for dynamic use
-          initialCenter: LatLng(staticLat, staticLong), //comment for dynamic use
+          initialCenter:
+              LatLng(staticLat, staticLong), //comment for dynamic use
           initialZoom: 15.0,
         ),
         children: [
-       
           TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             subdomains: ['a', 'b', 'c'],
           ),
-         
           MarkerLayer(
             markers: [
               Marker(

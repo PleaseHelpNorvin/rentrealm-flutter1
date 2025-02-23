@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
+import 'package:rentealm_flutter/screens/homelogged.dart';
+import 'package:rentealm_flutter/screens/outer_create_tenant_screen1.dart';
 
 import 'PROVIDERS/auth_provider.dart';
 import 'PROVIDERS/theme_provider.dart';
@@ -48,7 +50,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => TenantProvider()),
         ChangeNotifierProvider(create: (_) => PropertyProvider()),
         ChangeNotifierProvider(create: (_) => RoomProvider()),
-
       ],
       child: Builder(
         builder: (context) {
@@ -62,6 +63,9 @@ class MyApp extends StatelessWidget {
             themeMode: context.watch<ThemeProvider>().themeMode,
             home: const GetStartedScreen(),
             routes: {
+              '/get_started': (context) => GetStartedScreen(),
+              '/outercreatetenantscreen1': (context) =>
+                  OuterCreateTenantScreen1(),
               '/register': (context) => RegisterScreen(),
               '/login': (context) => LoginScreen(),
               '/edituser': (context) => EditUserScreen(),
