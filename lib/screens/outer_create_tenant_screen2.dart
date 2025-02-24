@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rentealm_flutter/screens/outer_create_tenant_screen3.dart';
 
 class OuterCreateTenantScreen2 extends StatefulWidget {
   const OuterCreateTenantScreen2({super.key});
@@ -136,12 +137,12 @@ class _OuterCreateTenantScreen2State extends State<OuterCreateTenantScreen2> {
     return GestureDetector(
       onTap: () {
         print("Card tapped");
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => OuterCreateTenantScreen2(),
-        //   ),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OuterCreateTenantScreen3(),
+          ),
+        );
       },
       child: SizedBox(
         width: 350,

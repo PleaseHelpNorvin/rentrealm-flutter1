@@ -342,7 +342,7 @@ class _CreateTenantScreen3State extends State<CreateTenantScreen3> {
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(5),
-                    child: const Text("Rent Now!"),
+                    child: const Text(" "),
                   ),
                 ),
               ],
