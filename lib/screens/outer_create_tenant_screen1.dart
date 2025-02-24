@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/models/property_model.dart';
+import '../PROVIDERS/property_provider.dart';
 import '../screens/property_map_screen.dart';
 import 'package:rentealm_flutter/screens/outer_create_tenant_screen2.dart';
 
@@ -15,17 +18,274 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
   final double staticLong = 123.997458;
 
   String searchQuery = '';
+  TextEditingController _searchController = TextEditingController();
+
   String selectedGender = ''; // Class-level variable to store gender selection
   String selectedType = "";
   bool? isPet;
 
-  Map<int, bool> cardStates = {}; // Track state for each card
+  // Map<int, bool> cardStates = {}; // Track state for each card
 
-  void _toggleCardState(int index) {
-    setState(() {
-      cardStates[index] = !(cardStates[index] ?? false); // Toggle state
-    });
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => Provider.of<PropertyProvider>(context, listen: false)
+        .fetchProperties(context));
   }
+
+  Widget _buildSearchBar() {
+    final propertyProvider = Provider.of<PropertyProvider>(context);
+    // final properties = propertyProvider.searchProperties;
+    return Container(
+      padding: EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: Color(0xFF2196F3),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                hintText: "Search Location.",
+                hintStyle: TextStyle(color: Colors.white),
+                border: InputBorder.none,
+                prefixIcon: Icon(Icons.search, color: Colors.white),
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 12), // Adjust padding here
+              ),
+              onChanged: (value) {
+                propertyProvider.searchForProperties(value);
+                // setState(() {
+                //   searchQuery = value.toLowerCase();
+                // });
+              },
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.filter_list, color: Colors.white),
+            onPressed: _showFilterDialog,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showFilterDialog() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Select Gender",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Icon(Icons.male),
+                            value: "boys-only",
+                            groupValue: selectedGender,
+                            onChanged: (value) {
+                              setModalState(() {
+                                selectedGender = value!;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<String>(
+                            title: Icon(Icons.female),
+                            value: "girls-only",
+                            groupValue: selectedGender,
+                            onChanged: (value) {
+                              setModalState(() {
+                                selectedGender = value!;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Text("Select Property Category",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildSelectableBox(setModalState, "apartment"),
+                        SizedBox(width: 10),
+                        _buildSelectableBox(setModalState, "house"),
+                        SizedBox(width: 10),
+                        _buildSelectableBox(setModalState, "boarding-house"),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Text("Pet preference",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: RadioListTile<bool>(
+                            title: Text("Yes, I'm fine with pets around",
+                                style: TextStyle(fontSize: 11)),
+                            value: true,
+                            groupValue: isPet,
+                            onChanged: (value) {
+                              setModalState(() {
+                                isPet = value;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: RadioListTile<bool>(
+                            title: Text("No, I'd prefer a pet-free place",
+                                style: TextStyle(fontSize: 11)),
+                            value: false,
+                            groupValue: isPet,
+                            onChanged: (value) {
+                              setModalState(() {
+                                isPet = value;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          minimumSize: Size(double.infinity, 45),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          print("Selected Gender: $selectedGender");
+                          print("Selected Type: $selectedType");
+                          print("IsPet?: $isPet");
+
+                          // 🔥 APPLY FILTERS AFTER CLOSING MODAL
+                          Provider.of<PropertyProvider>(context, listen: false)
+                              .filterProperties(
+                                  selectedGender, selectedType, isPet);
+                        },
+                        child: Text("Apply Filters"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildPropertyList() {
+    final propertyProvider = Provider.of<PropertyProvider>(context);
+    final properties = propertyProvider.searchProperties;
+
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: properties.isEmpty
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search_off, size: 50, color: Colors.grey),
+                    SizedBox(height: 10),
+                    Text(
+                      "No properties found",
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              )
+            : ListView.builder(
+                itemCount: properties.length,
+                itemBuilder: (context, index) {
+                  return _buildPropertyCard(properties[index], context);
+                },
+              ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final propertyProvider = Provider.of<PropertyProvider>(context);
+    final properties = propertyProvider.searchProperties;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Rent Realm'),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.menu),
+            onPressed: () => _showMenu(context),
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(5),
+        child: Column(
+          children: [
+            _buildSearchBar(), // Search bar at the top
+            // SizedBox(height: 5),
+
+            // Title Section
+            Padding(
+              padding: EdgeInsets.only(left: 10, right: 10, top: 10),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Property",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+            _buildPropertyList()
+          ],
+        ),
+      ),
+    );
+  }
+
+  // void _toggleCardState(int index) {
+  //   setState(() {
+  //     cardStates[index] = !(cardStates[index] ?? false); // Toggle state
+  //   });
+  // }
 
   void _showMenu(BuildContext context) {
     showModalBottomSheet(
@@ -73,153 +333,6 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
     );
   }
 
-  void _showFilterDialog() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true, // Adjusts modal height dynamically
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  mainAxisSize:
-                      MainAxisSize.min, // Prevents unnecessary stretching
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Select Gender",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center, // Center items horizontally
-                      children: [
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: Text("Male"),
-                            value: "male",
-                            groupValue: selectedGender,
-                            onChanged: (value) {
-                              setModalState(() {
-                                selectedGender = value!;
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: Text("Female"),
-                            value: "female",
-                            groupValue: selectedGender,
-                            onChanged: (value) {
-                              setModalState(() {
-                                selectedGender = value!;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "Select Type",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.center, // Centers the boxes
-                      children: [
-                        _buildSelectableBox(setModalState, "Apartment"),
-                        SizedBox(width: 10), // Adds spacing between items
-                        _buildSelectableBox(setModalState, "House"),
-                        SizedBox(width: 10),
-                        _buildSelectableBox(setModalState, "Boarding House"),
-                      ],
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      "Pet preference",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: Text(
-                              "yes, Im fine with pets around",
-                              style: TextStyle(
-                                fontSize: 11,
-                              ),
-                            ),
-                            value: true, // Male = true
-                            groupValue: isPet,
-                            onChanged: (value) {
-                              setModalState(() {
-                                isPet = value; // Set to true
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: Text(
-                              "No, I’d prefer a pet-free place",
-                              style: TextStyle(
-                                fontSize: 11,
-                              ),
-                            ),
-                            value: false, // Female = false
-                            groupValue: isPet,
-                            onChanged: (value) {
-                              setModalState(() {
-                                isPet = value; // Set to false
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Center(
-                      // Centers the button
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue,
-                          foregroundColor: Colors.white,
-                          minimumSize: Size(double.infinity, 45),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          print("Selected Gender: $selectedGender");
-                          print("Selected Type: $selectedType");
-                          print("IsPet?: $isPet");
-                        },
-                        child: Text("Apply Filters"),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
   Widget _buildSelectableBox(Function setModalState, String type) {
     return GestureDetector(
       onTap: () {
@@ -245,43 +358,44 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return Container(
-      padding: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: Color(0xFF2196F3),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
-                hintText: "Search Location.",
-                hintStyle: TextStyle(color: Colors.white),
-                border: InputBorder.none,
-                prefixIcon: Icon(Icons.search, color: Colors.white),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 12), // Adjust padding here
-              ),
-              onChanged: (value) {
-                setState(() {
-                  searchQuery = value.toLowerCase();
-                });
-              },
-            ),
-          ),
-          IconButton(
-            icon: Icon(Icons.filter_list, color: Colors.white),
-            onPressed: _showFilterDialog,
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _buildSearchBar(PropertyProvider propertyProvider) {
+  //   return Container(
+  //     padding: EdgeInsets.all(5),
+  //     decoration: BoxDecoration(
+  //       color: Color(0xFF2196F3),
+  //       borderRadius: BorderRadius.circular(10),
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         Expanded(
+  //           child: TextField(
+  //             controller: _searchController,
+  //             style: TextStyle(color: Colors.white),
+  //             decoration: InputDecoration(
+  //               hintText: "Search Location.",
+  //               hintStyle: TextStyle(color: Colors.white),
+  //               border: InputBorder.none,
+  //               prefixIcon: Icon(Icons.search, color: Colors.white),
+  //               contentPadding:
+  //                   EdgeInsets.symmetric(vertical: 12), // Adjust padding here
+  //             ),
+  //             onChanged: (value) {
+  //               setState(() {
+  //                 searchQuery = value.toLowerCase();
+  //               });
+  //             },
+  //           ),
+  //         ),
+  //         IconButton(
+  //           icon: Icon(Icons.filter_list, color: Colors.white),
+  //           onPressed: _showFilterDialog,
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildPropertyCard() {
+  Widget _buildPropertyCard(Property property, BuildContext context) {
     return GestureDetector(
       onTap: () {
         print("Card tapped");
@@ -309,7 +423,7 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
                   child: Image.asset(
                     'assets/images/getstartbg2.jpg',
                     width: 150, // Adjust width as needed
-                    height: 170, // Adjust height as needed
+                    height: 195, // Adjust height as needed
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -320,7 +434,7 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Property Name",
+                        property.name,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -329,22 +443,22 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
                       ),
                       SizedBox(height: 5),
                       Text(
-                        "Gender: test male",
+                        "Gender allowed: ${property.genderAllowed}",
                         style: TextStyle(color: Colors.white),
                       ),
                       SizedBox(height: 5),
                       Text(
-                        "Type: test test apartment",
+                        "Type: ${property.type}",
                         style: TextStyle(color: Colors.white),
                       ),
                       SizedBox(height: 5),
                       Text(
-                        "Status: test available",
+                        "Status: ${property.status}",
                         style: TextStyle(color: Colors.white),
                       ),
                       SizedBox(height: 5),
                       Text(
-                        "Location: test City XYZ",
+                        "Location: ${property.address.line1} ${property.address.line2} ${property.address.province} ${property.address.postalCode}",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -429,70 +543,61 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
   //   );
   // }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Rent Realm'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.menu),
-            onPressed: () => _showMenu(context),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(5),
-        child: Column(
-          children: [
-            _buildSearchBar(), // Search bar at the top
-            // SizedBox(height: 5),
+  // @override
+  // Widget build(BuildContext context) {
+  //   final propertyProvider = Provider.of<PropertyProvider>(context);
+  //   final properties = propertyProvider.properties;
 
-            // Title Section
-            Padding(
-              padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Property",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            // SizedBox(height: 5),
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: const Text('Rent Realm'),
+  //       backgroundColor: Colors.blue,
+  //       foregroundColor: Colors.white,
+  //       automaticallyImplyLeading: false,
+  //       actions: [
+  //         IconButton(
+  //           icon: Icon(Icons.menu),
+  //           onPressed: () => _showMenu(context),
+  //         ),
+  //       ],
+  //     ),
+  //     body: Padding(
+  //       padding: EdgeInsets.all(5),
+  //       child: Column(
+  //         children: [
+  //           _buildSearchBar(), // Search bar at the top
+  //           // SizedBox(height: 5),
 
-            // Property Cards List (Expanded to take all available space)
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: ListView(
-                  scrollDirection:
-                      Axis.vertical, // Enables horizontal scrolling
-                  children: [
-                    _buildPropertyCard(),
-                    SizedBox(width: 10),
-                    _buildPropertyCard(),
-                    SizedBox(width: 10),
-                    _buildPropertyCard(),
-                    SizedBox(width: 10),
-                    _buildPropertyCard(),
-                    SizedBox(width: 10),
-                    _buildPropertyCard(),
-                    SizedBox(width: 10),
-                    _buildPropertyCard(),
-                    SizedBox(width: 10),
-                    _buildPropertyCard(),
-                    // Add more dynamically
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //           // Title Section
+  //           Padding(
+  //             padding: EdgeInsets.only(left: 10, right: 10, top: 10),
+  //             child: Align(
+  //               alignment: Alignment.centerLeft,
+  //               child: Text(
+  //                 "Property",
+  //                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  //               ),
+  //             ),
+  //           ),
+  //           // SizedBox(height: 5),
+
+  //           // Property Cards List (Expanded to take all available space)
+  //           Expanded(
+  //             child: Padding(
+  //               padding: EdgeInsets.all(10),
+  //               child: ListView.builder(
+  //                 itemCount: properties.length,
+  //                 itemBuilder: (context, index) {
+  //                   return _buildPropertyCard(properties[index], context);
+  //                 },
+  //                 scrollDirection:
+  //                     Axis.vertical, // Enables horizontal scrolling
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 }

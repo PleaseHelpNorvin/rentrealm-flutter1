@@ -506,12 +506,12 @@ class ApiService {
     }
   }
 
-  Future<PropertyResponse?> getProperty({
-    required String token,
-  }) async {
-    print("getProperty(): token $token");
+  Future<PropertyResponse?> getProperty(
+      // required String token,
+      ) async {
+    // print("getProperty(): token $token");
 
-    final uri = Uri.parse('$rest/tenant/property/index');
+    final uri = Uri.parse('$rest/property/index');
 
     try {
       final response = await http.get(
@@ -519,7 +519,7 @@ class ApiService {
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
-          "Authorization": "Bearer $token",
+          // "Authorization": "Bearer $token",
         },
       );
 
@@ -537,10 +537,8 @@ class ApiService {
     }
   }
 
-  Future<RoomResponse?>getRoomsByPropertyId({
-    required int propertyId, 
-    required String token 
-  }) async {
+  Future<RoomResponse?> getRoomsByPropertyId(
+      {required int propertyId, required String token}) async {
     print("getRoomsByPropertyId(): $propertyId");
     print("getRoomsByPropertyId(): $token");
 
@@ -556,7 +554,7 @@ class ApiService {
         },
       );
 
-      if(response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getRoomsByPropertyId() Call: $responseData");
         return RoomResponse.fromJson(responseData);
@@ -570,73 +568,59 @@ class ApiService {
     }
   }
 
-  Future<PropertyResponse?>getPropertyById({
+  Future<PropertyResponse?> getPropertyById({
     required String token,
     required int propertyId,
   }) async {
     final uri = Uri.parse('$rest/tenant/property/show/$propertyId');
     try {
-      final response = await http.get(
-        uri,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Bearer $token",
-        }
-      ); 
+      final response = await http.get(uri, headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      });
 
-
-      if(response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getPropertyById() Call: $responseData");
         return PropertyResponse.fromJson(responseData);
-        
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
-
     } catch (e) {
       print('Exception: $e');
       return null;
     }
   }
 
-
-  Future<RoomResponse?>getRoomById({
+  Future<RoomResponse?> getRoomById({
     required int roomId,
     required String token,
   }) async {
-
     print("getRoomById(): $roomId");
     print("getRoomById(): $token");
-    
+
     final uri = Uri.parse('$rest/tenant/room/show/$roomId');
 
     try {
-      final response = await http.get(
-        uri,
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": "Bearer $token",
-        }
-      );  
+      final response = await http.get(uri, headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      });
 
-       if(response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getRoomById() Call: $responseData");
         return RoomResponse.fromJson(responseData);
-        
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
-
     } catch (e) {
       print('Exception: $e');
       return null;
     }
   }
-
 }

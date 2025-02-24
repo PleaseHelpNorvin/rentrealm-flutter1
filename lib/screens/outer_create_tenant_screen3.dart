@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -170,11 +172,7 @@ class _OuterCreateTenantScreen3State extends State<OuterCreateTenantScreen3> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //         builder: (context) =>
-                  //             CreateTenantScreen4(roomId: widget.roomId)));
+                  Navigator.pushNamed(context, '/register');
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
@@ -198,24 +196,6 @@ class _OuterCreateTenantScreen3State extends State<OuterCreateTenantScreen3> {
       ),
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: const Text("Room Details"),
-  //       backgroundColor: Colors.blue,
-  //       foregroundColor: Colors.white,
-  //     ),
-  //     body: Column(
-  //       children: <Widget>[
-  //         _buildCarousel(),
-  //         SizedBox(height: 10),
-  //         _buildTextPart(),
-  //       ],
-  //     ),
-  //   );
-  // }
 }
 
 class ImagePlaceHolder extends StatelessWidget {
