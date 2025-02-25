@@ -38,7 +38,7 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
           Provider.of<ProfileProvider>(context, listen: false)
               .loadUserProfile(context);
 
-      Provider.of<TenantProvider>(context, listen: false).fetchTenant(context);
+      // Provider.of<TenantProvider>(context, listen: false).fetchTenant(context);
 
       if (token != null && userId != null) {
         Provider.of<UserProvider>(context, listen: false).fetchUser(context);

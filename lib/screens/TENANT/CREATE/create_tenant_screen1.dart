@@ -262,7 +262,7 @@ class _CreateTenantScreen1State extends State<CreateTenantScreen1> {
                                                     context, property.id);
 
                                                 if (roomProvider
-                                                    .room.isNotEmpty) {
+                                                    .rooms.isNotEmpty) {
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(

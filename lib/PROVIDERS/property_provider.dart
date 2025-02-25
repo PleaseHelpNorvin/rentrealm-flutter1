@@ -125,6 +125,8 @@ class PropertyProvider extends ChangeNotifier {
   }
 
   void filterProperties(String selectedGender, String selectedType, bool? isPet) {
+    _searchProperties.clear(); // ✅ Always clear before filtering
+
     print("Filtering with:");
     print("Selected Gender: $selectedGender");
     print("Selected Type: $selectedType");
@@ -144,9 +146,10 @@ class PropertyProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+
   void searchForProperties(String query) {
     if (query.isEmpty) {
-      _searchProperties = _properties;
+      _searchProperties = []; 
     } else {
       final lowerQuery = query.toLowerCase();
 
@@ -167,6 +170,10 @@ class PropertyProvider extends ChangeNotifier {
       }).toList();
     }
 
+    notifyListeners();
+  }
+    void clearSearch() {
+    _searchProperties = [];
     notifyListeners();
   }
 }

@@ -65,14 +65,14 @@ class _CreateTenantScreen2State extends State<CreateTenantScreen2> {
                     color: Color(0xFFDAEFFF),
                     child: Consumer<RoomProvider>(
                       builder: (context, roomProvider, child) {
-                        if (roomProvider.room.isEmpty) {
+                        if (roomProvider.rooms.isEmpty) {
                           return Center(child: Text("No rooms available"));
                         }
 
                         return ListView.builder(
-                          itemCount: roomProvider.room.length,
+                          itemCount: roomProvider.rooms.length,
                           itemBuilder: (context, index) {
-                            final room = roomProvider.room[index];
+                            final room = roomProvider.rooms[index];
                             return Card(
                               margin: EdgeInsets.symmetric(vertical: 5),
                               color: Color(0xff2196F3),

@@ -542,7 +542,7 @@ class ApiService {
     print("getRoomsByPropertyId(): $propertyId");
     // print("getRoomsByPropertyId(): $token");
 
-    final uri = Uri.parse('$rest/tenant/room/property/$propertyId');
+    final uri = Uri.parse('$rest/room/property/$propertyId');
 
     try {
       final response = await http.get(
@@ -595,18 +595,16 @@ class ApiService {
 
   Future<RoomResponse?> getRoomById({
     required int roomId,
-    required String token,
   }) async {
     print("getRoomById(): $roomId");
-    print("getRoomById(): $token");
 
-    final uri = Uri.parse('$rest/tenant/room/show/$roomId');
+
+    final uri = Uri.parse('$rest/room/show/$roomId');
 
     try {
       final response = await http.get(uri, headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
-        "Authorization": "Bearer $token",
       });
 
       if (response.statusCode == 200 || response.statusCode == 201) {

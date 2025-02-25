@@ -34,14 +34,6 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
         .fetchProperties(context));
   }
 
- 
-
-  // void _toggleCardState(int index) {
-  //   setState(() {
-  //     cardStates[index] = !(cardStates[index] ?? false); // Toggle state
-  //   });
-  // }
-
   void _showMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -121,7 +113,7 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => OuterCreateTenantScreen2(),
+            builder: (context) => OuterCreateTenantScreen2(propertyId: property.id),
           ),
         );
       },
@@ -248,8 +240,6 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
   }
 
 Widget _buildSearchBar() {
-  final propertyProvider = Provider.of<PropertyProvider>(context);
-
   return Container(
     padding: EdgeInsets.all(5),
     decoration: BoxDecoration(
@@ -270,9 +260,14 @@ Widget _buildSearchBar() {
               contentPadding: EdgeInsets.symmetric(vertical: 12),
             ),
             onChanged: (value) {
-              setState(() {
+              final propertyProvider =
+                  Provider.of<PropertyProvider>(context, listen: false);
+
+              if (value.isEmpty) {
+                propertyProvider.clearSearch(); // Restore full list
+              } else {
                 propertyProvider.searchForProperties(value);
-              });
+              }
             },
           ),
         ),
@@ -284,6 +279,7 @@ Widget _buildSearchBar() {
     ),
   );
 }
+
   void _showFilterDialog() {
     showModalBottomSheet(
       context: context,
@@ -424,7 +420,9 @@ Widget _buildSearchBar() {
       padding: EdgeInsets.all(10),
       child: Consumer<PropertyProvider>(
         builder: (context, propertyProvider, child) {
-          final properties = propertyProvider.searchProperties ;
+          final properties = _searchController.text.isNotEmpty
+              ? propertyProvider.searchProperties // Use filtered list if searching
+              : propertyProvider.properties; // Use full list otherwise
 
           if (propertyProvider.isLoading) {
             return Center(child: CircularProgressIndicator());

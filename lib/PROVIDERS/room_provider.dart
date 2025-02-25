@@ -16,13 +16,13 @@ class RoomProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   List<Room> _room = [];
-  List<Room> get room => _room;
+  List<Room> get rooms => _room;
   
   Room? _singleRoom;
   Room? get singleRoom => _singleRoom;
 
   Future<void> fetchRoom(BuildContext context, int propertyId) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    // final authProvider = Provider.of<AuthProvider>(context, listen: false);
     // String? token = authProvider.token;
 
     // print("Token: $token");
@@ -92,23 +92,23 @@ class RoomProvider extends ChangeNotifier {
 
     // getRoomById
   Future<void> fetchRoomById(BuildContext context, int roomId) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    String? token = authProvider.token;
+    // final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    // String? token = authProvider.token;
 
-    print("Token: $token");
+    // print("Token: $token");
     print("Room ID: $roomId");
 
-    if (token == null) {
-      print('Token is null, cannot fetch Room $roomId');
-      return;
-    }
+    // if (token == null) {
+    //   print('Token is null, cannot fetch Room $roomId');
+    //   return;
+    // }
 
     _isLoading = true;
     notifyListeners();
 
     try {
       final response = await apiService
-          .getRoomById(roomId: roomId, token: token)
+          .getRoomById(roomId: roomId)
           .timeout(const Duration(seconds: 15));
 
       if (response != null && response.data.rooms != null) {

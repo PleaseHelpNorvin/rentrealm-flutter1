@@ -82,7 +82,12 @@ class AuthProvider extends ChangeNotifier {
           name: name, email: email, password: password);
 
       if (response != null && response.success) {
+        setUser(response);
         setAuthenticationStatus(true);
+         Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeLoggedScreen()),
+          );
       } else {
         setAuthenticationStatus(false);
       }

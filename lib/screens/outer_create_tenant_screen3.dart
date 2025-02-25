@@ -2,10 +2,14 @@ import 'dart:developer';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:async';
 
+import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
+
 class OuterCreateTenantScreen3 extends StatefulWidget {
-  const OuterCreateTenantScreen3({super.key});
+  final int roomId;
+  const OuterCreateTenantScreen3({super.key, required this.roomId});
 
   @override
   State<OuterCreateTenantScreen3> createState() =>
@@ -14,12 +18,13 @@ class OuterCreateTenantScreen3 extends StatefulWidget {
 
 class _OuterCreateTenantScreen3State extends State<OuterCreateTenantScreen3> {
   // ✅ Static Images
-  final List<String> imagePaths = [
-    "assets/images/rentrealm_logo.png",
-    "assets/images/profile_placeholder.png",
-  ];
+  // final List<String> imagePaths = [
+  //   "assets/images/rentrealm_logo.png",
+  //   "assets/images/profile_placeholder.png",
+  // ];
   //dynamic approach
-  // late List<String> imagePaths = [];
+
+  late List<String> imagePaths = [];
 
   int _activePage = 0;
   final PageController _pageController = PageController(initialPage: 0);
@@ -29,7 +34,19 @@ class _OuterCreateTenantScreen3State extends State<OuterCreateTenantScreen3> {
   void initState() {
     super.initState();
     startTimer();
+Future.microtask(() async {
+    final roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    await roomProvider.fetchRoomById(context, widget.roomId);
+    
+    if (mounted) {
+      setState(() {
+        imagePaths = List<String>.from(roomProvider.singleRoom?.roomPictureUrls ?? []);
+      });
+    }
+  });
   }
+
+
 
   void startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
@@ -105,13 +122,15 @@ class _OuterCreateTenantScreen3State extends State<OuterCreateTenantScreen3> {
   }
 
   Widget _buildTextPart() {
+    final roomProvider = Provider.of<RoomProvider>(context,listen: false);
+    final room = roomProvider.singleRoom;
     return Padding(
       padding: EdgeInsets.all(10),
       child: Column(
         children: [
           // Title - Fixed (Not Scrollable)
           Text(
-            "Test",
+            room!.roomCode,
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 5),
@@ -142,61 +161,67 @@ class _OuterCreateTenantScreen3State extends State<OuterCreateTenantScreen3> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Room Details"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        children: <Widget>[
-          _buildCarousel(),
-          SizedBox(height: 10),
-          Expanded(child: _buildTextPart()), // Makes content scrollable
-        ],
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.only(left: 10, right: 10, top: 3, bottom: 3),
-        color: Colors.blue,
-        child: Padding(
-          padding: EdgeInsets.all(0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Rent Price: \$500",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/register');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.15,
-                    vertical: 5,
+    final roomProvider = Provider.of<RoomProvider>(context,listen: false);
+    final room = roomProvider.singleRoom;
+      return Scaffold(
+          appBar: AppBar(
+            title: const Text("Room Details"),
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+          ),
+          body: room == null
+              ? Center(child: CircularProgressIndicator()) // Show loader if room is null
+              : Column(
+                  children: <Widget>[
+                    _buildCarousel(),
+                    SizedBox(height: 10),
+                    Expanded(child: _buildTextPart()), // Makes content scrollable
+                  ],
+                ),
+          bottomNavigationBar: room == null
+              ? SizedBox() // Hide bottom navigation if room is not loaded yet
+              :  Container(
+          padding: EdgeInsets.only(left: 10, right: 10, top: 3, bottom: 3),
+          color: Colors.blue,
+          child: Padding(
+            padding: EdgeInsets.all(0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Rent Price: ₱${room?.rentPrice}",
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/register');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.blue,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.12,
+                      vertical: 5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3),
+                    ),
                   ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
+                  child: Padding(
+                    padding: EdgeInsets.all(5),
+                    child: const Text("Enquire Now"),
                   ),
                 ),
-                child: Padding(
-                  padding: EdgeInsets.all(5),
-                  child: const Text("Enquire Now"),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
-}
 
 class ImagePlaceHolder extends StatelessWidget {
   final String imagePath;
@@ -205,9 +230,9 @@ class ImagePlaceHolder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.asset(
-      imagePath,
-      fit: BoxFit.cover,
+    return CachedNetworkImage(
+      imageUrl: imagePath,
+      fit: BoxFit.cover, 
     );
   }
 }

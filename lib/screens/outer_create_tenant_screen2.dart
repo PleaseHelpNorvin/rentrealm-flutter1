@@ -1,8 +1,18 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
 import 'package:rentealm_flutter/screens/outer_create_tenant_screen3.dart';
 
+import '../MODELS/room_model.dart';
+
+// import '../models/room_model.dart';
+// import '..//room_model.dart';
+
 class OuterCreateTenantScreen2 extends StatefulWidget {
-  const OuterCreateTenantScreen2({super.key});
+  final int propertyId;
+
+  const OuterCreateTenantScreen2({super.key, required this.propertyId,});
 
   @override
   State<OuterCreateTenantScreen2> createState() =>
@@ -11,6 +21,12 @@ class OuterCreateTenantScreen2 extends StatefulWidget {
 
 class _OuterCreateTenantScreen2State extends State<OuterCreateTenantScreen2> {
   String searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => Provider.of<RoomProvider>(context, listen: false ).fetchRoom(context, widget.propertyId));
+  }
 
   Widget _buildSearchBar() {
     return Container(
@@ -133,80 +149,138 @@ class _OuterCreateTenantScreen2State extends State<OuterCreateTenantScreen2> {
     );
   }
 
-  Widget _buildPropertyCard() {
-    return GestureDetector(
-      onTap: () {
-        print("Card tapped");
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OuterCreateTenantScreen3(),
-          ),
-        );
-      },
-      child: SizedBox(
-        width: 350,
-        child: Card(
-          color: Colors.blue,
-          elevation: 5,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-          child: Padding(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Image Section on the Left
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: Image.asset(
-                    'assets/images/getstartbg2.jpg',
-                    width: 150, // Adjust width as needed
-                    height: 130, // Adjust height as needed
-                    fit: BoxFit.cover,
-                  ),
+Widget _buildRoomCard(Room rooms, BuildContext context) {
+  return GestureDetector(
+    onTap: () {
+      print("Card tapped");
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OuterCreateTenantScreen3(roomId: rooms.id ,),
+        ),
+      );
+    },
+    child: SizedBox(
+      width: 350,
+      child: Card(
+        color: Colors.blue,
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image Section on the Left
+              ClipRRect(
+                borderRadius: BorderRadius.circular(5),
+                child: rooms.roomPictureUrls.isNotEmpty
+                    ? CachedNetworkImage(
+                        imageUrl: rooms.roomPictureUrls.first,
+                        fit: BoxFit.cover,
+                        width: 150,
+                        height: 150,
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Center(
+                          child: Text(
+                            'Failed to load image',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 12, color: Colors.red),
+                          ),
+                        ),
+                      )
+                    : Image.asset(
+                        'assets/images/rentrealm_logo.png',
+                        fit: BoxFit.cover,
+                        width: 150,
+                        height: 180,
+                      ),
+              ),
+              SizedBox(width: 9), // Space between image and text
+
+              // Text Section on the Right
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween, // Pushes Rent Price to bottom
+                  children: [
+                    Text(
+                      rooms.roomCode,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "Category: ${rooms.category}",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "Room Status: ${rooms.status}",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "Rent Price: ₱123/month",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(width: 9), // Space between image and text
-                // Text Section on the Right
-                Expanded(
-                    child: Center(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Room Code",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Category: zdasdasdas",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Room Status: test test apartment",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      SizedBox(height: 5),
-                      Text(
-                        "Rent Price: ₱123/month",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                )),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
+    ),
+  );
+}
+
+  Widget _buildRoomList() {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Consumer<RoomProvider>(
+          builder: (context, roomProvider, child) {
+          final rooms = roomProvider.rooms;
+
+          if(roomProvider.isLoading) {
+            return Center(child: CircularProgressIndicator(),);
+          }
+
+          if (rooms.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.search_off, size: 50, color: Colors.grey),
+                  SizedBox(height: 10),
+                  Text(
+                    "No Rooms found",
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ); 
+          }
+
+          return ListView.builder(
+            itemCount: rooms.length,
+            itemBuilder: (context, index) {
+              return _buildRoomCard(rooms[index], context);
+            },
+          );
+        }
+        ),
+      ),  
     );
   }
 
@@ -214,7 +288,7 @@ class _OuterCreateTenantScreen2State extends State<OuterCreateTenantScreen2> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Rooms"),
+        title: Text("Rooms ${widget.propertyId}"),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
         actions: [
@@ -243,34 +317,7 @@ class _OuterCreateTenantScreen2State extends State<OuterCreateTenantScreen2> {
             //     ),
             //   ),
             // ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.all(10),
-                child: ListView(
-                  scrollDirection: Axis.vertical,
-                  children: [
-                    _buildPropertyCard(),
-                    SizedBox(width: 10),
-                    _buildPropertyCard(),
-                    SizedBox(width: 10),
-                    _buildPropertyCard(),
-                    // SizedBox(width: 10),
-                    // _buildPropertyCard(),
-                    // SizedBox(width: 10),
-                    // _buildPropertyCard(),
-                    // SizedBox(width: 10),
-                    // _buildPropertyCard(),
-                    // SizedBox(width: 10),
-                    // _buildPropertyCard(),
-                    // SizedBox(width: 10),
-                    // _buildPropertyCard(),
-                    // SizedBox(width: 10),
-                    // _buildPropertyCard(),
-                    // SizedBox(width: 10),
-                  ],
-                ),
-              ),
-            ),
+            _buildRoomList()
           ],
         ),
       ),
