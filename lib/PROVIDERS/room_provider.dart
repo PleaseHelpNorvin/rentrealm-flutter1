@@ -23,22 +23,22 @@ class RoomProvider extends ChangeNotifier {
 
   Future<void> fetchRoom(BuildContext context, int propertyId) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    String? token = authProvider.token;
+    // String? token = authProvider.token;
 
-    print("Token: $token");
+    // print("Token: $token");
     print("Property ID: $propertyId");
 
-    if (token == null) {
-      print('Token is null, cannot fetch Room');
-      return;
-    }
+    // if (token == null) {
+    //   print('Token is null, cannot fetch Room');
+    //   return;
+    // }
 
     _isLoading = true;
     notifyListeners();
 
     try {
       final response = await apiService
-        .getRoomsByPropertyId(propertyId: propertyId, token: token)
+        .getRoomsByPropertyId(propertyId: propertyId)
         .timeout(const Duration(seconds: 15));
 
       if (response != null) {
@@ -79,7 +79,7 @@ class RoomProvider extends ChangeNotifier {
   List<String> _cleanRoomPictureUrls(List<String>? urls) {
 
 
-    print("cleanedURl: $urls");
+    print("cleanedURl: $urls");   
     if (urls == null || urls.isEmpty) return [];
     
     String correctBaseUrl = Rest.baseUrl.replaceAll('api', 'storage/');

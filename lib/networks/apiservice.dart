@@ -538,9 +538,9 @@ class ApiService {
   }
 
   Future<RoomResponse?> getRoomsByPropertyId(
-      {required int propertyId, required String token}) async {
+      {required int propertyId}) async {
     print("getRoomsByPropertyId(): $propertyId");
-    print("getRoomsByPropertyId(): $token");
+    // print("getRoomsByPropertyId(): $token");
 
     final uri = Uri.parse('$rest/tenant/room/property/$propertyId');
 
@@ -550,7 +550,6 @@ class ApiService {
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
-          "Authorization": "Bearer $token",
         },
       );
 
