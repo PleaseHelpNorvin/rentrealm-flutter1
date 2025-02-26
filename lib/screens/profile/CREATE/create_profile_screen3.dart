@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/models/user_model.dart';
+// import 'package:rentealm_flutter/models/user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // import '../../../controllers/profile_controller.dart';
 import '../../../PROVIDERS/profile_provider.dart';
@@ -16,6 +17,8 @@ class CreateProfileScreen3 extends StatefulWidget {
   final String provinceController;
   final String countryController;
   final String postalCodeController;
+  int? roomId;
+
 
   CreateProfileScreen3({
     super.key,
@@ -33,9 +36,26 @@ class CreateProfileScreen3 extends StatefulWidget {
 
   @override
   CreateProfileScreenState3 createState() => CreateProfileScreenState3();
+  
 }
 
+
 class CreateProfileScreenState3 extends State<CreateProfileScreen3> {
+  Future<void> _getRoomId() async {
+  final prefs = await SharedPreferences.getInstance();
+  setState(() {
+    widget.roomId = prefs.getInt('roomId'); // Retrieve the stored roomId
+  });
+}
+
+
+  @override
+void initState() {
+  super.initState();
+  _getRoomId();
+}
+
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   // List of identification options
@@ -70,6 +90,8 @@ class CreateProfileScreenState3 extends State<CreateProfileScreen3> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text('Room ID: ${widget.roomId ?? "Not Available"}'),
+
               ElevatedButton.icon(
                 onPressed: () {
                   if (_identificationList.length < 4) {
@@ -201,6 +223,7 @@ class CreateProfileScreenState3 extends State<CreateProfileScreen3> {
                         widget.provinceController,
                         widget.countryController,
                         widget.postalCodeController,
+                        widget.roomId!.toInt(),
                         _identificationList);
 
                     ScaffoldMessenger.of(context).showSnackBar(

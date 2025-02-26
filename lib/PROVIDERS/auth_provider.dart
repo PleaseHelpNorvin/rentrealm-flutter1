@@ -1,6 +1,7 @@
 // import 'dart:core';
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../CUSTOMS/alert_utils.dart';
 import '../MODELS/user_model.dart';
 import '../NETWORKS/apiservice.dart';
@@ -71,11 +72,16 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+    Future<void> saveRoomId(int roomId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('roomId', roomId);
+  }
 
   Future<void> registerUser(
       {required String name,
       required String email,
       required String password,
+      required int roomId,
       required BuildContext context}) async {
     try {
       final response = await apiService.registerUser(
@@ -84,6 +90,7 @@ class AuthProvider extends ChangeNotifier {
       if (response != null && response.success) {
         setUser(response);
         setAuthenticationStatus(true);
+        await saveRoomId(roomId);
          Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => const HomeLoggedScreen()),

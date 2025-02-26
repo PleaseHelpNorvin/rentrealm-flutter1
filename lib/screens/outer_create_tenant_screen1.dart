@@ -50,7 +50,7 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "Welcome to Rent Realm",
+                "Already have an account?",
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 15),
@@ -63,15 +63,15 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
                   Navigator.pushNamed(context, '/login');
                 },
               ),
-              Divider(),
-              ListTile(
-                leading: Icon(Icons.app_registration, color: Colors.green),
-                title: Text("Register"),
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.pushNamed(context, '/register');
-                },
-              ),
+              // Divider(),
+              // ListTile(
+              //   leading: Icon(Icons.app_registration, color: Colors.green),
+              //   title: Text("Register"),
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //     Navigator.pushNamed(context, '/register');
+              //   },
+              // ),
               SizedBox(height: 10),
             ],
           ),

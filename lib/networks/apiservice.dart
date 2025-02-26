@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:rentealm_flutter/MODELS/room_model.dart';
+import 'package:rentealm_flutter/models/inquiry_model.dart';
 import 'package:rentealm_flutter/models/property_model.dart';
 import 'package:rentealm_flutter/models/tenant_model.dart';
 
@@ -616,8 +617,68 @@ class ApiService {
         return null;
       }
     } catch (e) {
+        print('Exception: $e');
+        return null;
+    }
+  }
+
+  Future<InquiryResponse?>postInquiry({
+    required String token,
+    required int roomId,
+    required int profileId,
+    required bool isPetEnabled,
+    required bool isWifiEnabled,
+    required bool isLaundryAccess,
+    required bool hasPrivateFridge,
+    required bool hasSmartTV,
+  }) async {
+    print("storeInquiry() roomId $token");
+
+    print("storeInquiry() roomId $roomId");
+    print("storeInquiry() profileID $profileId");
+    print("storeInquiry() isPetEnabled $isPetEnabled");
+    print("storeInquiry() wifiEnabled: $isWifiEnabled");
+    print("storeInquiry() isLaundryAccess: $isLaundryAccess");
+    print("storeInquiry() hasPrivateFridge: $hasPrivateFridge");
+    print("storeInquiry() hasSmartTv: $hasSmartTV");
+
+    final uri = Uri.parse('$rest/tenant/inquiry/store');
+
+    try {
+      final body = {
+        "profile_id": profileId,
+        "room_id": roomId,
+        "has_pets": isPetEnabled,
+        "wifi_enabled": isWifiEnabled,
+        "has_laundry_access": isLaundryAccess,
+        "has_private_fridge": hasPrivateFridge,
+        "has_tv": hasSmartTV,
+      };
+
+      final response = await http.post(
+        uri, headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer $token",
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print(responseData);
+        return InquiryResponse.fromJson(responseData); // Parse response into model
+      } else {
+        // Handle errors
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+
+    } catch (e) {
       print('Exception: $e');
       return null;
     }
   }
 }
+
+

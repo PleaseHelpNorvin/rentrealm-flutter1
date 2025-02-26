@@ -39,7 +39,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: false,
         title: const Text("Login"),
       ),
       body: Consumer<AuthProvider>(
@@ -130,56 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         : const Text("Login"),
                   ),
                   const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/register');
-                    },
-                    child: RichText(
-                      text: const TextSpan(
-                        text: "Don't have an account? ",
-                        style: TextStyle(
-                          color: Colors.black, // Default text color
-                        ),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'Register Here',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              // decoration: TextDecoration.underline, // Corrected underline
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(
-                              context, '/outercreatetenantscreen1');
-                        },
-                        child: RichText(
-                          text: const TextSpan(
-                            text: "Back to find apartment? ",
-                            style: TextStyle(
-                              color: Colors.black, // Default text color
-                            ),
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: 'Here',
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  // decoration: TextDecoration.underline, // Corrected underline
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
+                  
                 ],
               ),
             ),

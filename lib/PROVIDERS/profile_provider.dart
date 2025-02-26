@@ -14,6 +14,7 @@ import '../MODELS/profile_model.dart';
 import '../NETWORKS/apiservice.dart';
 import '../SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
 import '../SCREENS/PROFILE/profile.dart';
+import '../screens/outer_create_tenant_screen4.dart';
 
 class ProfileProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
@@ -148,6 +149,8 @@ class ProfileProvider extends ChangeNotifier {
       String provinceController,
       String countryController,
       String postalCodeController,
+      int roomId,
+
       List<Map<String, dynamic>> identificationData) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     int? userId = authProvider.user?.data?.user.id;
@@ -188,6 +191,7 @@ class ProfileProvider extends ChangeNotifier {
     print('Driver License Number: $driverLicenseNumber');
     print('National ID Number: $nationalIdNumber');
     print('Passport Number: $passportNumber');
+    print('roomId: $roomId');
     print('Social Security Number: $socialSecurityNumber');
     final response = await apiService.postProfileData(
         userId: userId,
@@ -212,12 +216,21 @@ class ProfileProvider extends ChangeNotifier {
         title: "Profile Created Successfully",
         message: "Thank You For Creating Profile",
         onConfirmBtnTap: () {
+          // WidgetsBinding.instance.addPostFrameCallback((_) {
+          //   Navigator.pushReplacement(
+          //     context,
+          //     MaterialPageRoute(builder: (_) => const HomeLoggedScreen()),
+          //   );
+          // });
+
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => const HomeLoggedScreen()),
+              MaterialPageRoute(builder: (_) => OuterCreateTenantScreen4(roomId:roomId, profileId: _userProfile!.data.id,)),
             );
           });
+
+          
         },
       );
     } else {

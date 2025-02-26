@@ -6,10 +6,15 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
+import 'package:rentealm_flutter/screens/auth/register.dart';
 
 class OuterCreateTenantScreen3 extends StatefulWidget {
   final int roomId;
-  const OuterCreateTenantScreen3({super.key, required this.roomId});
+
+
+  const OuterCreateTenantScreen3({super.key, 
+    required this.roomId,
+  });
 
   @override
   State<OuterCreateTenantScreen3> createState() =>
@@ -197,7 +202,11 @@ Future.microtask(() async {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/register');
+                    Navigator.pushReplacement(context, 
+                      MaterialPageRoute(builder: (context) => 
+                        RegisterScreen(roomId: widget.roomId)
+                      )
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,

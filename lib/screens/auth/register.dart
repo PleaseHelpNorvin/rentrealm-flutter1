@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 // import 'package:flutter/src/foundation/diagnostics.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import '../../PROVIDERS/auth_provider.dart';
 // import 'package:rentealm_flutter/controllers/user_controller.dart';
 import 'login.dart';
 
 class RegisterScreen extends StatefulWidget {
+  final int roomId;
+
+    RegisterScreen({
+  super.key,
+  required this.roomId,
+});
   @override
   RegisterScreenState createState() => RegisterScreenState();
 }
@@ -26,6 +33,23 @@ class RegisterScreenState extends State<RegisterScreen> {
     super.initState();
     // Initialize any state if needed
   }
+  
+   Future<void> registerUser(AuthProvider authProvider) async {
+    if (_formKey.currentState!.validate()) {
+      // Call registerUser method from provider
+      await authProvider.registerUser(
+        name: nameController.text,
+        email: emailController.text,
+        password: passwordController.text,
+        roomId: widget.roomId,
+        context: context,
+      );
+
+      // Save roomId in SharedPreferences after successful registration
+      // await saveRoomId(widget.roomId);
+    }
+  }
+
 
   @override
   void dispose() {
@@ -39,7 +63,7 @@ class RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text("Register"),
+        title:  Text("Register ${widget.roomId}"),
       ),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
@@ -121,19 +145,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: 40),
                   ElevatedButton(
-                    onPressed: authProvider.isLoading
-                        ? null // Disable button if loading
-                        : () {
-                            if (_formKey.currentState!.validate()) {
-                              // Call loginUser method from provider with email and password
-                              authProvider.registerUser(
-                                name: nameController.text,
-                                email: emailController.text,
-                                password: passwordController.text,
-                                context: context,
-                              );
-                            }
-                          },
+                    onPressed: authProvider.isLoading ? null : () => registerUser(authProvider),
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
                       backgroundColor: Colors.blue,
@@ -146,29 +158,30 @@ class RegisterScreenState extends State<RegisterScreen> {
                         ? const CircularProgressIndicator(color: Colors.white)
                         : const Text("Submit Register"),
                   ),
+
                   const SizedBox(height: 20),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/login');
-                    },
-                    child: RichText(
-                      text: TextSpan(
-                        text: "Already have an account? ",
-                        style: const TextStyle(
-                          color: Colors.black, // Default text color
-                        ),
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'Login Here',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              // decoration: TextDecoration.underline, // Corrected underline
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     Navigator.pushNamed(context, '/login');
+                  //   },
+                  //   child: RichText(
+                  //     text: TextSpan(
+                  //       text: "Already have an account? ",
+                  //       style: const TextStyle(
+                  //         color: Colors.black, // Default text color
+                  //       ),
+                  //       children: <TextSpan>[
+                  //         TextSpan(
+                  //           text: 'Login Here',
+                  //           style: TextStyle(
+                  //             color: Colors.blue,
+                  //             // decoration: TextDecoration.underline, // Corrected underline
+                  //           ),
+                  //         ),
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),

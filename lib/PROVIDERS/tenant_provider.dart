@@ -65,4 +65,5 @@ class TenantProvider extends ChangeNotifier {
       // setTenant(null); // Ensure tenant is set to null if token or profile ID is missing
     }
   }
+
 }
