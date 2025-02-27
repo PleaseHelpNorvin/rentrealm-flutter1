@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/inquiry_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/notification_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
 import 'package:rentealm_flutter/screens/homelogged.dart';
 import 'package:rentealm_flutter/screens/outer_create_tenant_screen1.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PropertyProvider()),
         ChangeNotifierProvider(create: (_) => RoomProvider()),
         ChangeNotifierProvider(create: (_) => InquiryProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: Builder(
         builder: (context) {

@@ -20,98 +20,80 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<ProfileProvider>(context, listen: false);
-
-      // Provider.of<TenantProvider>(context, listen: false)
-      // .fetchTenant(context);
-
       Provider.of<UserProvider>(context, listen: false).fetchUser(context);
 
     });
   }
 
+  Future<void> _refreshData() async {
+    await Future.delayed(Duration(seconds: 2)); // Simulate data fetching
+    setState(() {}); // Rebuild the widget
+  }
+
+
+Widget _buildNoDataCard() {
+  return Card(
+    elevation: 1,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+    color: Colors.orange.shade50,
+    child: const SizedBox(
+      width: double.infinity,
+      height: 300, // Increased height to 300px
+      child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Center( // Center everything inside the Card
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+              crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
+              children: [
+                Icon(Icons.reviews, size: 40, color: Colors.orange),
+                SizedBox(height: 8),
+                Text(
+                  'Thank you for inquiring. The admins are reviewing your inquiry.',
+                  textAlign: TextAlign.center, // Center text
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Admins may contact you once they have reviewed your inquiry.',
+                  textAlign: TextAlign.center, // Center text
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Please check your notifications or be available for a possible call.',
+                  textAlign: TextAlign.center, // Center text
+                  style: TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            // Make the whole body scrollable
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  // Welcome Back Text
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Text(
-                      'Welcome Back, $userName!',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  // Card under the Row of Cards (Maintenance Requests Card)
-                  Card(
-                    elevation: 5,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    color: Colors.orange.shade50,
-                    child: const SizedBox(
-                      width: double.infinity,
-                      height: 450, // Increased height to 200px
-                      child: Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: SingleChildScrollView(
-                          // Make content scrollable
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Icon(Icons.handyman,
-                                  size: 40, color: Colors.orange),
-                              SizedBox(height: 8),
-                              Text(
-                                'Your Maintenance Requests',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 4),
-                              // Static Data for Maintenance Request
-                              SizedBox(height: 8),
-                              // Adding some static values inside the card
-                              Text(
-                                'Request ID: 12345',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Scheduled: Tomorrow, 2:00 PM',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              // You can add more content to make it scrollable
-                              SizedBox(height: 8),
-                              Text(
-                                'Details: This is a static detail for the maintenance request.',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Handyman Accepted: John Doe',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+      body: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: Padding(
+          padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
+          child: SingleChildScrollView(
+            physics: AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                _buildNoDataCard(),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

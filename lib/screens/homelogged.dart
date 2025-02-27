@@ -2,9 +2,9 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
 import 'package:rentealm_flutter/SCREENS/PROFILE/UPDATE/edit_address_screen.dart';
 import 'package:rentealm_flutter/screens/CONTRACT/contract.dart';
+import 'package:rentealm_flutter/screens/NOTIFICATIONS/notifications.dart';
 import 'package:rentealm_flutter/screens/RENT/rent.dart';
 import 'package:rentealm_flutter/screens/profile/UPDATE/edit_identification_screen.dart';
 import '../PROVIDERS/auth_provider.dart';
@@ -22,7 +22,7 @@ class HomeLoggedScreen extends StatefulWidget {
 }
 
 class HomeLoggedScreenState extends State<HomeLoggedScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 2;
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
@@ -51,9 +51,10 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
   @override
   Widget build(BuildContext context) {
     final List<String> titles = [
-      'Home',
       'Contracts',
       'Rent',
+      'Home',
+      'Notification',
       'Profile',
     ];
 
@@ -73,12 +74,14 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
             switch (settings.name) {
               case '/':
                 if (_currentIndex == 0) {
-                  page = const HomeScreen();
-                } else if (_currentIndex == 1) {
                   page = const ContractScreen();
-                } else if (_currentIndex == 2) {
+                } else if (_currentIndex == 1) {
                   page = const RentScreen();
+                } else if (_currentIndex == 2) {
+                  page = const HomeScreen();
                 } else if (_currentIndex == 3) {
+                  page = const NotificationScreen();
+                } else if (_currentIndex == 4) {
                   page = const ProfileScreen();
                 }
                 break;
@@ -95,13 +98,15 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
                 page = const EditIdentificationScreen();
                 break;
               default:
-                if (_currentIndex == 0) {
-                  page = const HomeScreen();
-                } else if (_currentIndex == 1) {
+                     if (_currentIndex == 0) {
                   page = const ContractScreen();
-                } else if (_currentIndex == 2) {
+                } else if (_currentIndex == 1) {
                   page = const RentScreen();
+                } else if (_currentIndex == 2) {
+                  page = const HomeScreen();
                 } else if (_currentIndex == 3) {
+                  page = const NotificationScreen();
+                } else if (_currentIndex == 4) {
                   page = const ProfileScreen();
                 }
             }
@@ -114,9 +119,10 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
         color: Colors.blue,
         backgroundColor: Colors.transparent,
         items: const <Widget>[
-          Icon(Icons.home, size: 30, color: Colors.white),
           Icon(Icons.description, size: 30, color: Colors.white),
           Icon(Icons.apartment, size: 30, color: Colors.white),
+          Icon(Icons.home, size: 30, color: Colors.white),
+          Icon(Icons.notifications, size: 30, color: Colors.white),
           Icon(Icons.person, size: 30, color: Colors.white),
         ],
         index: _currentIndex,

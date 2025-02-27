@@ -1,24 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class RentScreen extends StatefulWidget {
-  const RentScreen({super.key});
+import '../../PROVIDERS/notification_provider.dart';
+
+class NotificationScreen extends StatefulWidget {
+  const NotificationScreen({super.key});
 
   @override
-  State<RentScreen> createState() => _RentScreenState();
+  State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
-class _RentScreenState extends State<RentScreen> {
+class _NotificationScreenState extends State<NotificationScreen> {
+  List<String> notifications = [
+    // "Welcome to the app!",
+    // "Your profile has been updated.",
+    // "New message from support."
+  ]; // ✅ Static notifications
 
-  List<String> rent = [
-    "Welcome to the app!",
-    "Your profile has been updated.",
-    "New message from support."
-  ]; // ✅ Static rent
+ @override
+  void initState() {
+    super.initState();
+      final notificationProvider = Provider.of<NotificationProvider>(context, listen: false).fetchNotification(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+        final notificationProvider1 = Provider.of<NotificationProvider>(context, listen: false);
+
+      final fetchedNotifications = notificationProvider1.notificationsList;
+
+      setState(() {
+        notifications = fetchedNotifications;
+      });
+    });
+  }
 
   Future<void> _refreshData() async {
     await Future.delayed(Duration(seconds: 2)); // Simulate data fetching
     setState(() {
-      rent = [
+      notifications = [
         "New system update available!",
         "Reminder: Check your tasks"
       ]; // Simulated new data
@@ -38,7 +56,7 @@ class _RentScreenState extends State<RentScreen> {
               Icon(Icons.search_off, size: 50, color: Colors.grey),
               SizedBox(height: 10),
               Text(
-                "No Rent found",
+                "No notifications found",
                 style: TextStyle(fontSize: 18, color: Colors.grey),
               ),
             ],
@@ -48,7 +66,7 @@ class _RentScreenState extends State<RentScreen> {
     );
   }
 
-  Widget _buildRentListCard(String notification) {
+  Widget _buildNotificationListCard(String notification) {
     return Card(
       elevation: 1,
       shape: RoundedRectangleBorder(
@@ -65,25 +83,27 @@ class _RentScreenState extends State<RentScreen> {
   }
 
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refreshData,
         child: Column(
           children: [
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
-                child: rent.isEmpty
-                    ? _buildNoDataCard()
-                    : ListView.builder(
-                        itemCount: rent.length,
-                        itemBuilder: (context, index) {
-                          return _buildRentListCard(rent[index]); // ✅ Using card widget
-                        },
-                      ),
-              ),
-            ),
+  child: Padding(
+    padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
+    child: notifications.isEmpty
+        ? _buildNoDataCard()
+        : ListView.builder(
+            itemCount: notifications.length,
+            itemBuilder: (context, index) {
+              return _buildNotificationListCard(notifications[index]);
+            },
+          ),
+  ),
+)
+
+
           ],
         ),
       ),

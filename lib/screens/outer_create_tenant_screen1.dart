@@ -414,49 +414,52 @@ Widget _buildSearchBar() {
     );
   }
 
-  Widget _buildPropertyList() {
-  return Expanded(
-    child: Padding(
-      padding: EdgeInsets.all(10),
-      child: Consumer<PropertyProvider>(
-        builder: (context, propertyProvider, child) {
-          final properties = _searchController.text.isNotEmpty
-              ? propertyProvider.searchProperties // Use filtered list if searching
-              : propertyProvider.properties; // Use full list otherwise
+    Widget _buildPropertyList() {
+    return Expanded(
+      child: Padding(
+        padding: EdgeInsets.all(0),
+        child: Consumer<PropertyProvider>(
+          builder: (context, propertyProvider, child) {
+            final properties = _searchController.text.isNotEmpty
+                ? propertyProvider.searchProperties // Use filtered list if searching
+                : propertyProvider.properties; // Use full list otherwise
 
-          if (propertyProvider.isLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
+            if (propertyProvider.isLoading) {
+              return Center(child: CircularProgressIndicator());
+            }
 
-          if (properties.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.search_off, size: 50, color: Colors.grey),
-                  SizedBox(height: 10),
-                  Text(
-                    "No properties found",
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
-                  ),
-                ],
-              ),
+            if (properties.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search_off, size: 50, color: Colors.grey),
+                    SizedBox(height: 10),
+                    Text(
+                      "No properties found",
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return ListView.builder(
+              itemCount: properties.length,
+              itemBuilder: (context, index) {
+                return _buildPropertyCard(properties[index], context);
+              },
             );
-          }
-
-          return ListView.builder(
-            itemCount: properties.length,
-            itemBuilder: (context, index) {
-              return _buildPropertyCard(properties[index], context);
-            },
-          );
-        },
+          },
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-
+  Future<void> _refreshData() async {
+    await Future.delayed(Duration(seconds: 2)); // Simulate data fetching
+    setState(() {}); // Rebuild the widget
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -473,26 +476,36 @@ Widget _buildSearchBar() {
           ),
         ],
       ),
-      body: Padding(
-        padding: EdgeInsets.all(5),
-        child: Column(
-          children: [
-            _buildSearchBar(), // Search bar at the top
-            // SizedBox(height: 5),
+      body: RefreshIndicator(
+        onRefresh: _refreshData, // Function to refresh data
+        child: SingleChildScrollView(
+          physics: AlwaysScrollableScrollPhysics(), // Ensures scrollability even if content is small
+          child: Padding(
+            padding: EdgeInsets.all(10),
+            child: Column(
+            children: [
+              _buildSearchBar(), // Search bar at the top
 
-            // Title Section
-            Padding(
-              padding: EdgeInsets.only(left: 10, right: 10, top: 10),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Property",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              // Title Section
+              Padding(
+                padding: EdgeInsets.only(left: 10, right: 10, top: 10),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Property",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
-            ),
-            _buildPropertyList()
-          ],
+
+              // Property List wrapped inside a ListView
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7, // Adjust height as needed
+                child: _buildPropertyList(),
+              ),
+            ],
+          ),
+          )
         ),
       ),
     );

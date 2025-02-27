@@ -98,9 +98,9 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
                       ),
                     ),
                   );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Valid!')),
-                  );
+                  // ScaffoldMessenger.of(context).showSnackBar(
+                  //   const SnackBar(content: Text('Valid!')),
+                  // );
                 } else {
                   // If the form is not valid, show a message
                   ScaffoldMessenger.of(context).showSnackBar(
