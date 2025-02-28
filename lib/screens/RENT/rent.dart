@@ -63,6 +63,41 @@ class _RentScreenState extends State<RentScreen> {
       ),
     );
   }
+  Widget _buildRentListandPaylist() {
+  return SizedBox(
+    width: double.infinity, // ✅ Ensures full width
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly, // ✅ Spaces buttons evenly
+      children: [
+        _buildRentButton("My Rent"),
+        _buildRentButton("My Payment"),
+      ],
+    ),
+  );
+}
+
+Widget _buildRentButton(String text) {
+  return ElevatedButton(
+    onPressed: () {
+      print("$text tapped");
+    },
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.blue,
+      padding: EdgeInsets.symmetric(
+        horizontal: MediaQuery.of(context).size.width * 0.12,
+        vertical: 5,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(3),
+      ),
+    ),
+    child: Padding(
+      padding: EdgeInsets.all(5),
+      child: Text(text),
+    ),
+  );
+}
 
   @override
    Widget build(BuildContext context) {
@@ -71,6 +106,7 @@ class _RentScreenState extends State<RentScreen> {
         onRefresh: _refreshData,
         child: Column(
           children: [
+            _buildRentListandPaylist(),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),

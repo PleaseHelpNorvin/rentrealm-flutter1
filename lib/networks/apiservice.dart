@@ -698,8 +698,43 @@ class ApiService {
       });
 
       if(response.statusCode == 200 || response.statusCode == 201) {
+        print("Raw API response: ${response.body}");
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getNotification() Call: $responseData");
+        return NotificationResponse.fromJson(responseData);
+      } else{
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+      
+    } catch (e) {
+      print('Exception: $e');
+      return null;
+    }
+  }
+
+  Future<NotificationResponse?>patchNotificationStatus({
+    required String token,
+    required int userId,
+    required int notifId,
+  }) async {
+    print("patchNotificationStatus(): $token");
+    print("patchNotificationStatus():userId $userId");
+    print("patchNotificationStatus(): notifId $notifId");
+
+    final uri = Uri.parse('$rest/tenant/notification/updateIsRead/$notifId');
+    try {
+      
+      final response = await http.patch(uri, headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      });
+
+      if(response.statusCode == 200 || response.statusCode == 201) {
+        print("Raw API response: ${response.body}");
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from patchNotificationStatus() Call: $responseData");
         return NotificationResponse.fromJson(responseData);
       } else{
         print('Error: ${response.statusCode} - ${response.body}');

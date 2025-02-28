@@ -11,6 +11,7 @@ import '../PROVIDERS/auth_provider.dart';
 import '../PROVIDERS/user_provider.dart';
 import '../SCREENS/HOME/home.dart';
 import '../SCREENS/PROFILE/profile.dart';
+import 'PAYMENT/rental_agreement.dart';
 import 'PROFILE/UPDATE/edit_user_screen.dart';
 import 'PROFILE/UPDATE/edit_profile_screen.dart';
 
@@ -97,6 +98,8 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
               case '/editidentification':
                 page = const EditIdentificationScreen();
                 break;
+              case '/rentalAgreement':
+                page = RentalAgreementScreen();
               default:
                      if (_currentIndex == 0) {
                   page = const ContractScreen();

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 
 class NotificationResponse {
   final bool success;
@@ -17,51 +18,51 @@ class NotificationResponse {
       data: NotificationData.fromJson(json['data']),
     );
   }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'success': success,
-      'message': message,
-      'data': data.toJson(),
-    };
-  }
 }
 
 class NotificationData {
-  final List<Notification> notifications;
+  late final List<NotificationModel> notifications;
 
   NotificationData({required this.notifications});
 
   factory NotificationData.fromJson(Map<String, dynamic> json) {
-    return NotificationData(
-      notifications: (json['notifications'] as List)
-          .map((item) => Notification.fromJson(item))
-          .toList(),
-    );
-  }
+    var notificationsJson = json['notifications'];
+    
+    // if (notificationsJson == null) {
+    //   return NotificationData(notifications: []); // ✅ Return empty list if null
+    // }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'notifications': notifications.map((e) => e.toJson()).toList(),
-    };
+    if (notificationsJson is List) {
+      return NotificationData(
+        notifications: List<NotificationModel>.from(
+          notificationsJson.map((x) => NotificationModel.fromJson(x)),
+        ),
+      );
+    } else if (notificationsJson is Map<String, dynamic>) {
+      return NotificationData(
+        notifications: [NotificationModel.fromJson(notificationsJson)],
+      );
+    } else {
+      throw Exception('Invalid notifications data format');
+    }
   }
-
-  map(Function(dynamic item) param0) {}
 }
 
-class Notification {
+
+
+class NotificationModel {
   final int id;
   final int userId;
   final String title;
   final String message;
-  final int isRead;
+  late final int isRead;
   final String notifiableType;
   final int notifiableId;
-  final String createdAt;
-  final String updatedAt;
-  final Notifiable? notifiable;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final Map<String, dynamic>? notifiable;
 
-  Notification({
+  NotificationModel({
     required this.id,
     required this.userId,
     required this.title,
@@ -74,8 +75,8 @@ class Notification {
     this.notifiable,
   });
 
-  factory Notification.fromJson(Map<String, dynamic> json) {
-    return Notification(
+  factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    return NotificationModel(
       id: json['id'],
       userId: json['user_id'],
       title: json['title'],
@@ -83,84 +84,55 @@ class Notification {
       isRead: json['is_read'],
       notifiableType: json['notifiable_type'],
       notifiableId: json['notifiable_id'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-      notifiable: json['notifiable'] != null ? Notifiable.fromJson(json['notifiable']) : null,
+      createdAt: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
+      notifiable: json['notifiable'],
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'title': title,
-      'message': message,
-      'is_read': isRead,
-      'notifiable_type': notifiableType,
-      'notifiable_id': notifiableId,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-      'notifiable': notifiable?.toJson(),
-    };
   }
 }
 
-class Notifiable {
-  final int id;
-  final int profileId;
-  final int roomId;
-  final String status;
-  final int hasPets;
-  final int wifiEnabled;
-  final int hasLaundryAccess;
-  final int hasPrivateFridge;
-  final int hasTv;
-  final String createdAt;
-  final String updatedAt;
+// just in case gamiton
 
-  Notifiable({
-    required this.id,
-    required this.profileId,
-    required this.roomId,
-    required this.status,
-    required this.hasPets,
-    required this.wifiEnabled,
-    required this.hasLaundryAccess,
-    required this.hasPrivateFridge,
-    required this.hasTv,
-    required this.createdAt,
-    required this.updatedAt,
-  });
+// class Notifiable {
+//   final int id;
+//   final int profileId;
+//   final int roomId;
+//   final String status;
+//   final bool hasPets;
+//   final bool wifiEnabled;
+//   final bool hasLaundryAccess;
+//   final bool hasPrivateFridge;
+//   final bool hasTv;
+//   final DateTime createdAt;
+//   final DateTime updatedAt;
 
-  factory Notifiable.fromJson(Map<String, dynamic> json) {
-    return Notifiable(
-      id: json['id'],
-      profileId: json['profile_id'],
-      roomId: json['room_id'],
-      status: json['status'],
-      hasPets: json['has_pets'],
-      wifiEnabled: json['wifi_enabled'],
-      hasLaundryAccess: json['has_laundry_access'],
-      hasPrivateFridge: json['has_private_fridge'],
-      hasTv: json['has_tv'],
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-    );
-  }
+//   Notifiable({
+//     required this.id,
+//     required this.profileId,
+//     required this.roomId,
+//     required this.status,
+//     required this.hasPets,
+//     required this.wifiEnabled,
+//     required this.hasLaundryAccess,
+//     required this.hasPrivateFridge,
+//     required this.hasTv,
+//     required this.createdAt,
+//     required this.updatedAt,
+//   });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'profile_id': profileId,
-      'room_id': roomId,
-      'status': status,
-      'has_pets': hasPets,
-      'wifi_enabled': wifiEnabled,
-      'has_laundry_access': hasLaundryAccess,
-      'has_private_fridge': hasPrivateFridge,
-      'has_tv': hasTv,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-    };
-  }
-}
+//   factory Notifiable.fromJson(Map<String, dynamic> json) {
+//     return Notifiable(
+//       id: json['id'],
+//       profileId: json['profile_id'],
+//       roomId: json['room_id'],
+//       status: json['status'],
+//       hasPets: json['has_pets'] == 1,
+//       wifiEnabled: json['wifi_enabled'] == 1,
+//       hasLaundryAccess: json['has_laundry_access'] == 1,
+//       hasPrivateFridge: json['has_private_fridge'] == 1,
+//       hasTv: json['has_tv'] == 1,
+//       createdAt: DateTime.parse(json['created_at']),
+//       updatedAt: DateTime.parse(json['updated_at']),
+//     );
+//   }
+// }
