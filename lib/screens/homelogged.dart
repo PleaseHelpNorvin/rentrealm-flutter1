@@ -99,7 +99,9 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
                 page = const EditIdentificationScreen();
                 break;
               case '/rentalAgreement':
-                page = RentalAgreementScreen();
+                final args = settings.arguments as Map<String, dynamic>?; 
+                page = RentalAgreementScreen(notifNotifiableInquiryId: args?['notifNotifiableInquiryId']);
+                break;
               default:
                      if (_currentIndex == 0) {
                   page = const ContractScreen();

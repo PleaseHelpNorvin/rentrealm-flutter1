@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:rentealm_flutter/screens/PAYMENT/checkout.dart';
 import 'package:signature/signature.dart';
 
 class RentalAgreementScreen extends StatefulWidget {
-  const RentalAgreementScreen({super.key});
+  final int notifNotifiableInquiryId;
+  const RentalAgreementScreen({
+    super.key,
+    required this.notifNotifiableInquiryId,
+    
+    });
+
 
   @override
   State<RentalAgreementScreen> createState() => _RentalAgreementScreenState();
@@ -14,7 +21,15 @@ class _RentalAgreementScreenState extends State<RentalAgreementScreen> {
     penStrokeWidth: 5,
     exportBackgroundColor: Colors.white,
   );
-  
+
+
+
+    @override
+    void dispose() {
+      _RentalSignatureController.dispose();
+      super.dispose();
+    }
+    
   @override
   Widget build(BuildContext context) {
      // Check the constructor values
@@ -44,8 +59,12 @@ class _RentalAgreementScreenState extends State<RentalAgreementScreen> {
                 child: RichText(
                   text: TextSpan(
                     children: [
+                      TextSpan(
+                        text:
+                            "inquiry_id: ${widget.notifNotifiableInquiryId}",
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      ),
                       // Bold text for "Payment Obligation"
-                      
                       TextSpan(
                         text: "Payment Obligation:  ",
                         style: TextStyle(
@@ -100,7 +119,6 @@ class _RentalAgreementScreenState extends State<RentalAgreementScreen> {
                             "The renter agrees to comply with all the rules and regulations stated in this contract. Failure to comply may result in termination of the lease and forfeiture of the security deposit.\n\n",
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
-
                     ],
                   ),
                 ),
@@ -175,29 +193,26 @@ class _RentalAgreementScreenState extends State<RentalAgreementScreen> {
                     ),
                   ),
                   onPressed: () async {
-                    var signatureSvg = await _RentalSignatureController.toRawSVG();
-                    // var signatureSvg = await _RentalSignatureController.toSVG();
-                    print("Signature submitted!$signatureSvg" );
-                    
-                    // Navigator.push(
-                    //   context, 
-                    //   MaterialPageRoute(
-                    //     builder: (context) => CreateTenantScreen6(
-                    //       roomId: widget.roomId, 
-                    //       isPetAccess: widget.isPetAccess, 
-                    //       isWifiEnabled: widget.isWifiEnabled, 
-                    //       wifiCharge: widget.wifiCharge, 
-                    //       isLaundryAccess: widget.isLaundryAccess, 
-                    //       laundryCharge: widget.laundryCharge, 
-                    //       hasPrivateFridge: widget.hasPrivateFridge, 
-                    //       privateFridgeCharge: widget.privateFridgeCharge, 
-                    //       hasSmartTV: widget.hasSmartTV, 
-                    //       smartTVCharge: widget.smartTVCharge,
-                    //       signatureSvg: signatureSvg
-                    //     )
-                    //   )
-                    // );
-                  },
+                      var signatureRawSVG = await _RentalSignatureController.toRawSVG();
+
+
+                      // Ensure it is converted into a String
+                      String signatureSvg = signatureRawSVG as String;
+
+                      print("""
+                          Signature submitted! 
+                          $signatureSvg
+                          """);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CheckoutScreen(
+                            inquiryId: widget.notifNotifiableInquiryId,
+                            signatureSvgString: signatureSvg, // Now it's a String
+                          ),
+                        ),
+                      );
+                    },
                   child: const Text('Submit Signature'),
 
                 ),

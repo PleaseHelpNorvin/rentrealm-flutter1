@@ -4,6 +4,8 @@ import 'package:rentealm_flutter/PROVIDERS/inquiry_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
 import 'package:rentealm_flutter/screens/homelogged.dart';
 
+import 'PAYMENT/rental_agreement.dart';
+
 class OuterCreateTenantScreen4 extends StatefulWidget {
   final int roomId;
   final int profileId;
@@ -251,7 +253,7 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
                 // Navigator.push(
                 //   context,
                 //   MaterialPageRoute(
-                //     builder: (context) => CreateTenantScreen5(
+                //     builder: (context) => RentalAgreementScreen(
                 //       roomId: widget.roomId,
                 //       // Pass the charge values only if the corresponding switch is true
                 //       isPetAccess: _isPetAccess,
@@ -275,7 +277,16 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
                 // });
 
                 final inquiryProvider = Provider.of<InquiryProvider> (context, listen:false); 
-                inquiryProvider.storeInquiry(context, widget.roomId, widget.profileId, _isPetAccess, _isWifiEnabled, _isLaundryAccess, _hasPrivateFridge, _hasSmartTV);
+                inquiryProvider.storeInquiry(
+                  context, 
+                  widget.roomId, 
+                  widget.profileId, 
+                  _isPetAccess, 
+                  _isWifiEnabled, 
+                  _isLaundryAccess, 
+                  _hasPrivateFridge, 
+                  _hasSmartTV
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,

@@ -60,7 +60,8 @@ class NotificationModel {
   final int notifiableId;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final Map<String, dynamic>? notifiable;
+  // final Map<String, dynamic>? notifiable;
+  final NotifiableModel? notifiable; 
 
   NotificationModel({
     required this.id,
@@ -86,53 +87,21 @@ class NotificationModel {
       notifiableId: json['notifiable_id'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      notifiable: json['notifiable'],
+      // notifiable: json['notifiable'],
+      notifiable: json['notifiable'] != null ? NotifiableModel.fromJson(json['notifiable']) : null,
+
     );
   }
 }
 
-// just in case gamiton
+class NotifiableModel {
+  final int id;
 
-// class Notifiable {
-//   final int id;
-//   final int profileId;
-//   final int roomId;
-//   final String status;
-//   final bool hasPets;
-//   final bool wifiEnabled;
-//   final bool hasLaundryAccess;
-//   final bool hasPrivateFridge;
-//   final bool hasTv;
-//   final DateTime createdAt;
-//   final DateTime updatedAt;
+  NotifiableModel({required this.id});
 
-//   Notifiable({
-//     required this.id,
-//     required this.profileId,
-//     required this.roomId,
-//     required this.status,
-//     required this.hasPets,
-//     required this.wifiEnabled,
-//     required this.hasLaundryAccess,
-//     required this.hasPrivateFridge,
-//     required this.hasTv,
-//     required this.createdAt,
-//     required this.updatedAt,
-//   });
-
-//   factory Notifiable.fromJson(Map<String, dynamic> json) {
-//     return Notifiable(
-//       id: json['id'],
-//       profileId: json['profile_id'],
-//       roomId: json['room_id'],
-//       status: json['status'],
-//       hasPets: json['has_pets'] == 1,
-//       wifiEnabled: json['wifi_enabled'] == 1,
-//       hasLaundryAccess: json['has_laundry_access'] == 1,
-//       hasPrivateFridge: json['has_private_fridge'] == 1,
-//       hasTv: json['has_tv'] == 1,
-//       createdAt: DateTime.parse(json['created_at']),
-//       updatedAt: DateTime.parse(json['updated_at']),
-//     );
-//   }
-// }
+  factory NotifiableModel.fromJson(Map<String, dynamic> json) {
+    return NotifiableModel(
+      id: json['id'],
+    );
+  }
+}

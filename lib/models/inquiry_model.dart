@@ -15,7 +15,7 @@ class InquiryResponse {
     return InquiryResponse(
       success: json['success'],
       message: json['message'],
-      data: InquiryData.fromJson(json['data']),
+      data: InquiryData.fromJson(json['data'] ?? {}),
     );
   }
 }
@@ -53,6 +53,8 @@ class Inquiry {
   final bool hasLaundryAccess;
   final bool hasPrivateFridge;
   final bool hasTv;
+  final double rentPrice;
+  final DateTime acceptedAt;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -66,6 +68,8 @@ class Inquiry {
     required this.hasLaundryAccess,
     required this.hasPrivateFridge,
     required this.hasTv,
+    required this.rentPrice,
+    required this.acceptedAt,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -81,6 +85,8 @@ class Inquiry {
       hasLaundryAccess: json['has_laundry_access']?.toString().trim() == "1",
       hasPrivateFridge: json['has_private_fridge']?.toString().trim() == "1",
       hasTv: json['has_tv']?.toString().trim() == "1",
+      rentPrice: double.tryParse(json['rent_price']?.toString() ?? '0.0') ?? 0.0,
+      acceptedAt: json['accepted_at'] != null ? DateTime.tryParse(json['accepted_at']) ?? DateTime(1970, 1, 1) : DateTime(1970, 1, 1),
       createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at']) ?? DateTime(1970, 1, 1) : DateTime(1970, 1, 1),
       updatedAt: json['updated_at'] != null ? DateTime.tryParse(json['updated_at']) ?? DateTime(1970, 1, 1) : DateTime(1970, 1, 1),
     );

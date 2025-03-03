@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/models/inquiry_model.dart';
 import 'package:rentealm_flutter/screens/NOTIFICATIONS/notifications_details.dart';
+import '../../PROVIDERS/inquiry_provider.dart';
 import '../../PROVIDERS/notification_provider.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -49,6 +51,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildNotificationListCard(Map<String, dynamic> notification) {
     String notificationTitle = notification["title"] ?? "No Title";
     String notificationMessage = notification["message"] ?? "No Message";
+    int? notifiableId = notification["notifiable_id"]; 
 
     return GestureDetector(
       onTap: () async {
@@ -62,6 +65,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               notificationId: notification["id"],
               notificationTitle: notificationTitle,
               notificationMessage: notificationMessage,
+              notifNotifiableInquiryId: notifiableId ?? 0,
             ),
           ),
         );
@@ -130,6 +134,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     final notificationProvider = Provider.of<NotificationProvider>(context);
     final notifications = notificationProvider.notificationDetails;
+
+
+    
 
     return Scaffold(
       body: RefreshIndicator(

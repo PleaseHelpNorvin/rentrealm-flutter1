@@ -23,7 +23,8 @@ class NotificationProvider extends ChangeNotifier {
                   "id": notif.id,
                   "title": notif.title,
                   "message": notif.message,
-                  "is_read": notif.isRead
+                  "is_read": notif.isRead,
+                  "notifiable_id": notif.notifiableId
                 })
             .toList() ??
         [];
