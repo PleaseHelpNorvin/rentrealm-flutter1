@@ -111,7 +111,7 @@ class RoomProvider extends ChangeNotifier {
           .getRoomById(roomId: roomId)
           .timeout(const Duration(seconds: 15));
 
-      if (response != null && response.data.rooms != null) {
+      if (response != null) {
         _singleRoom = response.data.rooms.first; // ✅ Assign the first (only) room
         print("Room fetched successfully: ${_singleRoom?.roomPictureUrls}");
       } else {

@@ -49,7 +49,7 @@ dependencies:
   signature: ^5.5.0
   flutter_svg: ^2.0.17
   shared_preferences: ^2.5.2
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

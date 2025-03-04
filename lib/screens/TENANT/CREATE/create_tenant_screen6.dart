@@ -517,7 +517,7 @@ class _CreateTenantScreen6State extends State<CreateTenantScreen6> {
                                     ),
                                     const SizedBox(width: 10),
                                     Text(
-                                      room.rentPrice,
+                                      room.rentPrice.toString(),
                                       style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.normal,

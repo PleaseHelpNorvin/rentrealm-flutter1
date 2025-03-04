@@ -226,7 +226,7 @@ Widget _buildRoomCard(Room rooms, BuildContext context) {
                     ),
                     SizedBox(height: 5),
                     Text(
-                      "Rent Price: ₱123/month",
+                      "Rent Price: ${rooms.rentPrice.toString()}",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,

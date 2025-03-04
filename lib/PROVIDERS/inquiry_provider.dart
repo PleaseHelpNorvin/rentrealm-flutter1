@@ -25,11 +25,6 @@ class InquiryProvider extends ChangeNotifier{
     BuildContext context,
     int roomId,
     int profileId,
-    bool isPetEnabled,
-    bool isWifiEnabled,
-    bool isLaundryAccess,
-    bool hasPrivateFridge,
-    bool hasSmartTV,
   ) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final token = authProvider.token;
@@ -37,21 +32,12 @@ class InquiryProvider extends ChangeNotifier{
     print("$token");
     print("roomId $roomId");
     print("profileID $profileId");
-    print("isPetEnabled $isPetEnabled");
-    print("wifiEnabled: $isWifiEnabled");
-    print("isLaundryAccess: $isLaundryAccess");
-    print("hasPrivateFridge: $hasPrivateFridge");
-    print("hasSmartTv: $hasSmartTV");
+ 
 
     final response = await apiService.postInquiry(
       token: token ?? "",
       roomId: roomId,
       profileId: profileId,
-      isPetEnabled: isPetEnabled,
-      isWifiEnabled: isWifiEnabled,
-      isLaundryAccess: isLaundryAccess,
-      hasPrivateFridge: hasPrivateFridge,
-      hasSmartTV: hasSmartTV,
     );
 
 

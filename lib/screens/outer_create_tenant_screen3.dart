@@ -7,6 +7,9 @@ import 'dart:async';
 
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
 import 'package:rentealm_flutter/screens/auth/register.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'outer_create_tenant_screen4.dart';
 
 class OuterCreateTenantScreen3 extends StatefulWidget {
   final int roomId;
@@ -194,20 +197,40 @@ Future.microtask(() async {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Rent Price: ₱${room?.rentPrice}",
+                  "Rent Price: ₱${room.rentPrice.toString()}",
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(context, 
-                      MaterialPageRoute(builder: (context) => 
-                        RegisterScreen(roomId: widget.roomId)
-                      )
-                    );
-                  },
+                  onPressed: () async {
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      bool? isRegistered = prefs.getBool('isRegistered');
+                      int? profileId = prefs.getInt('profileId');
+
+                      if (isRegistered == true && profileId != null) {
+                        // User is already registered and has a profile, go to confirm inquiry
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OuterCreateTenantScreen4(
+                              roomId: widget.roomId,
+                              profileId: profileId, // Pass saved profileId
+                            ),
+                          ),
+                        );
+                      } else {
+                        // If not registered or no profile, go to register screen
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RegisterScreen(roomId: widget.roomId),
+                          ),
+                        );
+                      }
+                    },
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.blue,

@@ -627,21 +627,12 @@ class ApiService {
     required String token,
     required int roomId,
     required int profileId,
-    required bool isPetEnabled,
-    required bool isWifiEnabled,
-    required bool isLaundryAccess,
-    required bool hasPrivateFridge,
-    required bool hasSmartTV,
+
   }) async {
     print("storeInquiry() roomId $token");
 
     print("storeInquiry() roomId $roomId");
     print("storeInquiry() profileID $profileId");
-    print("storeInquiry() isPetEnabled $isPetEnabled");
-    print("storeInquiry() wifiEnabled: $isWifiEnabled");
-    print("storeInquiry() isLaundryAccess: $isLaundryAccess");
-    print("storeInquiry() hasPrivateFridge: $hasPrivateFridge");
-    print("storeInquiry() hasSmartTv: $hasSmartTV");
 
     final uri = Uri.parse('$rest/tenant/inquiry/store');
 
@@ -649,11 +640,7 @@ class ApiService {
       final body = {
         "profile_id": profileId,
         "room_id": roomId,
-        "has_pets": isPetEnabled,
-        "wifi_enabled": isWifiEnabled,
-        "has_laundry_access": isLaundryAccess,
-        "has_private_fridge": hasPrivateFridge,
-        "has_tv": hasSmartTV,
+
       };
 
       final response = await http.post(

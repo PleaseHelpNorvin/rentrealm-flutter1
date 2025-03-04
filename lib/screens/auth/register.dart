@@ -36,7 +36,6 @@ class RegisterScreenState extends State<RegisterScreen> {
   
    Future<void> registerUser(AuthProvider authProvider) async {
     if (_formKey.currentState!.validate()) {
-      // Call registerUser method from provider
       await authProvider.registerUser(
         name: nameController.text,
         email: emailController.text,
@@ -45,10 +44,18 @@ class RegisterScreenState extends State<RegisterScreen> {
         context: context,
       );
 
-      // Save roomId in SharedPreferences after successful registration
-      // await saveRoomId(widget.roomId);
+      // Save registration flag
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isRegistered', true);
+
+      // Navigate to Login or Home screen
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => LoginScreen()), // Redirect to Login
+      // );
     }
   }
+
 
 
   @override

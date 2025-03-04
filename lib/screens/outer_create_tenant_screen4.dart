@@ -1,301 +1,199 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/inquiry_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
-import 'package:rentealm_flutter/screens/homelogged.dart';
+import 'package:rentealm_flutter/screens/outer_create_tenant_screen1.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'PAYMENT/rental_agreement.dart';
+import '../PROVIDERS/room_provider.dart';
+import 'TENANT/CREATE/create_tenant_screen3.dart';
+import 'outer_create_tenant_screen3.dart';
 
 class OuterCreateTenantScreen4 extends StatefulWidget {
   final int roomId;
   final int profileId;
 
-  const OuterCreateTenantScreen4({super.key, 
+  const OuterCreateTenantScreen4({
+    super.key,
     required this.roomId,
     required this.profileId,
   });
 
   @override
-  State<OuterCreateTenantScreen4> createState() => _OuterCreateTenantScreen4State();
+  State<OuterCreateTenantScreen4> createState() =>
+      _OuterCreateTenantScreen4State();
 }
 
 class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
-  bool _isPetAccess = false;
-  bool _isWifiEnabled = false;
-  bool _isLaundryAccess = false;
-  bool _hasPrivateFridge = false;
-  bool _hasSmartTV = false;
 
-  double wifiCharge = 50.0;
-  double laundryCharge = 30.0;
-  double privateFridgeCharge = 40.0;
-  double smartTVCharge = 1160.0;
+  void initState() {
+    super.initState();
+    Future.microtask(() => Provider.of<RoomProvider>(context, listen: false)
+        .fetchRoomById(context, widget.roomId));
+
+    _saveProfileId(); // Call the method when the screen loads
+
+
+  }
+
+  Future<void> _saveProfileId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('profileId', widget.profileId);
+    // await prefs.setInt('roomId', widget.roomId);
+  }
+
 
   @override
   Widget build(BuildContext context) {
-
+    final roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    final room = roomProvider.singleRoom; 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Your Preferences"),
+        title: const Text("Confirm your Inquiry"),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-          ),
-          const SizedBox(height: 5),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Pet Access
-                Padding(
-                  padding:
-                      EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.pets,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                      SizedBox(width: 10),
-                      Text(
-                        "PET ACCESS?",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Center(
-                  child: Switch(
-                    value: _isPetAccess,
-                    onChanged: (bool newValue) {
-                      setState(() {
-                        _isPetAccess = newValue;
-                      });
-                    },
-                  ),
-                ),
-
-                // Wifi Enabled
-                Padding(
-                  padding:
-                      EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.wifi,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          "WIFI ENABLED? (Charged: ₱$wifiCharge)",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Card(
+                    color: const Color(0xff2196F3),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            // Replace this with an actual room object if necessary
+                            child: room?.roomPictureUrls.first != null
+                           ? CachedNetworkImage(
+                                imageUrl: room!.roomPictureUrls.first,
+                                fit: BoxFit.cover,
+                                width: 150,
+                                height: 150,
+                                placeholder: (context, url) => Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                                errorWidget: (context, url, error) => Center(
+                                  child: Text(
+                                    'Failed to load image',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 12, color: Colors.red),
+                                  ),
+                                ),
+                              )
+                            : Image.asset(
+                                'assets/images/rentrealm_logo.png',
+                                fit: BoxFit.cover,
+                                width: 150,
+                                height: 180,
+                              ),
                           ),
-                          softWrap: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Center(
-                  child: Switch(
-                    value: _isWifiEnabled,
-                    onChanged: (bool newValue) {
-                      setState(() {
-                        _isWifiEnabled = newValue;
-                      });
-                    },
-                  ),
-                ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  room!.roomCode,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFDAEFFF),
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  room.roomDetails,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Color(0xFFDAEFFF),
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  "₱ ${room.rentPrice} / Month",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFDAEFFF),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: () async {
+                                       SharedPreferences prefs = await SharedPreferences.getInstance();
+                                              await prefs.setInt('roomId', widget.roomId); // Save roomId
+                                              await prefs.setInt('profileId', widget.profileId); // Save profileId
 
-                // Laundry Access
-                Padding(
-                  padding:
-                      EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.local_laundry_service,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          "LAUNDRY ACCESS? (Charged: ₱$laundryCharge)",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              OuterCreateTenantScreen1(
+                                            // roomId: widget.roomId,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(3),
+                                      ),
+                                    ),
+                                    child: const Text("Select Another"),
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                          softWrap: true,
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                Center(
-                  child: Switch(
-                    value: _isLaundryAccess,
-                    onChanged: (bool newValue) {
-                      setState(() {
-                        _isLaundryAccess = newValue;
-                      });
-                    },
-                  ),
-                ),
-
-                // Private Fridge
-                Padding(
-                  padding:
-                      EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.kitchen,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        // Use Expanded or Flexible
-                        child: Text(
-                          "HAS PRIVATE FRIDGE? (Charged: ₱$privateFridgeCharge)",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
-                          ),
-                          softWrap: true, // Allow wrapping of text
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Center(
-                  child: Switch(
-                    value: _hasPrivateFridge,
-                    onChanged: (bool newValue) {
-                      setState(() {
-                        _hasPrivateFridge = newValue;
-                      });
-                    },
-                  ),
-                ),
-
-                // Smart TV
-                Padding(
-                  padding:
-                      EdgeInsets.only(left: 20, top: 20, right: 20, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.tv,
-                        color: Colors.blue,
-                        size: 30,
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          "HAS SMART TV? (Charged: ₱$smartTVCharge)",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
-                          ),
-                          softWrap: true,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Center(
-                  child: Switch(
-                    value: _hasSmartTV,
-                    onChanged: (bool newValue) {
-                      setState(() {
-                        _hasSmartTV = newValue;
-                      });
-                    },
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-          Container(
-            width: double.infinity,
-            color: Colors.blue,
-            padding: EdgeInsets.all(20),
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => RentalAgreementScreen(
-                //       roomId: widget.roomId,
-                //       // Pass the charge values only if the corresponding switch is true
-                //       isPetAccess: _isPetAccess,
-                //       isWifiEnabled: _isWifiEnabled,
-                //       wifiCharge: _isWifiEnabled ? wifiCharge : 0.0,
-                //       isLaundryAccess: _isLaundryAccess,
-                //       laundryCharge: _isLaundryAccess ? laundryCharge : 0.0,
-                //       hasPrivateFridge: _hasPrivateFridge,
-                //       privateFridgeCharge: _hasPrivateFridge ? privateFridgeCharge : 0.0,
-                //       hasSmartTV: _hasSmartTV,
-                //       smartTVCharge: _hasSmartTV ? smartTVCharge : 0.0,
-                //     ),
-                //   ),
-                // );
 
-                // WidgetsBinding.instance.addPostFrameCallback((_) {
-                //   Navigator.pushReplacement(
-                //     context,
-                //     MaterialPageRoute(builder: (_) => HomeLoggedScreen()),
-                //   );
-                // });
-
-                final inquiryProvider = Provider.of<InquiryProvider> (context, listen:false); 
-                inquiryProvider.storeInquiry(
-                  context, 
-                  widget.roomId, 
-                  widget.profileId, 
-                  _isPetAccess, 
-                  _isWifiEnabled, 
-                  _isLaundryAccess, 
-                  _hasPrivateFridge, 
-                  _hasSmartTV
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(3),
+          /// **Using Consumer for InquiryProvider**
+          Consumer<InquiryProvider>(
+            builder: (context, inquiryProvider, child) {
+              return Container(
+                width: double.infinity,
+                color: Colors.blue,
+                padding: const EdgeInsets.all(20),
+                child: ElevatedButton(
+                  onPressed: () {
+                    inquiryProvider.storeInquiry(
+                      context,
+                      widget.roomId,
+                      widget.profileId,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                  child: const Text("Submit Inquiry"),
                 ),
-              ),
-              child: Text("Submit Inquiry"),
-            ),
+              );
+            },
           ),
         ],
       ),

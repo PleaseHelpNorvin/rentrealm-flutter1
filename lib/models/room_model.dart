@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import '../API/rest.dart';
 
 class RoomResponse {
@@ -68,7 +67,7 @@ class Room {
   final String description;
   final String roomDetails;
   final String category;
-  final String rentPrice;
+  final double rentPrice;
   final int capacity;
   final int currentOccupants;
   final int minLease;
@@ -106,7 +105,8 @@ class Room {
     description: json['description'],
     roomDetails: json['room_details'],
     category: json['category'],
-    rentPrice: json['rent_price'].toString(), // Ensure it's a string
+    rentPrice: double.tryParse(json['rent_price'].toString()) ?? 0.0,
+ // Ensure it's a string
     capacity: json['capacity'],
     currentOccupants: json['current_occupants']?? 0,
     minLease: json['min_lease'],
