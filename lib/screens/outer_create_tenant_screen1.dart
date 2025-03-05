@@ -117,7 +117,7 @@ class _OuterCreateTenantScreen1State extends State<OuterCreateTenantScreen1> {
           ),
         );
       },
-      child: SizedBox(
+      child: Container(
         width: 350,
         child: Card(
           color: Colors.blue,
@@ -414,50 +414,51 @@ Widget _buildSearchBar() {
     );
   }
 
-    Widget _buildPropertyList() {
-    return Expanded(
-      child: Padding(
-        padding: EdgeInsets.all(0),
-        child: Consumer<PropertyProvider>(
-          builder: (context, propertyProvider, child) {
-            final properties = _searchController.text.isNotEmpty
-                ? propertyProvider.searchProperties // Use filtered list if searching
-                : propertyProvider.properties; // Use full list otherwise
+  Widget _buildPropertyList() {
+    return Padding(
+      padding: EdgeInsets.all(0),
+      child: Consumer<PropertyProvider>(
+        builder: (context, propertyProvider, child) {
+          final properties = _searchController.text.isNotEmpty
+              ? propertyProvider.searchProperties // Use filtered list if searching
+              : propertyProvider.properties; // Use full list otherwise
 
-            if (propertyProvider.isLoading) {
-              return Center(child: CircularProgressIndicator());
-            }
+          if (propertyProvider.isLoading) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-            if (properties.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.search_off, size: 50, color: Colors.grey),
-                    SizedBox(height: 10),
-                    Text(
-                      "No properties found",
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            return ListView.builder(
-              itemCount: properties.length,
-              itemBuilder: (context, index) {
-                return _buildPropertyCard(properties[index], context);
-              },
+          if (properties.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.search_off, size: 50, color: Colors.grey),
+                  SizedBox(height: 10),
+                  Text(
+                    "No properties found",
+                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  ),
+                ],
+              ),
             );
-          },
-        ),
+          }
+
+          return ListView.builder(
+            itemCount: properties.length,
+            itemBuilder: (context, index) {
+              return _buildPropertyCard(properties[index], context);
+            },
+          );
+        },
       ),
     );
   }
 
   Future<void> _refreshData() async {
-    await Future.delayed(Duration(seconds: 2)); // Simulate data fetching
+    // await Future.delayed(Duration(seconds: 2)); // Simulate data fetching
+
+    await Provider.of<PropertyProvider>(context, listen: false).fetchProperties(context);
+
     setState(() {}); // Rebuild the widget
   }
 

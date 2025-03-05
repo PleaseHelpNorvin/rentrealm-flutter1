@@ -92,7 +92,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Expanded(child: _buildFilterButton("All", "all")),
+          Expanded(child: _buildFilterButton("All", "all")),
           Expanded(child: _buildFilterButton("Unread", "unread")),
           Expanded(child: _buildFilterButton("Read", "read")),
         ],

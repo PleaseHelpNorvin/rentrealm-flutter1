@@ -1,17 +1,21 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';  // For formatting dates
+import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
-
 import '../../PROVIDERS/inquiry_provider.dart';
 import '../../MODELS/room_model.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final String signatureSvgString;
   final int inquiryId;
+
   const CheckoutScreen({
     super.key,
     required this.inquiryId,
-    required this.signatureSvgString, 
+    required this.signatureSvgString,
   });
 
   @override
@@ -19,7 +23,10 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
+  final TextEditingController _additionalPersonDescController = TextEditingController();
+  DateTime? selectedDate; // Store selected date
   int personCount = 1; // Default value of 1 person
+  double totalPrice = 0.0;
 
   @override
   void initState() {
@@ -30,18 +37,82 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         final int? inquiryRoomId = inquiryProvider.inquiry?.data.inquiries.single.roomId;
         if (inquiryRoomId != null) {
           Provider.of<RoomProvider>(context, listen: false).fetchRoomById(context, inquiryRoomId);
+          _updateTotalPrice();
+
+          /// 🛠 Use Future.microtask to ensure provider is accessed after build
+          Future.microtask(() {
+            try {
+              final paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
+              paymentProvider.initAuthDetails(context); // Initialize details
+            } catch (e) {
+              print("Error accessing PaymentProvider: $e");
+            }
+          });
         }
       });
     });
-
   }
 
   @override
+  void dispose() {
+    _additionalPersonDescController.dispose();
+    super.dispose();
+  }
+
+  void _updateTotalPrice() {
+    final roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    final room = roomProvider.singleRoom;
+    setState(() {
+      totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
+    });
+  }
+
+  // **Improved Date Picker Function**
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime now = DateTime.now();
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: now, // Prevent selection of past dates
+      lastDate: DateTime(2100),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        selectedDate = pickedDate;
+      });
+    }
+  }
+
+  void _callProcessPayment() {
+    final paymentProvider = Provider.of<PaymentProvider>(context, listen: false); 
+    final rentalagreementProvider = Provider.of<RentalagreementProvider>(context, listen: false);
+    final inquiryProvider = Provider.of<InquiryProvider>(context, listen: false);
+    final inquiry = inquiryProvider.inquiry?.data.inquiries.single;
+
+    if (inquiry == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Inquiry details not available.")),
+      );
+      return;
+    }
+    
+    int inquiryId = inquiry.id;
+    int roomId = inquiry.roomId;
+    String startDate = selectedDate != null
+        ? DateFormat("yyyy-MM-dd").format(selectedDate!)
+        : DateFormat("yyyy-MM-dd").format(DateTime.now());
+    int persons = personCount;
+
+    paymentProvider.processPayment(context, inquiryId, roomId, startDate, persons, widget.signatureSvgString, totalPrice);
+    rentalagreementProvider.storeRentalAgreement(context, inquiryId, roomId, startDate, persons, widget.signatureSvgString, totalPrice, _additionalPersonDescController.text);
+  }
+  
+
+  @override
   Widget build(BuildContext context) {
-    final inquiryProvider =
-        Provider.of<InquiryProvider>(context, listen: false);
-    final int? inquiryRoomId =
-        inquiryProvider.inquiry?.data.inquiries.single.roomId;
+    final inquiryProvider = Provider.of<InquiryProvider>(context, listen: false);
+    final int? inquiryRoomId = inquiryProvider.inquiry?.data.inquiries.single.roomId;
 
     if (inquiryRoomId == null) {
       return const Scaffold(
@@ -52,121 +123,123 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Checkout"),
-      ),
+      appBar: AppBar(title: const Text("Checkout")),
       body: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Expanded(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(10),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildRoomCard(),
+                  _buildTextCard(),
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(color: Colors.blue, width: 1),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+                ),
+                onPressed: () {
+                  _callProcessPayment();
+                },
+                child: const Text("Pay"),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextCard() {
+    final roomProvider = Provider.of<RoomProvider>(context, listen: false);
+    final room = roomProvider.singleRoom;
+
+    totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
+
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: Color(0xff2196F3), width: 2),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildRoomCard(),
-              _buildTextCard(),
+              const Center(
+                child: Text(
+                  "Inquiry Details",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
+                ),
+              ),
+              const Divider(thickness: 3),
+
+              // **Improved Date Picker UI**
+              const Text("Rent Start Date:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: () => _selectDate(context),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        selectedDate == null
+                            ? "Select a date"
+                            : DateFormat("MMMM dd, yyyy").format(selectedDate!),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                      const Icon(Icons.calendar_today, color: Colors.blue),
+                    ],
+                  ),
+                ),
+              ),
+
+              const Divider(),
+
+              _buildPersonCounter(room),
+              const Divider(),
+
+              _buildRow("Total Price per Month:", "₱${totalPrice.toStringAsFixed(2)}", isBold: true),
             ],
           ),
         ),
       ),
-      Padding(
-        padding: const EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
-        child: SizedBox(
-          width: double.infinity, // Full width
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blue, // Button background color
-              foregroundColor: Colors.white, // Text color
-              side: BorderSide(
-                color: Colors.blue, // Border color set to blue
-                width: 1, // Border width set to 1px
-              ),
-
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-            onPressed: () {},
-            child: Text("Pay"),
-          ),
-        ),
-      ),
-    ],
-  ),
-
     );
   }
 
-Widget _buildTextCard() {
-  final roomProvider = Provider.of<RoomProvider>(context, listen: false); 
-  final room = roomProvider.singleRoom;
+  Widget _buildPersonCounter(Room? room) {
+    int maxCapacity = room?.capacity ?? 1;
 
-  final inquiryProvider = Provider.of<InquiryProvider>(context, listen: false);
-  final inquiry = inquiryProvider.inquiry;
-
-  double totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
-
-  return SizedBox(
-    width: double.infinity,
-    child: Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-        side: const BorderSide(color: Color(0xff2196F3), width: 2),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: const Text(
-                "Inquiry Details",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            const Divider(thickness: 1),
-
-            _buildRow("Rent Start Date:", "${inquiry?.data.inquiries.single.acceptedAt}"),
-            const Divider(),
-
-            _buildPersonCounter(room), // ✅ Updated person counter
-            const Divider(),
-
-            _buildRow("Total Price per Month:", "₱${totalPrice.toStringAsFixed(2)}", isBold: true), // ✅ Display updated price
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-  /// **Widget for Person Counter**
-Widget _buildPersonCounter(Room? room) {
-  int maxCapacity = room?.capacity ?? 1;
-
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 8),
-    child: Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          "Maximum Room Capacity: $maxCapacity",
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: 5), 
+        Text("Maximum Room Capacity: $maxCapacity", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+        const SizedBox(height: 5),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Persons:",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
+            const Text("Persons:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             Row(
               children: [
                 IconButton(
@@ -175,20 +248,19 @@ Widget _buildPersonCounter(Room? room) {
                     if (personCount > 1) {
                       setState(() {
                         personCount--;
+                        totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
                       });
                     }
                   },
                 ),
-                Text(
-                  "$personCount",
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+                Text("$personCount", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 IconButton(
                   icon: const Icon(Icons.add, color: Colors.green),
                   onPressed: () {
-                    if (personCount < maxCapacity) { 
+                    if (personCount < maxCapacity) {
                       setState(() {
                         personCount++;
+                        totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
                       });
                     }
                   },
@@ -197,15 +269,27 @@ Widget _buildPersonCounter(Room? room) {
             ),
           ],
         ),
-        if (personCount >= maxCapacity)
-          const Text(
-            "Limit Reached!",
-            style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        // Show text input field when personCount is greater than 1
+        if (personCount > 1)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: TextField(
+              controller: _additionalPersonDescController,
+              decoration: InputDecoration(
+                labelText: "whats your relationship of the added person?",
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                // Handle the input change if needed
+                print("Additional Person Details: $value");
+              },
+            ),
           ),
+        if (personCount >= maxCapacity)
+          const Text("Limit Reached!", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
       ],
-    ),
-  );
-}
+    );
+  }
 
   Widget _buildRow(String label, String value, {bool isBold = false}) {
     return Padding(
@@ -213,17 +297,10 @@ Widget _buildPersonCounter(Room? room) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
+          Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: Colors.black,
-            ),
+            style: TextStyle(fontSize: 16, fontWeight: isBold ? FontWeight.bold : FontWeight.normal, color: Colors.black),
           ),
         ],
       ),
@@ -231,36 +308,46 @@ Widget _buildPersonCounter(Room? room) {
   }
 
   Widget _buildRoomCard() {
-  return Consumer<RoomProvider>(
-    builder: (context, roomProvider, child) {
-      final room = roomProvider.singleRoom;
-      if (room == null) {
-        return const Center(child: CircularProgressIndicator());
-      }
+    return Consumer<RoomProvider>(
+      builder: (context, roomProvider, child) {
+        final room = roomProvider.singleRoom;
+        if (room == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-      return Card(
-        color: const Color(0xff2196F3),
-        child: Padding(
-          padding: const EdgeInsets.all(5),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: 150,
-                height: 150,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Image.asset(
-                  'assets/images/rentrealm_logo.png',
-                  fit: BoxFit.cover,
-                  width: 150,
-                  height: 150,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Flexible(
-                child: Column(
+        return Card(
+          color: const Color(0xff2196F3),
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Row(
+              children: [
+                room.roomPictureUrls.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: room.roomPictureUrls.first,
+                    fit: BoxFit.cover,
+                    width: 150,
+                    height: 180,
+                    placeholder: (context, url) => Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                    errorWidget: (context, url, error) => Center(
+                      child: Text(
+                        'Failed to load image',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 12, color: Colors.red),
+                      ),
+                    ),
+                  )
+                : Image.asset(
+                    'assets/images/rentrealm_logo.png',
+                    fit: BoxFit.cover,
+                    width: 150,
+                    height: 150,
+                  ),
+                const SizedBox(width: 10),
+
+                // Column to display roomCode and rentPrice vertically
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -268,52 +355,25 @@ Widget _buildPersonCounter(Room? room) {
                       style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFDAEFFF),
+                        color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 5), // Spacing between text
                     Text(
-                      room.roomDetails,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFFDAEFFF),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(
-                      "₱ ${room.rentPrice.toString()} / Month",
+                      "Rent Price: ₱${room.rentPrice.toString()}", // Display price with currency
                       style: const TextStyle(
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFFDAEFFF),
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 10),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
-
-
-
-
-  
-
-  Widget _buildBoldText(String label, String value) {
-    return Text.rich(
-      TextSpan(
-        children: [
-          TextSpan(text: label, style: const TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(text: value),
-        ],
-      ),
+        );
+      },
     );
   }
 }

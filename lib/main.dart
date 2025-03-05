@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/inquiry_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/notification_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
 import 'package:rentealm_flutter/screens/homelogged.dart';
@@ -56,6 +57,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => InquiryProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => RentalagreementProvider()),
+        ChangeNotifierProvider(create: (_) => PaymentProvider()),
       ],
       child: Builder(
         builder: (context) {

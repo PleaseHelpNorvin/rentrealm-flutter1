@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:rentealm_flutter/MODELS/room_model.dart';
 import 'package:rentealm_flutter/models/inquiry_model.dart';
 import 'package:rentealm_flutter/models/property_model.dart';
+import 'package:rentealm_flutter/models/rentalAgreement_model.dart';
 import 'package:rentealm_flutter/models/tenant_model.dart';
 
 import '../API/rest.dart';
@@ -764,6 +765,55 @@ class ApiService {
       return null;
     }
   }
+
+  Future<PropertyResponse?>postRentalAgreement({
+    required String token,
+    required int inquiryId,
+    required String rentStartDate,
+    // required DateTime rentEndDate,
+    required int personCount,
+    required double totalMonthlyDue,
+    required String? description,
+    required String svgSignatureString,
+  }) async {
+    final uri = Uri.parse('$rest/tenant/rental_agreement/store');
+
+    try {
+      final body = {
+        "inquiry_id": inquiryId,
+        "rent_start_date": rentStartDate,
+        "person_count": personCount,
+        "total_monthly_due": totalMonthlyDue,
+        "description": description,
+        "signature_svg_string": svgSignatureString,
+      };
+      print("Z postRentalAgreement(): $body");
+      final headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      };
+
+      final response = await http.post(
+        uri,
+        headers: headers,
+        body: jsonEncode(body)
+      );
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print('from ApiService.postRentalAgreement:  $responseData');
+        return PropertyResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print("EXEPTION ERROR: $e");
+      return null;
+    }
+  }
+
 }
 
 
