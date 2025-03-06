@@ -1,4 +1,9 @@
+import 'dart:io';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:rentealm_flutter/screens/PAYMENT/checkout.dart';
 import 'package:signature/signature.dart';
 
@@ -193,26 +198,37 @@ class _RentalAgreementScreenState extends State<RentalAgreementScreen> {
                     ),
                   ),
                   onPressed: () async {
-                      var signatureRawSVG = await _RentalSignatureController.toRawSVG();
+                    // Capture the signature as an Image object
+                var signatureImage = await _RentalSignatureController.toImage();
 
+                // Convert the Image to ByteData
+                var byteData = await signatureImage!.toByteData(format: ImageByteFormat.png);
+                
+                if (byteData != null) {
+                  // Convert the ByteData into List<int>
+                  final imageBytes = byteData.buffer.asUint8List();
 
-                      // Ensure it is converted into a String
-                      String signatureSvg = signatureRawSVG as String;
+                  // Get the app's document directory
+                  final directory = await getApplicationDocumentsDirectory();
+                  final file = File('${directory.path}/signature.png');
 
-                      print("""
-                          Signature submitted! 
-                          $signatureSvg
-                          """);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CheckoutScreen(
-                            inquiryId: widget.notifNotifiableInquiryId,
-                            signatureSvgString: signatureSvg, // Now it's a String
-                          ),
-                        ),
-                      );
-                    },
+                  // Write the image bytes to a file
+                  await file.writeAsBytes(imageBytes);
+
+                  print("Signature saved to file: $file");
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CheckoutScreen(
+                        inquiryId: widget.notifNotifiableInquiryId,
+                        signaturePngString: file, // Pass the File instead of String
+                      ),
+                    ),
+                  );
+                }
+              },
+
                   child: const Text('Submit Signature'),
 
                 ),

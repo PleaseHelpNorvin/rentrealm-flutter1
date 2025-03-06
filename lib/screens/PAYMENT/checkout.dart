@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,13 +11,13 @@ import '../../PROVIDERS/inquiry_provider.dart';
 import '../../MODELS/room_model.dart';
 
 class CheckoutScreen extends StatefulWidget {
-  final String signatureSvgString;
+  final File signaturePngString;
   final int inquiryId;
 
   const CheckoutScreen({
     super.key,
     required this.inquiryId,
-    required this.signatureSvgString,
+    required this.signaturePngString,
   });
 
   @override
@@ -25,7 +27,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController _additionalPersonDescController = TextEditingController();
   DateTime? selectedDate; // Store selected date
-  int personCount = 1; // Default value of 1 person
+  int personCount = 1; // Default value of 1 person fuc
   double totalPrice = 0.0;
 
   @override
@@ -104,8 +106,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         : DateFormat("yyyy-MM-dd").format(DateTime.now());
     int persons = personCount;
 
-    paymentProvider.processPayment(context, inquiryId, roomId, startDate, persons, widget.signatureSvgString, totalPrice);
-    rentalagreementProvider.storeRentalAgreement(context, inquiryId, roomId, startDate, persons, widget.signatureSvgString, totalPrice, _additionalPersonDescController.text);
+    paymentProvider.processPayment(context, inquiryId, roomId, startDate, persons, widget.signaturePngString, totalPrice);
+    rentalagreementProvider.storeRentalAgreement(context, inquiryId, roomId, startDate, persons, widget.signaturePngString, totalPrice, _additionalPersonDescController.text);
   }
   
 

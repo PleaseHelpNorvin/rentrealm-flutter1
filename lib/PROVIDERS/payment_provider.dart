@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,7 +26,7 @@ class PaymentProvider extends ChangeNotifier {
     profileId = profileProvider.userProfile?.data.id;
   }
 
-  Future<void> processPayment(BuildContext context, int inquiryId, int roomId, String startDate, int persons, String signatureStringSvg, double totalPrice) async {
+  Future<void> processPayment(BuildContext context, int inquiryId, int roomId, String startDate, int persons, File signatureStringSvg, double totalPrice) async {
     initAuthDetails(context);
 
     print('Token: $token, Profile ID: $profileId');

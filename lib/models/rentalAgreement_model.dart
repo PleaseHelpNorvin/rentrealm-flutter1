@@ -30,7 +30,7 @@ class RentalAgreement {
   final int personCount;
   final double totalMonthlyDue;
   final String? description;
-  final String signatureSvgString;
+  final String signaturePngString;
   final String agreementCode;
   final String status;
   final DateTime updatedAt;
@@ -44,7 +44,7 @@ class RentalAgreement {
     required this.personCount,
     required this.totalMonthlyDue,
     this.description,
-    required this.signatureSvgString,
+    required this.signaturePngString,
     required this.agreementCode,
     required this.status,
     required this.updatedAt,
@@ -60,7 +60,7 @@ class RentalAgreement {
       personCount: int.parse(json['person_count'].toString()), // Convert string to int
       totalMonthlyDue: double.parse(json['total_monthly_due'].toString()), // Convert string to double
       description: json['description'],
-      signatureSvgString: json['signature_svg_string'],
+      signaturePngString: json['signature_png_string'],
       agreementCode: json['agreement_code'],
       status: json['status'],
       updatedAt: DateTime.parse(json['updated_at']),

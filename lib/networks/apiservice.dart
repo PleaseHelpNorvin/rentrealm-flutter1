@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:rentealm_flutter/MODELS/room_model.dart';
 import 'package:rentealm_flutter/models/inquiry_model.dart';
 import 'package:rentealm_flutter/models/property_model.dart';
@@ -766,53 +767,61 @@ class ApiService {
     }
   }
 
-  Future<PropertyResponse?>postRentalAgreement({
-    required String token,
-    required int inquiryId,
-    required String rentStartDate,
-    // required DateTime rentEndDate,
-    required int personCount,
-    required double totalMonthlyDue,
-    required String? description,
-    required String svgSignatureString,
-  }) async {
-    final uri = Uri.parse('$rest/tenant/rental_agreement/store');
+Future<PropertyResponse?> postRentalAgreement({
+  required String token,
+  required int inquiryId,
+  required String rentStartDate,
+  required int personCount,
+  required double totalMonthlyDue,
+  required String? description,
+  required File svgSignatureString, // Now a File object
+}) async {
+  final uri = Uri.parse('$rest/tenant/rental_agreement/store');
 
-    try {
-      final body = {
-        "inquiry_id": inquiryId,
-        "rent_start_date": rentStartDate,
-        "person_count": personCount,
-        "total_monthly_due": totalMonthlyDue,
-        "description": description,
-        "signature_svg_string": svgSignatureString,
-      };
-      print("Z postRentalAgreement(): $body");
-      final headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-      };
+  try {
+    final request = http.MultipartRequest('POST', uri);
 
-      final response = await http.post(
-        uri,
-        headers: headers,
-        body: jsonEncode(body)
-      );
-      
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print('from ApiService.postRentalAgreement:  $responseData');
-        return PropertyResponse.fromJson(responseData);
-      } else {
-        print('Error: ${response.statusCode} - ${response.body}');
-        return null;
-      }
-    } catch (e) {
-      print("EXEPTION ERROR: $e");
+    // Add fields to the request body (non-file fields)
+    request.fields['inquiry_id'] = inquiryId.toString();
+    request.fields['rent_start_date'] = rentStartDate;
+    request.fields['person_count'] = personCount.toString();
+    request.fields['total_monthly_due'] = totalMonthlyDue.toString();
+    if (description != null) {
+      request.fields['description'] = description;
+    }
+
+    // Add the file (signature PNG)
+    final fileBytes = await svgSignatureString.readAsBytes();
+    final multipartFile = http.MultipartFile.fromBytes(
+      'signature_png_string', // Field name in the form
+      fileBytes,
+      filename: 'signature.png', // Filename of the uploaded file
+      contentType: MediaType('image', 'png'), // Content type of the file
+    );
+    request.files.add(multipartFile);
+
+    // Add headers
+    request.headers['Authorization'] = 'Bearer $token';
+    request.headers['Accept'] = 'application/json';
+
+    // Send the request
+    final response = await request.send();
+
+    // Get the response body
+    final responseBody = await response.stream.bytesToString();
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final Map<String, dynamic> responseData = jsonDecode(responseBody);
+      print('Response from API: $responseData');
+      return PropertyResponse.fromJson(responseData);
+    } else {
+      print('Error: ${response.statusCode} - ${responseBody}');
       return null;
     }
+  } catch (e) {
+    print("Exception error: $e");
+    return null;
   }
+}
 
 }
 
