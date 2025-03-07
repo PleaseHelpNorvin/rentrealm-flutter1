@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
 import '../../PROVIDERS/profile_provider.dart';
-import '../../PROVIDERS/tenant_provider.dart';
-import '../../PROVIDERS/user_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,85 +11,113 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // You can change this name based on user login data
-  String userName = "User";
+  late Future<bool> _profileCheckFuture;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ProfileProvider>(context, listen: false);
-      Provider.of<UserProvider>(context, listen: false).fetchUser(context);
-
-    });
+    _profileCheckFuture = Provider.of<ProfileProvider>(context, listen: false).loadUserProfile(context);
   }
-
-  Future<void> _refreshData() async {
-    await Future.delayed(Duration(seconds: 2)); // Simulate data fetching
-    setState(() {}); // Rebuild the widget
-  }
-
-
-Widget _buildNoDataCard() {
-  return Card(
-    elevation: 1,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(10),
-    ),
-    color: Colors.orange.shade50,
-    child: const SizedBox(
-      width: double.infinity,
-      height: 300, // Increased height to 300px
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Center( // Center everything inside the Card
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center, // Center vertically
-              crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
-              children: [
-                Icon(Icons.reviews, size: 40, color: Colors.orange),
-                SizedBox(height: 8),
-                Text(
-                  'Thank you for inquiring. The admins are reviewing your inquiry.',
-                  textAlign: TextAlign.center, // Center text
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Admins may contact you once they have reviewed your inquiry.',
-                  textAlign: TextAlign.center, // Center text
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Please check your notifications or be available for a possible call.',
-                  textAlign: TextAlign.center, // Center text
-                  style: TextStyle(fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _refreshData,
-        child: Padding(
-          padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
-          child: SingleChildScrollView(
-            physics: AlwaysScrollableScrollPhysics(),
-            child: Column(
-              children: [
-                _buildNoDataCard(),
-              ],
+      body: FutureBuilder<bool>(
+        future: _profileCheckFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          
+          if (snapshot.hasData && !snapshot.data!) {
+            return _buildNoDataCard();
+          }
+
+          return _buildWithDataCard();
+        },
+      ),
+    );
+  }
+
+  /// Widget that displays the main home screen content
+  Widget _buildWithDataCard() {
+    return RefreshIndicator(
+      onRefresh: () async {
+        setState(() {
+          _profileCheckFuture = Provider.of<ProfileProvider>(context, listen: false)
+              .loadUserProfile(context);
+        });
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        child: Consumer<ProfileProvider>(
+          builder: (context, profileProvider, child) {
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: const [
+                  Text("Welcome to Home Screen!"), // Home screen content
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  /// Widget shown when the user doesn't have a profile
+  Widget _buildNoDataCard() {
+    return Center(
+      child: Card(
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        color: Colors.orange.shade50,
+        child: SizedBox(
+          width: double.infinity,
+          height: 300,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CreateProfileScreen1(),
+                        ),
+                      );
+                    },
+                    child: const Text('Continue Creating Profile'),
+                  ),
+                  const SizedBox(height: 8),
+                  const Icon(Icons.reviews, size: 40, color: Colors.orange),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Thank you for inquiring. The admins are reviewing your inquiry.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Admins may contact you once they have reviewed your inquiry.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Please check your notifications or be available for a possible call.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 14),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

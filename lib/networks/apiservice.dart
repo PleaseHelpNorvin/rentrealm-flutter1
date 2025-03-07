@@ -626,30 +626,30 @@ class ApiService {
   }
 
   Future<InquiryResponse?>postInquiry({
-    required String token,
     required int roomId,
-    required int profileId,
+    required String name,
+    required String contactNumber,
+    required String message,
 
   }) async {
-    print("storeInquiry() roomId $token");
 
     print("storeInquiry() roomId $roomId");
-    print("storeInquiry() profileID $profileId");
+    print("storeInquiry() message $message");
 
-    final uri = Uri.parse('$rest/tenant/inquiry/store');
+    final uri = Uri.parse('$rest/inquiry/store');
 
     try {
       final body = {
-        "profile_id": profileId,
         "room_id": roomId,
-
+        "name": name,
+        "contact_no": contactNumber,
+        "message": message,
       };
 
       final response = await http.post(
         uri, headers: {
             "Content-Type": "application/json",
             "Accept": "application/json",
-            "Authorization": "Bearer $token",
         },
         body: jsonEncode(body),
       );

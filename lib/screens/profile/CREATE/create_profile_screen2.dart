@@ -43,11 +43,11 @@ class CreateProfileScreenState2 extends State<CreateProfileScreen2> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text("Fill Address"),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text("Fill Address"),
+      // ),
       body: Column(
         children: <Widget>[
           Expanded(

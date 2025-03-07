@@ -6,9 +6,10 @@ import '../SCREENS/homelogged.dart';
 class AlertUtils {
   // Success Alert
   static void showSuccessAlert(BuildContext context,
-      {String? title, String? message, VoidCallback? onConfirmBtnTap}) {
+      {String? title, String? message, VoidCallback? onConfirmBtnTap, required bool barrierDismissible}) {
     QuickAlert.show(
       context: context,
+      barrierDismissible: false,
       type: QuickAlertType.success,
       title: title ?? 'Success',
       text: message ?? 'Operation completed successfully!',

@@ -34,10 +34,10 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
       final token = authProvider.token;
       final userId = authProvider.userId;
 
-      final profileProvider =
-          // Provider.of<ProfileProvider>(context, listen: false);
-          Provider.of<ProfileProvider>(context, listen: false)
-              .loadUserProfile(context);
+      // final profileProvider =
+      //     // Provider.of<ProfileProvider>(context, listen: false);
+      //     Provider.of<ProfileProvider>(context, listen: false)
+      //         .loadUserProfile(context);
 
       // Provider.of<TenantProvider>(context, listen: false).fetchTenant(context);
 

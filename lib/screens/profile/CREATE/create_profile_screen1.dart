@@ -38,12 +38,12 @@ class CreateProfileScreenState1 extends State<CreateProfileScreen1> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: Text('Create Profile'),
-      ),
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: Text('Create Profile'),
+      // ),
       body: Column(
         children: <Widget>[
           // The scrollable content above the button

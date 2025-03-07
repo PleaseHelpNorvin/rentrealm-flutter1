@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
+import 'package:rentealm_flutter/screens/outer_create_tenant_inquiry_screen1.dart';
 import 'package:rentealm_flutter/screens/outer_create_tenant_screen3.dart';
 
 import '../MODELS/room_model.dart';
@@ -233,9 +234,33 @@ Widget _buildRoomCard(Room rooms, BuildContext context) {
                         color: Colors.white,
                       ),
                     ),
+                    SizedBox(height: 5),
+                    ElevatedButton(
+                      onPressed: () {
+
+                        Navigator.push(context, 
+                          MaterialPageRoute(
+                            builder: (context) =>
+                            OuterCreateTenantInquiryScreen1(roomCode: rooms.roomCode, roomId: rooms.id) 
+                          
+                          )
+                        );
+                      }, 
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.blue,
+                          minimumSize: Size(double.infinity, 45),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                        ),
+                      child: Text("Make an Inquiry")
+                    )
                   ],
                 ),
               ),
+
+              
             ],
           ),
         ),

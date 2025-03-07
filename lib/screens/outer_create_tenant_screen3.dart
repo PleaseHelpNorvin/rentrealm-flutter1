@@ -250,7 +250,7 @@ Future.microtask(() async {
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(5),
-                    child: const Text("Enquire Now"),
+                    child: const Text("Rent Now"),
                   ),
                 ),
               ],

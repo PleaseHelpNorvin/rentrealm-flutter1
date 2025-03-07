@@ -9,6 +9,7 @@ import 'package:rentealm_flutter/screens/homelogged.dart';
 import 'package:rentealm_flutter/screens/outer_create_tenant_screen1.dart';
 
 import 'PROVIDERS/auth_provider.dart';
+import 'PROVIDERS/reservation_provider.dart';
 import 'PROVIDERS/theme_provider.dart';
 import 'PROVIDERS/tenant_provider.dart';
 import 'PROVIDERS/property_provider.dart';
@@ -58,6 +59,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => RentalagreementProvider()),
         ChangeNotifierProvider(create: (_) => PaymentProvider()),
+        ChangeNotifierProvider(create: (_) => ReservationProvider()),
+
+        
       ],
       child: Builder(
         builder: (context) {

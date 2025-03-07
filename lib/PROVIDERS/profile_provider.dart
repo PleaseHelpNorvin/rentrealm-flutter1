@@ -66,7 +66,7 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   Future<File> imageCompression(BuildContext context, File pickedFile) async {
-    // Decode the original image
+
     final originalImageData = img.decodeImage(pickedFile.readAsBytesSync());
 
     // Resize the image
@@ -213,6 +213,7 @@ class ProfileProvider extends ChangeNotifier {
       setUserProfile(response);
       AlertUtils.showSuccessAlert(
         context,
+        barrierDismissible: false,
         title: "Profile Created Successfully",
         message: "Thank You For Creating Profile",
         onConfirmBtnTap: () {
@@ -251,50 +252,38 @@ class ProfileProvider extends ChangeNotifier {
     if (token != null && userId != null) {
       try {
         await fetchUserProfile(context, token: token, userId: userId);
-        return true;
+        return userProfile != null; // Return true if profile exists
       } catch (e) {
         print("Error loading user profile: $e");
         AlertUtils.showErrorAlert(context,
             message: "Failed to load user profile.");
       }
-      return false;
     } else {
       AlertUtils.showErrorAlert(context, message: "User not authenticated.");
-      return false;
     }
+    return false; // Default return value
   }
 
-  Future<void> fetchUserProfile(context,
-      {required String token, required int userId}) async {
-    try {
-      setLoading(true);
+Future<void> fetchUserProfile(context, {required String token, required int userId}) async {
+  try {
+    setLoading(true);
 
-      final response =
-          await apiService.getUserProfile(token: token, userId: userId);
+    final response = await apiService.getUserProfile(token: token, userId: userId);
 
-      if (response != null && response.success) {
-        setUserProfile(response);
-        print("User profile Id $userId  fetched successfully:");
-      } else {
-        setUserProfile(null);
-        AlertUtils.showInfoAlert(
-          context,
-          title: "Profile Not Found",
-          message: "Please create your profile first!",
-          onConfirmBtnTap: () {
-            Navigator.pushReplacementNamed(
-                context, '/createprofile1'); // Then navigate
-          },
-        );
-      }
-    } catch (e) {
-      print("Error fetching user profile: $e");
-      AlertUtils.showErrorAlert(context,
-          title: "Error", message: "Something went wrong: $e");
-    } finally {
-      setLoading(false);
+    if (response != null && response.success) {
+      setUserProfile(response);  // Ensure this updates the profile
+      notifyListeners(); // Important: Notify listeners when data changes
+    } else {
+      setUserProfile(null);
+      print("No profile found for this user");
     }
+  } catch (e) {
+    print("Error fetching user profile: $e");
+    AlertUtils.showErrorAlert(context, title: "Error", message: "Something went wrong: $e");
+  } finally {
+    setLoading(false);
   }
+}
 
   Future<void> onUpdateUserAddress(
     BuildContext context,
@@ -326,6 +315,7 @@ class ProfileProvider extends ChangeNotifier {
         setUserProfile(userProfile);
         AlertUtils.showSuccessAlert(
           context,
+          barrierDismissible: false,
           title: "Update Success",
           message: "Your address was updated successfully",
         );
@@ -372,6 +362,7 @@ class ProfileProvider extends ChangeNotifier {
         // await loadUserProfile(context);
         AlertUtils.showSuccessAlert(
           context,
+          barrierDismissible: false,
           title: "Update Success",
           message: "your Profile updated successfully",
           onConfirmBtnTap: () {
@@ -412,6 +403,7 @@ class ProfileProvider extends ChangeNotifier {
         setUserProfile(response);
         AlertUtils.showSuccessAlert(
           context,
+          barrierDismissible: false,
           title: "Update Success",
           message: "your Identificaitons updated successfully",
         );

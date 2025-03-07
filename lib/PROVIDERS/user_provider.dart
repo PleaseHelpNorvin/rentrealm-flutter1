@@ -113,6 +113,7 @@ class UserProvider extends ChangeNotifier {
         setUser(response);
         AlertUtils.showSuccessAlert(
           context,
+          barrierDismissible: false,
           title: "Update Success",
           message: "Your user updated successfully",
           onConfirmBtnTap: () {

@@ -78,11 +78,11 @@ void initState() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: const Text("Fill Identification"),
-      ),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.blue,
+      //   foregroundColor: Colors.white,
+      //   title: const Text("Fill Identification"),
+      // ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Form(

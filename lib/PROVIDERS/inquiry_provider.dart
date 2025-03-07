@@ -6,6 +6,7 @@ import 'package:rentealm_flutter/networks/apiservice.dart';
 import 'package:rentealm_flutter/models/inquiry_model.dart';
 import 'package:rentealm_flutter/screens/homelogged.dart';
 
+import '../CUSTOMS/alert_utils.dart';
 import 'auth_provider.dart';
 
 class InquiryProvider extends ChangeNotifier{
@@ -24,37 +25,48 @@ class InquiryProvider extends ChangeNotifier{
   Future<void> storeInquiry(
     BuildContext context,
     int roomId,
-    int profileId,
+    String name,
+    String contactNumber,
+    String message,
+
   ) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final token = authProvider.token;
 
     print("$token");
     print("roomId $roomId");
-    print("profileID $profileId");
  
 
     final response = await apiService.postInquiry(
-      token: token ?? "",
       roomId: roomId,
-      profileId: profileId,
+      name: name,
+      contactNumber: contactNumber,
+      message: message,
+
     );
 
 
 
     if (response != null) {
       print("Inquiry stored successfully");
-     
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => HomeLoggedScreen()),
-        );
-      });
-
+          // Show success alert
+      AlertUtils.showSuccessAlert(
+        context,
+        title: "Success",
+        barrierDismissible: false,
+        message: "Inquiry sent successfully!",
+        onConfirmBtnTap: () {
+          Navigator.pop(context); // Navigate back after success
+        },
+      );
       setInquiry(response); // Update the provider state
     } else {
       print("Failed to store inquiry.");
+      AlertUtils.showErrorAlert(
+        context,
+        title: "Error",
+        message: "Failed to send inquiry. Please try again.",
+      );
     }
   }
 
