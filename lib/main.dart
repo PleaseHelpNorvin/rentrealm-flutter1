@@ -63,7 +63,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PaymentProvider()),
         ChangeNotifierProvider(create: (_) => ReservationProvider()),
         ChangeNotifierProvider(
-          create: (context) => PickedroomProvider(
+          create: (context) => PickedRoomProvider(
             authProvider: Provider.of<AuthProvider>(context, listen: false),
           ),
         ),

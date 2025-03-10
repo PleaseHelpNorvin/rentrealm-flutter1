@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
+import '../../PROVIDERS/pickedroom_provider.dart';
 import '../../PROVIDERS/profile_provider.dart';
 
 class HomeScreen extends StatefulWidget {
