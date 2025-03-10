@@ -7,6 +7,7 @@ import 'package:rentealm_flutter/MODELS/room_model.dart';
 import 'package:rentealm_flutter/models/inquiry_model.dart';
 import 'package:rentealm_flutter/models/property_model.dart';
 import 'package:rentealm_flutter/models/rentalAgreement_model.dart';
+import 'package:rentealm_flutter/models/reservation_model.dart';
 import 'package:rentealm_flutter/models/tenant_model.dart';
 
 import '../API/rest.dart';
@@ -14,6 +15,7 @@ import '../API/rest.dart';
 import '../MODELS/profile_model.dart';
 import '../MODELS/user_model.dart';
 import '../models/notification_model.dart';
+import '../models/pickedRoom_model.dart';
 
 class ApiService {
   final String rest = Rest.baseUrl;
@@ -822,7 +824,78 @@ Future<PropertyResponse?> postRentalAgreement({
     return null;
   }
 }
+  Future<PickedRoomResponse?> postPickedRoomByUser({
+    required int userId, 
+    required String token, 
+    required int roomId,
+  }) async {
+    print("from postPickedRoomByUser() userId: $userId");
+    print("from postPickedRoomByUser() token: $token");
+    print("from postPickedRoomByUser() roomId: $roomId");
+    final uri = Uri.parse('$rest/tenant/picked_room/addRoomForUser');
 
+    final body = {
+      "user_id": userId,
+      "room_id": roomId,
+    };  
+
+    final headers = { 
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.post(
+        uri,
+        headers: headers,
+        body: jsonEncode(body),
+      );  
+
+      if(response.statusCode == 200 || response.statusCode == 201) {
+        print("Raw API response: ${response.body}");
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from InquiryResponse() Call: $responseData");
+        return PickedRoomResponse.fromJson(responseData);
+      } else{
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+
+    } catch (e) {
+      print('EXCEPTION $e');
+      return null;
+    }
+  }
+
+
+  Future<PickedRoomResponse?>getPickedRoomsByUser({
+    required int userId,
+    required String token,
+  }) async {
+    final uri = Uri.parse('$rest/tenant/picked_room/getRoomsByUser/$userId');
+    
+    final headers = { 
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    final response = await http.get(
+      uri,
+      headers: headers
+    );
+
+    if(response.statusCode == 200 || response.statusCode == 201) {
+      print("Raw API response: ${response.body}");
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      print("responseData from InquiryResponse() Call: $responseData");
+      return PickedRoomResponse.fromJson(responseData);
+    } else{
+      print('Error: ${response.statusCode} - ${response.body}');
+      return null;
+    }
+  }
 }
 
 

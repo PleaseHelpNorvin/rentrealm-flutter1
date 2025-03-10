@@ -1,6 +1,7 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/pickedRoom_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
 import 'package:rentealm_flutter/SCREENS/PROFILE/UPDATE/edit_address_screen.dart';
 import 'package:rentealm_flutter/screens/CONTRACT/contract.dart';
@@ -43,6 +44,7 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
 
       if (token != null && userId != null) {
         Provider.of<UserProvider>(context, listen: false).fetchUser(context);
+        // Provider.of<PickedroomProvider>(context, listen: false).addRoomForUser()
       } else {
         print("Token or userId is null");
       }
