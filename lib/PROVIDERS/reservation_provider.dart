@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/NETWORKS/apiservice.dart';
 import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
 
+import '../networks/apiservice.dart';
 import 'auth_provider.dart';
 
 class ReservationProvider extends ChangeNotifier {
@@ -27,9 +27,22 @@ class ReservationProvider extends ChangeNotifier {
 
   // methods below
   Future<void> createReservation(BuildContext context, int profileId,
-      int roomId, File? paymentProof) async {
+      int roomId, File? paymentProof, String? paymentMethod) async {
+    if (paymentMethod == null) {
+      print("Please select a payment method");
+      return;
+    }
+
     print("profileId: $profileId");
     print("roomId: $roomId");
     print("paymentProof.path: ${paymentProof?.path}");
+    print("paymentMethod: $paymentMethod");
+
+    final response = await apiService.postReservation(
+      profileId: profileId,
+      roomId: roomId,
+      paymentProof: paymentProof,
+      paymentMethod: paymentMethod,
+    );
   }
 }

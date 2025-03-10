@@ -64,6 +64,13 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
       return;
     }
 
+    if (_selectedTitle == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a payment method")),
+      );
+      return;
+    }
+
     // Print values before submitting
     print("Profile ID: ${widget.profileId}");
     print("Room ID: ${widget.roomId}");
@@ -77,6 +84,7 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
       widget.profileId,
       widget.roomId,
       _selectedFile,
+      _selectedTitle,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(

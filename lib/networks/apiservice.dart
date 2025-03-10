@@ -543,8 +543,7 @@ class ApiService {
     }
   }
 
-  Future<RoomResponse?> getRoomsByPropertyId(
-      {required int propertyId}) async {
+  Future<RoomResponse?> getRoomsByPropertyId({required int propertyId}) async {
     print("getRoomsByPropertyId(): $propertyId");
     // print("getRoomsByPropertyId(): $token");
 
@@ -604,7 +603,6 @@ class ApiService {
   }) async {
     print("getRoomById(): $roomId");
 
-
     final uri = Uri.parse('$rest/room/show/$roomId');
 
     try {
@@ -622,19 +620,17 @@ class ApiService {
         return null;
       }
     } catch (e) {
-        print('Exception: $e');
-        return null;
+      print('Exception: $e');
+      return null;
     }
   }
 
-  Future<InquiryResponse?>postInquiry({
+  Future<InquiryResponse?> postInquiry({
     required int roomId,
     required String name,
     required String contactNumber,
     required String message,
-
   }) async {
-
     print("storeInquiry() roomId $roomId");
     print("storeInquiry() message $message");
 
@@ -649,9 +645,10 @@ class ApiService {
       };
 
       final response = await http.post(
-        uri, headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
+        uri,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
         },
         body: jsonEncode(body),
       );
@@ -659,20 +656,20 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print(responseData);
-        return InquiryResponse.fromJson(responseData); // Parse response into model
+        return InquiryResponse.fromJson(
+            responseData); // Parse response into model
       } else {
         // Handle errors
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
-
     } catch (e) {
       print('Exception: $e');
       return null;
     }
   }
 
-  Future<NotificationResponse?>getNotification({
+  Future<NotificationResponse?> getNotification({
     required String token,
     required int userId,
   }) async {
@@ -681,30 +678,28 @@ class ApiService {
 
     final uri = Uri.parse('$rest/tenant/notification/index/$userId');
     try {
-      
       final response = await http.get(uri, headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Authorization": "Bearer $token",
       });
 
-      if(response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print("Raw API response: ${response.body}");
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getNotification() Call: $responseData");
         return NotificationResponse.fromJson(responseData);
-      } else{
+      } else {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
-      
     } catch (e) {
       print('Exception: $e');
       return null;
     }
   }
 
-  Future<NotificationResponse?>patchNotificationStatus({
+  Future<NotificationResponse?> patchNotificationStatus({
     required String token,
     required int userId,
     required int notifId,
@@ -715,30 +710,29 @@ class ApiService {
 
     final uri = Uri.parse('$rest/tenant/notification/updateIsRead/$notifId');
     try {
-      
       final response = await http.patch(uri, headers: {
         "Content-Type": "application/json",
         "Accept": "application/json",
         "Authorization": "Bearer $token",
       });
 
-      if(response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print("Raw API response: ${response.body}");
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print("responseData from patchNotificationStatus() Call: $responseData");
+        print(
+            "responseData from patchNotificationStatus() Call: $responseData");
         return NotificationResponse.fromJson(responseData);
-      } else{
+      } else {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
-      
     } catch (e) {
       print('Exception: $e');
       return null;
     }
   }
 
-  Future<InquiryResponse?>getInquiryById({
+  Future<InquiryResponse?> getInquiryById({
     required String token,
     required int unquiryId,
   }) async {
@@ -754,12 +748,12 @@ class ApiService {
         "Authorization": "Bearer $token",
       });
 
-       if(response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print("Raw API response: ${response.body}");
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from InquiryResponse() Call: $responseData");
         return InquiryResponse.fromJson(responseData);
-      } else{
+      } else {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
@@ -769,64 +763,65 @@ class ApiService {
     }
   }
 
-Future<PropertyResponse?> postRentalAgreement({
-  required String token,
-  required int inquiryId,
-  required String rentStartDate,
-  required int personCount,
-  required double totalMonthlyDue,
-  required String? description,
-  required File svgSignatureString, // Now a File object
-}) async {
-  final uri = Uri.parse('$rest/tenant/rental_agreement/store');
+  Future<PropertyResponse?> postRentalAgreement({
+    required String token,
+    required int inquiryId,
+    required String rentStartDate,
+    required int personCount,
+    required double totalMonthlyDue,
+    required String? description,
+    required File svgSignatureString, // Now a File object
+  }) async {
+    final uri = Uri.parse('$rest/tenant/rental_agreement/store');
 
-  try {
-    final request = http.MultipartRequest('POST', uri);
+    try {
+      final request = http.MultipartRequest('POST', uri);
 
-    // Add fields to the request body (non-file fields)
-    request.fields['inquiry_id'] = inquiryId.toString();
-    request.fields['rent_start_date'] = rentStartDate;
-    request.fields['person_count'] = personCount.toString();
-    request.fields['total_monthly_due'] = totalMonthlyDue.toString();
-    if (description != null) {
-      request.fields['description'] = description;
-    }
+      // Add fields to the request body (non-file fields)
+      request.fields['inquiry_id'] = inquiryId.toString();
+      request.fields['rent_start_date'] = rentStartDate;
+      request.fields['person_count'] = personCount.toString();
+      request.fields['total_monthly_due'] = totalMonthlyDue.toString();
+      if (description != null) {
+        request.fields['description'] = description;
+      }
 
-    // Add the file (signature PNG)
-    final fileBytes = await svgSignatureString.readAsBytes();
-    final multipartFile = http.MultipartFile.fromBytes(
-      'signature_png_string', // Field name in the form
-      fileBytes,
-      filename: 'signature.png', // Filename of the uploaded file
-      contentType: MediaType('image', 'png'), // Content type of the file
-    );
-    request.files.add(multipartFile);
+      // Add the file (signature PNG)
+      final fileBytes = await svgSignatureString.readAsBytes();
+      final multipartFile = http.MultipartFile.fromBytes(
+        'signature_png_string', // Field name in the form
+        fileBytes,
+        filename: 'signature.png', // Filename of the uploaded file
+        contentType: MediaType('image', 'png'), // Content type of the file
+      );
+      request.files.add(multipartFile);
 
-    // Add headers
-    request.headers['Authorization'] = 'Bearer $token';
-    request.headers['Accept'] = 'application/json';
+      // Add headers
+      request.headers['Authorization'] = 'Bearer $token';
+      request.headers['Accept'] = 'application/json';
 
-    // Send the request
-    final response = await request.send();
+      // Send the request
+      final response = await request.send();
 
-    // Get the response body
-    final responseBody = await response.stream.bytesToString();
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final Map<String, dynamic> responseData = jsonDecode(responseBody);
-      print('Response from API: $responseData');
-      return PropertyResponse.fromJson(responseData);
-    } else {
-      print('Error: ${response.statusCode} - ${responseBody}');
+      // Get the response body
+      final responseBody = await response.stream.bytesToString();
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(responseBody);
+        print('Response from API: $responseData');
+        return PropertyResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${responseBody}');
+        return null;
+      }
+    } catch (e) {
+      print("Exception error: $e");
       return null;
     }
-  } catch (e) {
-    print("Exception error: $e");
-    return null;
   }
-}
+
   Future<PickedRoomResponse?> postPickedRoomByUser({
-    required int userId, 
-    required String token, 
+    required int userId,
+    required String token,
     required int roomId,
   }) async {
     print("from postPickedRoomByUser() userId: $userId");
@@ -837,9 +832,9 @@ Future<PropertyResponse?> postRentalAgreement({
     final body = {
       "user_id": userId,
       "room_id": roomId,
-    };  
+    };
 
-    final headers = { 
+    final headers = {
       "Content-Type": "application/json",
       "Accept": "application/json",
       "Authorization": "Bearer $token",
@@ -850,52 +845,86 @@ Future<PropertyResponse?> postRentalAgreement({
         uri,
         headers: headers,
         body: jsonEncode(body),
-      );  
+      );
 
-      if(response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         print("Raw API response: ${response.body}");
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from InquiryResponse() Call: $responseData");
         return PickedRoomResponse.fromJson(responseData);
-      } else{
+      } else {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
-
     } catch (e) {
       print('EXCEPTION $e');
       return null;
     }
   }
 
-
-  Future<PickedRoomResponse?>getPickedRoomsByUser({
+  Future<PickedRoomResponse?> getPickedRoomsByUser({
     required int userId,
     required String token,
   }) async {
     final uri = Uri.parse('$rest/tenant/picked_room/getRoomsByUser/$userId');
-    
-    final headers = { 
+
+    final headers = {
       "Content-Type": "application/json",
       "Accept": "application/json",
       "Authorization": "Bearer $token",
     };
 
-    final response = await http.get(
-      uri,
-      headers: headers
-    );
+    final response = await http.get(uri, headers: headers);
 
-    if(response.statusCode == 200 || response.statusCode == 201) {
+    if (response.statusCode == 200 || response.statusCode == 201) {
       print("Raw API response: ${response.body}");
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       print("responseData from InquiryResponse() Call: $responseData");
       return PickedRoomResponse.fromJson(responseData);
-    } else{
+    } else {
       print('Error: ${response.statusCode} - ${response.body}');
       return null;
     }
   }
+
+  Future<ReservationResponse?> postReservation({
+    required int profileId,
+    required int roomId,
+    required File? paymentProof,
+    required String paymentMethod,
+  }) async {
+    try {
+      var uri = Uri.parse(
+          "YOUR_API_ENDPOINT_HERE"); // Replace with your actual API endpoint
+      var request = http.MultipartRequest("POST", uri)
+        ..fields['profile_id'] = profileId.toString()
+        ..fields['room_id'] = roomId.toString()
+        ..fields['payment_method'] = paymentMethod;
+
+      // Attach the file if it exists
+      if (paymentProof != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'payment_proof', // Field name in the API
+            paymentProof.path,
+          ),
+        );
+      }
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      if (response.statusCode == 200) {
+        var responseData = jsonDecode(response.body);
+        print("Response Data: $responseData");
+        return ReservationResponse.fromJson(responseData);
+      } else {
+        print("Error: ${response.statusCode} - ${response.body}");
+        return null;
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return null;
+    }
+  }
 }
-
-
