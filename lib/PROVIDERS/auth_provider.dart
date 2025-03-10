@@ -1,6 +1,8 @@
 // import 'dart:core';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/pickedRoom_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../CUSTOMS/alert_utils.dart';
 import '../MODELS/user_model.dart';
@@ -77,29 +79,47 @@ class AuthProvider extends ChangeNotifier {
     await prefs.setInt('roomId', roomId);
   }
 
-  Future<void> registerUser(
-      {required String name,
-      required String email,
-      required String password,
-      required int roomId,
-      required BuildContext context}) async {
+  Future<void> registerUser({
+    required String name,
+    required String email,
+    required String password,
+    required int roomId,
+    required BuildContext context,
+  }) async {
     try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final pickedRoomProvider = Provider.of<PickedroomProvider>(context, listen: false);
+
       final response = await apiService.registerUser(
-          name: name, email: email, password: password);
+        name: name, email: email, password: password,
+      );
 
       if (response != null && response.success) {
-        setUser(response);
+        // ✅ Store token & user ID AFTER successful registration
+        authProvider.setUser(response);
+
+        // ✅ Update PickedroomProvider with the new token & userId
+        pickedRoomProvider.token = authProvider.token ?? 'no token';
+        pickedRoomProvider.userId = authProvider.userId ?? 0;
+
         setAuthenticationStatus(true);
-        await saveRoomId(roomId);
-         Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeLoggedScreen()),
-          );
+
+        // ✅ Call addRoomForUser AFTER setting token & userId
+        await pickedRoomProvider.addRoomForUser(roomId);
+
+        // ✅ Navigate to Home
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeLoggedScreen()),
+        );
+        
       } else {
         setAuthenticationStatus(false);
+        print("Registration failed.");
       }
     } catch (e) {
       setAuthenticationStatus(false);
+      print("Error in registerUser: $e");
     }
   }
 }

@@ -36,6 +36,8 @@ class RegisterScreenState extends State<RegisterScreen> {
   
    Future<void> registerUser(AuthProvider authProvider) async {
     if (_formKey.currentState!.validate()) {
+
+      
       await authProvider.registerUser(
         name: nameController.text,
         email: emailController.text,
