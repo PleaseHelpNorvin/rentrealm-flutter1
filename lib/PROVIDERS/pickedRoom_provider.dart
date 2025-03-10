@@ -3,7 +3,7 @@ import 'package:rentealm_flutter/networks/apiservice.dart';
 import 'auth_provider.dart';
 import '../models/pickedRoom_model.dart';
 
-class PickedroomProvider extends ChangeNotifier {
+class PickedRoomProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
   final AuthProvider authProvider;
 
@@ -26,7 +26,7 @@ class PickedroomProvider extends ChangeNotifier {
     notifyListeners();  // Notify UI about changes
   }
 
-  PickedroomProvider({required this.authProvider}) {
+  PickedRoomProvider({required this.authProvider}) {
     token = authProvider.token ?? 'no token';
     userId = authProvider.userId ?? 0;
   }
@@ -41,6 +41,7 @@ class PickedroomProvider extends ChangeNotifier {
       
       if (response != null && response.success) {
         pickedRooms = response.data.pickedRooms;
+        
         print("the state reached here but not yet set nofitify()");
       } else {
         print("Failed to fetch picked rooms.");
@@ -74,6 +75,7 @@ class PickedroomProvider extends ChangeNotifier {
       if (response != null && response.success) {
         print("Room successfully picked for user.");
         
+        await fetchPickedRooms();
        
       } else {
         print("Failed to pick room. API response was unsuccessful.");

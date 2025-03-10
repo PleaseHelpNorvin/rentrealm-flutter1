@@ -23,9 +23,11 @@ class PickedRoomsData {
 
   factory PickedRoomsData.fromJson(Map<String, dynamic> json) {
     return PickedRoomsData(
-      pickedRooms: List<PickedRoomDetails>.from(
-        json['picked_rooms'].map((x) => PickedRoomDetails.fromJson(x)),
-      ),
+      pickedRooms: json['picked_rooms'] != null
+          ? List<PickedRoomDetails>.from(
+              json['picked_rooms'].map((x) => PickedRoomDetails.fromJson(x)),
+            )
+          : [], // 👈 Fallback to empty list if null
     );
   }
 }

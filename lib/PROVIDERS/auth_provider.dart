@@ -88,7 +88,7 @@ class AuthProvider extends ChangeNotifier {
   }) async {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final pickedRoomProvider = Provider.of<PickedroomProvider>(context, listen: false);
+      final pickedRoomProvider = Provider.of<PickedRoomProvider>(context, listen: false);
 
       final response = await apiService.registerUser(
         name: name, email: email, password: password,
