@@ -7,7 +7,7 @@ import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
 
 import 'auth_provider.dart';
 
-class ReservationProvider extends ChangeNotifier{
+class ReservationProvider extends ChangeNotifier {
   ApiService apiService = ApiService();
 
   bool _isLoading = false;
@@ -18,18 +18,18 @@ class ReservationProvider extends ChangeNotifier{
 
   void initAuthDetails(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
 
     token = authProvider.token ?? 'no token';
     profileId = profileProvider.userProfile?.data.id;
   }
+
   // methods below
-  Future<void> createReservation(   BuildContext context,
-    int userId, int roomId, double amount, File? paymentProof
-  ) async {
-    print("userId: $userId");
-    print("userId: $roomId");
-    print("userId: $amount");
-    print("userId: ${paymentProof?.path}");
+  Future<void> createReservation(BuildContext context, int profileId,
+      int roomId, File? paymentProof) async {
+    print("profileId: $profileId");
+    print("roomId: $roomId");
+    print("paymentProof.path: ${paymentProof?.path}");
   }
 }

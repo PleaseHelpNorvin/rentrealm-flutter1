@@ -5,7 +5,8 @@ class PickedRoomResponse {
   final String message;
   final PickedRoomsData data;
 
-  PickedRoomResponse({required this.success, required this.message, required this.data});
+  PickedRoomResponse(
+      {required this.success, required this.message, required this.data});
 
   factory PickedRoomResponse.fromJson(Map<String, dynamic> json) {
     return PickedRoomResponse(
@@ -22,13 +23,21 @@ class PickedRoomsData {
   PickedRoomsData({required this.pickedRooms});
 
   factory PickedRoomsData.fromJson(Map<String, dynamic> json) {
-    return PickedRoomsData(
-      pickedRooms: json['picked_rooms'] != null
-          ? List<PickedRoomDetails>.from(
-              json['picked_rooms'].map((x) => PickedRoomDetails.fromJson(x)),
-            )
-          : [], // 👈 Fallback to empty list if null
-    );
+    if (json['picked_rooms'] == null) {
+      return PickedRoomsData(pickedRooms: []); // ✅ Return an empty list if null
+    } else if (json['picked_rooms'] is List) {
+      return PickedRoomsData(
+        pickedRooms: List<PickedRoomDetails>.from(
+          json['picked_rooms'].map((x) => PickedRoomDetails.fromJson(x)),
+        ),
+      );
+    } else {
+      return PickedRoomsData(
+        pickedRooms: [
+          PickedRoomDetails.fromJson(json['picked_rooms'])
+        ], // ✅ Wrap single object in a list
+      );
+    }
   }
 }
 
@@ -40,12 +49,18 @@ class PickedRoomDetails {
   final String updatedAt;
   final Room room;
 
-  PickedRoomDetails({required this.id, required this.userId, required this.roomId, required this.createdAt, required this.updatedAt, required this.room});
+  PickedRoomDetails(
+      {required this.id,
+      required this.userId,
+      required this.roomId,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.room});
 
   factory PickedRoomDetails.fromJson(Map<String, dynamic> json) {
     return PickedRoomDetails(
       id: json['id'],
-      userId: json['user_id'],
+      userId: json['user_id'] ?? 0,
       roomId: json['room_id'],
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
@@ -105,7 +120,7 @@ class Room {
       rentPrice: json['rent_price'],
       reservationFee: json['reservation_fee'],
       capacity: json['capacity'],
-      currentOccupants: json['current_occupants'],
+      currentOccupants: json['current_occupants'] ?? 0,
       minLease: json['min_lease'],
       size: json['size'],
       status: json['status'],

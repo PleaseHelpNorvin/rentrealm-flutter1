@@ -13,17 +13,25 @@ class PickedRoomProvider extends ChangeNotifier {
   late String token;
   late int userId;
 
-  bool hasReservation = false; 
+  bool hasReservation = false;
 
   List<PickedRoomDetails>? _pickedRooms;
-  
+
   // ✅ Getter for picked rooms
   List<PickedRoomDetails>? get pickedRooms => _pickedRooms;
 
+  PickedRoomDetails? get singlePickedRoom =>
+      _pickedRooms?.isNotEmpty == true ? _pickedRooms!.first : null;
+
   // ✅ Setter for picked rooms
-  set pickedRooms(List<PickedRoomDetails>? rooms) {
-    _pickedRooms = rooms;
-    notifyListeners();  // Notify UI about changes
+  set pickedRooms(List<PickedRoomDetails>? pickedRoomsByUser) {
+    _pickedRooms = pickedRoomsByUser;
+    notifyListeners(); // Notify UI about changes
+  }
+
+  set singlePickedRoom(PickedRoomDetails? pickedRoom) {
+    _pickedRooms = pickedRoom != null ? [pickedRoom] : [];
+    notifyListeners(); // Notify UI about changes
   }
 
   PickedRoomProvider({required this.authProvider}) {
@@ -32,19 +40,37 @@ class PickedRoomProvider extends ChangeNotifier {
   }
 
   // ✅ Fetch picked rooms for user
-  Future<void> fetchPickedRooms() async {
+  Future<void> fetchPickedRooms({
+    required int userId,
+    required String token,
+  }) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      final response = await apiService.getPickedRoomsByUser(userId: userId, token: token);
-      
-      if (response != null && response.success) {
-        pickedRooms = response.data.pickedRooms;
-        
-        print("the state reached here but not yet set nofitify()");
+      print("Fetching picked rooms...");
+      print("Token: $token");
+      print("UserId: $userId");
+
+      final response =
+          await apiService.getPickedRoomsByUser(userId: userId, token: token);
+
+      if (response != null &&
+          response.success &&
+          response.data.pickedRooms != null) {
+        pickedRooms = response.data.pickedRooms; // ✅ Update list
+        singlePickedRoom = response.data.pickedRooms.isNotEmpty
+            ? response.data.pickedRooms.first
+            : null; // ✅ Update single room
+
+        print("Picked rooms updated successfully.");
+
+        print("pickedRoomslist ${pickedRooms?.length}");
+        print("singlePickedRoom ${singlePickedRoom?.room.id}");
       } else {
         print("Failed to fetch picked rooms.");
+        pickedRooms = []; // Ensure list is not null
+        singlePickedRoom = null;
       }
     } catch (e) {
       print("Error in fetchPickedRooms: $e");
@@ -67,16 +93,18 @@ class PickedRoomProvider extends ChangeNotifier {
 
     try {
       final response = await apiService.postPickedRoomByUser(
-        userId: userId, 
-        token: token, 
+        userId: userId,
+        token: token,
         roomId: roomId,
       );
 
       if (response != null && response.success) {
         print("Room successfully picked for user.");
-        
-        await fetchPickedRooms();
-       
+
+        await fetchPickedRooms(
+          token: token,
+          userId: userId,
+        );
       } else {
         print("Failed to pick room. API response was unsuccessful.");
       }

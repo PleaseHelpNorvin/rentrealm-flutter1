@@ -67,8 +67,6 @@ class MyApp extends StatelessWidget {
             authProvider: Provider.of<AuthProvider>(context, listen: false),
           ),
         ),
-
-        
       ],
       child: Builder(
         builder: (context) {

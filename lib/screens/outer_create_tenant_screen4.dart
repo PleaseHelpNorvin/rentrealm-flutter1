@@ -28,13 +28,13 @@ class OuterCreateTenantScreen4 extends StatefulWidget {
 class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
   final TextEditingController _amountController = TextEditingController();
   File? _selectedFile;
+  String? _selectedTitle;
 
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => 
-      Provider.of<RoomProvider>(context, listen: false)
-          .fetchRoomById(context, widget.roomId));
+    Future.microtask(() => Provider.of<RoomProvider>(context, listen: false)
+        .fetchRoomById(context, widget.roomId));
 
     _saveProfileId();
   }
@@ -46,7 +46,8 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedImage =
+        await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedImage != null) {
       setState(() {
@@ -56,13 +57,6 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
   }
 
   void _submitReservation() {
-    if (_amountController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter an amount")),
-      );
-      return;
-    }
-
     if (_selectedFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please upload a payment proof")),
@@ -70,22 +64,85 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
       return;
     }
 
-    // Call reservation provider to handle the reservation
-    Provider.of<ReservationProvider>(context, listen: false)
-    .createReservation(
-      context,
-      widget.profileId, // Pass as int
-      widget.roomId, // Pass as int
-      double.tryParse(_amountController.text) ?? 0.0, // Convert String to double
-      _selectedFile, // Ensure _selectedFile is nullable
-    );
+    // Print values before submitting
+    print("Profile ID: ${widget.profileId}");
+    print("Room ID: ${widget.roomId}");
+    print("Amount: ${_amountController.text}");
+    print("Payment Proof: ${_selectedFile!.path}");
+    print("Selected Payment Method: $_selectedTitle");
 
+    // Call reservation provider to handle the reservation
+    Provider.of<ReservationProvider>(context, listen: false).createReservation(
+      context,
+      widget.profileId,
+      widget.roomId,
+      _selectedFile,
+    );
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text("Reservation submitted successfully")),
     );
 
     Navigator.pop(context);
+  }
+
+  Widget _buildPaymentChoiceButton({
+    required String title,
+    required String content,
+    required VoidCallback onTap,
+    required bool isSelected,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.all(10),
+        width: double.infinity,
+        child: isSelected
+            ? Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        content,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            : ElevatedButton(
+                onPressed: onTap,
+                style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(title),
+              ),
+      ),
+    );
   }
 
   @override
@@ -98,57 +155,130 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
       body: Column(
         children: [
           Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Consumer<RoomProvider>(
-                builder: (context, roomProvider, child) {
-                  final room = roomProvider.singleRoom;
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Consumer<RoomProvider>(
+                  builder: (context, roomProvider, child) {
+                    final room = roomProvider.singleRoom;
 
-                  if (room == null) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
+                    if (room == null) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildRoomCard(room),
-                      const SizedBox(height: 10),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildRoomCard(room),
+                        const SizedBox(height: 10),
 
-                      /// **Amount Input Field**
-                      TextFormField(
-                        controller: _amountController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: "Enter Amount",
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-
-                      /// **File Upload Button**
-                      ElevatedButton.icon(
-                        onPressed: _pickImage,
-                        icon: const Icon(Icons.upload_file),
-                        label: const Text("Upload Payment Proof"),
-                      ),
-
-                      /// **File Preview**
-                      if (_selectedFile != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Text(
-                            "Selected file: ${_selectedFile!.path.split('/').last}",
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
+                        /// **Payment Options**
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildPaymentChoiceButton(
+                                title: "GCash",
+                                content: "09454365069.",
+                                isSelected: _selectedTitle == "GCash",
+                                onTap: () {
+                                  setState(() {
+                                    _selectedTitle = _selectedTitle == "GCash"
+                                        ? null
+                                        : "GCash";
+                                  });
+                                },
+                              ),
                             ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: _buildPaymentChoiceButton(
+                                title: "Maya",
+                                content: "09161396471.",
+                                isSelected: _selectedTitle == "Maya",
+                                onTap: () {
+                                  setState(() {
+                                    _selectedTitle = _selectedTitle == "Maya"
+                                        ? null
+                                        : "Maya";
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildPaymentChoiceButton(
+                                title: "Union Bank",
+                                content: "123123123123.",
+                                isSelected: _selectedTitle == "Union Bank",
+                                onTap: () {
+                                  setState(() {
+                                    _selectedTitle =
+                                        _selectedTitle == "Union Bank"
+                                            ? null
+                                            : "Union Bank";
+                                  });
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+
+                        // /// **Amount Input Field**
+                        // TextFormField(
+                        //   controller: _amountController,
+                        //   keyboardType: TextInputType.number,
+                        //   decoration: const InputDecoration(
+                        //     labelText: "Enter Amount",
+                        //     border: OutlineInputBorder(),
+                        //   ),
+                        // ),
+                        const SizedBox(height: 10),
+
+                        /// **Upload Button**
+                        Center(
+                          child: ElevatedButton.icon(
+                            onPressed: _pickImage,
+                            icon: const Icon(Icons.upload_file),
+                            label: const Text("Upload Payment Proof"),
                           ),
                         ),
-                    ],
-                  );
-                },
+
+                        /// **Selected Image Preview**
+                        if (_selectedFile != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Selected file: ${_selectedFile!.path.split('/').last}",
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Center(
+                                  child: Image.file(
+                                    _selectedFile!,
+                                    width: 200,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -197,8 +327,8 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
                       height: 150,
                       placeholder: (context, url) =>
                           const Center(child: CircularProgressIndicator()),
-                      errorWidget: (context, url, error) =>
-                          const Center(child: Icon(Icons.error, color: Colors.red)),
+                      errorWidget: (context, url, error) => const Center(
+                          child: Icon(Icons.error, color: Colors.red)),
                     )
                   : Image.asset(
                       'assets/images/rentrealm_logo.png',

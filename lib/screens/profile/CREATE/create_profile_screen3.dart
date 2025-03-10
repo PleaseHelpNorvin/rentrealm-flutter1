@@ -19,7 +19,6 @@ class CreateProfileScreen3 extends StatefulWidget {
   final String postalCodeController;
   int? roomId;
 
-
   CreateProfileScreen3({
     super.key,
     required this.userId,
@@ -36,25 +35,21 @@ class CreateProfileScreen3 extends StatefulWidget {
 
   @override
   CreateProfileScreenState3 createState() => CreateProfileScreenState3();
-  
 }
-
 
 class CreateProfileScreenState3 extends State<CreateProfileScreen3> {
   Future<void> _getRoomId() async {
-  final prefs = await SharedPreferences.getInstance();
-  setState(() {
-    widget.roomId = prefs.getInt('roomId'); // Retrieve the stored roomId
-  });
-}
-
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      widget.roomId = prefs.getInt('roomId'); // Retrieve the stored roomId
+    });
+  }
 
   @override
-void initState() {
-  super.initState();
-  _getRoomId();
-}
-
+  void initState() {
+    super.initState();
+    _getRoomId();
+  }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -91,7 +86,6 @@ void initState() {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Room ID: ${widget.roomId ?? "Not Available"}'),
-
               ElevatedButton.icon(
                 onPressed: () {
                   if (_identificationList.length < 4) {

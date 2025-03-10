@@ -66,7 +66,6 @@ class ProfileProvider extends ChangeNotifier {
   }
 
   Future<File> imageCompression(BuildContext context, File pickedFile) async {
-
     final originalImageData = img.decodeImage(pickedFile.readAsBytesSync());
 
     // Resize the image
@@ -150,7 +149,6 @@ class ProfileProvider extends ChangeNotifier {
       String countryController,
       String postalCodeController,
       int roomId,
-
       List<Map<String, dynamic>> identificationData) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     int? userId = authProvider.user?.data?.user.id;
@@ -217,21 +215,20 @@ class ProfileProvider extends ChangeNotifier {
         title: "Profile Created Successfully",
         message: "Thank You For Creating Profile",
         onConfirmBtnTap: () {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.pushReplacementNamed(context, '/');
+          });
+
           // WidgetsBinding.instance.addPostFrameCallback((_) {
           //   Navigator.pushReplacement(
           //     context,
-          //     MaterialPageRoute(builder: (_) => const HomeLoggedScreen()),
+          //     MaterialPageRoute(
+          //         builder: (_) => OuterCreateTenantScreen4(
+          //               roomId: roomId,
+          //               profileId: _userProfile!.data.id,
+          //             )),
           //   );
           // });
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => OuterCreateTenantScreen4(roomId:roomId, profileId: _userProfile!.data.id,)),
-            );
-          });
-
-          
         },
       );
     } else {
@@ -264,26 +261,28 @@ class ProfileProvider extends ChangeNotifier {
     return false; // Default return value
   }
 
-Future<void> fetchUserProfile(context, {required String token, required int userId}) async {
-  try {
-    setLoading(true);
+  Future<void> fetchUserProfile(context,
+      {required String token, required int userId}) async {
+    try {
+      print("Fetching user profile...");
 
-    final response = await apiService.getUserProfile(token: token, userId: userId);
+      setLoading(true);
+      final response =
+          await apiService.getUserProfile(token: token, userId: userId);
 
-    if (response != null && response.success) {
-      setUserProfile(response);  // Ensure this updates the profile
-      notifyListeners(); // Important: Notify listeners when data changes
-    } else {
-      setUserProfile(null);
-      print("No profile found for this user");
+      if (response != null && response.success) {
+        print("Profile fetched successfully!");
+        setUserProfile(response);
+      } else {
+        print("No profile found.");
+        setUserProfile(null);
+      }
+    } catch (e) {
+      print("Error fetching user profile: $e");
+    } finally {
+      setLoading(false);
     }
-  } catch (e) {
-    print("Error fetching user profile: $e");
-    AlertUtils.showErrorAlert(context, title: "Error", message: "Something went wrong: $e");
-  } finally {
-    setLoading(false);
   }
-}
 
   Future<void> onUpdateUserAddress(
     BuildContext context,
