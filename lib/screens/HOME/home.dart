@@ -53,101 +53,149 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Widget that displays the main home screen content
-  Widget _buildWithDataCard() {
-    return RefreshIndicator(
-      onRefresh: () async {
-        setState(() {
-          _profileCheckFuture =
-              Provider.of<ProfileProvider>(context, listen: false)
-                  .loadUserProfile(context);
-        });
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-        child: Consumer2<ProfileProvider, PickedRoomProvider>(
-          builder: (context, profileProvider, pickedRoomProvider, child) {
-            final singlePickedRoom = pickedRoomProvider.singlePickedRoom;
+Widget _buildWithDataCard() {
+  return RefreshIndicator(
+    onRefresh: () async {
+      setState(() {
+        _profileCheckFuture =
+            Provider.of<ProfileProvider>(context, listen: false)
+                .loadUserProfile(context);
+      });
+    },
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      child: Consumer2<ProfileProvider, PickedRoomProvider>(
+        builder: (context, profileProvider, pickedRoomProvider, child) {
+          final singlePickedRoom = pickedRoomProvider.singlePickedRoom;
 
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      if (singlePickedRoom?.room.id != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => OuterCreateTenantScreen4(
-                              roomId: singlePickedRoom!
-                                  .room.id, // ✅ Use roomId safely
-                              profileId: profileProvider.userProfile?.data.id ??
-                                  0, // ✅ Ensure `_userProfile` is not null
-                            ),
-                          ),
-                        );
-                        print("Room ID: ${singlePickedRoom?.room.id}");
-                      } else {
-                        print("No room selected.");
-                      }
-                    },
-                    child: SizedBox(
-                      width: double.infinity, // Ensures full-width card
-                      child: Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const Text(
-                                  "Continue to Reservation Payment",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "Room ID: ${singlePickedRoom?.room.id ?? 'N/A'}",
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  "Room Details: ${singlePickedRoom?.room.roomDetails ?? 'No details available'}",
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 14),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            );
-          },
+          return SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              children: [
+                if (singlePickedRoom != null)
+                  _buildContinueReservationPayment(
+                      context, profileProvider, singlePickedRoom),
+                if (singlePickedRoom == null) _buildShowReservationSent(),
+              ],
+            ),
+          );
+        },
+      ),
+    ),
+  );
+}
+
+Widget _buildContinueReservationPayment(
+    BuildContext context, ProfileProvider profileProvider, singlePickedRoom) {
+  return GestureDetector(
+    onTap: () {
+      if (singlePickedRoom?.room.id != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OuterCreateTenantScreen4(
+              roomId: singlePickedRoom!.room.id,
+              profileId: profileProvider.userProfile?.data.id ?? 0,
+              pickedRoomId: singlePickedRoom.id,
+            ),
+          ),
+        );
+        print("Room ID: ${singlePickedRoom?.room.id}");
+      } else {
+        print("No room selected.");
+      }
+    },
+    child: SizedBox(
+      width: double.infinity,
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  "Continue to Reservation Payment",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Room ID: ${singlePickedRoom?.room.id ?? 'N/A'}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Room Details: ${singlePickedRoom?.room.roomDetails ?? 'No details available'}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
+
+Widget _buildShowReservationSent() {
+  return SizedBox(
+    width: double.infinity,
+    child: Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                "Reservation Sent!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Please wait for a possible call from management.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                "Also, check your notifications for updates.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}
 
   /// Widget shown when the user doesn't have a profile
   Widget _buildNoDataCard() {
-    return Center(
-      child: Card(
+    
+      return Card(
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -155,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.orange.shade50,
         child: SizedBox(
           width: double.infinity,
-          height: 300,
+          height: 150,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
@@ -163,6 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Text("No profile Detected!"),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushReplacement(
@@ -175,31 +224,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Text('Continue Creating Profile'),
                   ),
                   const SizedBox(height: 8),
-                  const Icon(Icons.reviews, size: 40, color: Colors.orange),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Thank you for inquiring. The admins are reviewing your inquiry.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Admins may contact you once they have reviewed your inquiry.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Please check your notifications or be available for a possible call.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14),
-                  ),
                 ],
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+  
   }
 }
