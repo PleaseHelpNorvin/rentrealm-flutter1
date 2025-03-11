@@ -1,18 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 // import 'package:rentealm_flutter/models/inquiry_model.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:flutter/services.dart';
 
 
 import '../networks/apiservice.dart';

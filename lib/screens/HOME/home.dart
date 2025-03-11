@@ -83,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               roomId: singlePickedRoom!
                                   .room.id, // ✅ Use roomId safely
                               profileId: profileProvider.userProfile?.data.id ??
-                                  0, // ✅ Ensure `_userProfile` is not null
+                                  0, // ✅ Ensure _userProfile is not null
                             ),
                           ),
                         );
@@ -146,8 +146,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Widget shown when the user doesn't have a profile
   Widget _buildNoDataCard() {
-    return Center(
-      child: Card(
+    
+      return Card(
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.orange.shade50,
         child: SizedBox(
           width: double.infinity,
-          height: 300,
+          height: 150,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
@@ -163,6 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  Text("No profile Detected!"),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.pushReplacement(
@@ -175,31 +176,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: const Text('Continue Creating Profile'),
                   ),
                   const SizedBox(height: 8),
-                  const Icon(Icons.reviews, size: 40, color: Colors.orange),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Thank you for inquiring. The admins are reviewing your inquiry.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Admins may contact you once they have reviewed your inquiry.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Please check your notifications or be available for a possible call.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14),
-                  ),
                 ],
               ),
             ),
           ),
         ),
-      ),
-    );
+      );
+  
   }
 }

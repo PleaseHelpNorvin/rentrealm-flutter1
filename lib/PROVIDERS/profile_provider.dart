@@ -148,7 +148,7 @@ class ProfileProvider extends ChangeNotifier {
       String provinceController,
       String countryController,
       String postalCodeController,
-      int roomId,
+      // int roomId,
       List<Map<String, dynamic>> identificationData) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     int? userId = authProvider.user?.data?.user.id;
@@ -189,7 +189,7 @@ class ProfileProvider extends ChangeNotifier {
     print('Driver License Number: $driverLicenseNumber');
     print('National ID Number: $nationalIdNumber');
     print('Passport Number: $passportNumber');
-    print('roomId: $roomId');
+    // print('roomId: $roomId');
     print('Social Security Number: $socialSecurityNumber');
     final response = await apiService.postProfileData(
         userId: userId,

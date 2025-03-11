@@ -892,20 +892,28 @@ class ApiService {
     required int roomId,
     required File? paymentProof,
     required String paymentMethod,
+    required String token,
   }) async {
     try {
+      print("from postReservation(): $token");
+      
       var uri = Uri.parse(
-          "YOUR_API_ENDPOINT_HERE"); // Replace with your actual API endpoint
+          '$rest/tenant/reservation/store'); // Replace with your actual API endpoint
       var request = http.MultipartRequest("POST", uri)
         ..fields['profile_id'] = profileId.toString()
         ..fields['room_id'] = roomId.toString()
-        ..fields['payment_method'] = paymentMethod;
+        ..fields['payment_method'] = paymentMethod
+        ..headers.addAll({
+        'Authorization': 'Bearer $token', // Add the Authorization header
+        'Content-Type': 'multipart/form-data',
+        'Accept': 'application/json',
+      });
 
       // Attach the file if it exists
       if (paymentProof != null) {
         request.files.add(
           await http.MultipartFile.fromPath(
-            'payment_proof', // Field name in the API
+            'reservation_payment_proof_url[]', // Field name in the API
             paymentProof.path,
           ),
         );
@@ -914,7 +922,7 @@ class ApiService {
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         var responseData = jsonDecode(response.body);
         print("Response Data: $responseData");
         return ReservationResponse.fromJson(responseData);
@@ -927,4 +935,31 @@ class ApiService {
       return null;
     }
   }
+
+
+  Future<ReservationResponse?>getReservations({
+    required String token
+  }) async {
+    final uri = Uri.parse('$rest/tenant/reservation/index');
+
+    final headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    }; 
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Raw API response: ${response.body}");
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      print("responseData from InquiryResponse() Call: $responseData");
+      return ReservationResponse.fromJson(responseData);
+    } else {
+      print('Error: ${response.statusCode} - ${response.body}');
+      return null;
+    }
+  }
+
+  
 }
