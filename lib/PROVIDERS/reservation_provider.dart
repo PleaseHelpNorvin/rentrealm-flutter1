@@ -1,13 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/pickedRoom_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
 import 'package:rentealm_flutter/models/reservation_model.dart';
 
-  import '../networks/apiservice.dart';
+import '../networks/apiservice.dart';
 import 'auth_provider.dart';
 
 class ReservationProvider extends ChangeNotifier {
@@ -19,24 +18,23 @@ class ReservationProvider extends ChangeNotifier {
   late String token;
   late int? profileId;
 
-    // List of reservations
-    List<Reservation>? _reservationList;
-    List<Reservation>? get reservationList => _reservationList;
+  // List of reservations
+  List<Reservation>? _reservationList;
+  List<Reservation>? get reservationList => _reservationList;
 
-    set reservationList(List<Reservation>? reservations) {
-      _reservationList = reservations;
-      notifyListeners(); // Notify UI when list changes
-    }
+  set reservationList(List<Reservation>? reservations) {
+    _reservationList = reservations;
+    notifyListeners(); // Notify UI when list changes
+  }
 
-    // Single reservation
-    ReservationData? _singleReservation;
-    ReservationData? get singleReservation => _singleReservation;
+  // Single reservation
+  ReservationData? _singleReservation;
+  ReservationData? get singleReservation => _singleReservation;
 
-    set singleReservation(ReservationData? reservation) {
-      _singleReservation = reservation;
-      notifyListeners(); // Notify UI when a single object changes
-    }
-
+  set singleReservation(ReservationData? reservation) {
+    _singleReservation = reservation;
+    notifyListeners(); // Notify UI when a single object changes
+  }
 
   void initAuthDetails(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -57,12 +55,12 @@ class ReservationProvider extends ChangeNotifier {
     String? paymentMethod,
   ) async {
     initAuthDetails(context);
-    final pickedRoomProvider = Provider.of<PickedRoomProvider>(context, listen: false);
+    final pickedRoomProvider =
+        Provider.of<PickedRoomProvider>(context, listen: false);
     if (token.isEmpty) {
       print("Error: Token is not available.");
       return;
     }
-
 
     if (paymentMethod == null) {
       print("Please select a payment method");
@@ -92,27 +90,25 @@ class ReservationProvider extends ChangeNotifier {
       print("Reservation created successfully");
       print("createReservation(): $singleReservation");
 
-      // final destroyPickedRoomResponse = await apiService.deletePickedRoomById(pickedRoomId: pickedRoomId, token: token); 
-      await pickedRoomProvider.destroyPickedRoom(pickedRoomId: pickedRoomId, token: token);
-      
+      // final destroyPickedRoomResponse = await apiService.deletePickedRoomById(pickedRoomId: pickedRoomId, token: token);
+      await pickedRoomProvider.destroyPickedRoom(
+          pickedRoomId: pickedRoomId, token: token);
     } else {
       print("Failed to create reservation");
     }
   }
 
-
-   Future<void> fetchReservations() async {
+  Future<void> fetchReservations() async {
     _isLoading = true;
     notifyListeners();
 
-    final response = await apiService.getReservations(
-      token: token
-    );
+    final response = await apiService.getReservations(token: token);
 
     _isLoading = false;
 
     if (response != null && response.success) {
-      reservationList = response.data.reservations; // Store the list of reservations
+      reservationList =
+          response.data.reservations; // Store the list of reservations
       print("Reservations fetched successfully");
       print("fetchReservations(): ${reservationList?.length}");
     } else {

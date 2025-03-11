@@ -896,7 +896,7 @@ class ApiService {
   }) async {
     try {
       print("from postReservation(): $token");
-      
+
       var uri = Uri.parse(
           '$rest/tenant/reservation/store'); // Replace with your actual API endpoint
       var request = http.MultipartRequest("POST", uri)
@@ -904,10 +904,10 @@ class ApiService {
         ..fields['room_id'] = roomId.toString()
         ..fields['payment_method'] = paymentMethod
         ..headers.addAll({
-        'Authorization': 'Bearer $token', // Add the Authorization header
-        'Content-Type': 'multipart/form-data',
-        'Accept': 'application/json',
-      });
+          'Authorization': 'Bearer $token', // Add the Authorization header
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json',
+        });
 
       // Attach the file if it exists
       if (paymentProof != null) {
@@ -936,17 +936,14 @@ class ApiService {
     }
   }
 
-
-  Future<ReservationResponse?>getReservations({
-    required String token
-  }) async {
+  Future<ReservationResponse?> getReservations({required String token}) async {
     final uri = Uri.parse('$rest/tenant/reservation/index');
 
     final headers = {
       "Content-Type": "application/json",
       "Accept": "application/json",
       "Authorization": "Bearer $token",
-    }; 
+    };
 
     final response = await http.get(uri, headers: headers);
 
@@ -998,5 +995,4 @@ class ApiService {
       return null;
     }
   }
-
 }

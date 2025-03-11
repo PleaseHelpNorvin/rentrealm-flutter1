@@ -18,16 +18,17 @@ class NotificationProvider extends ChangeNotifier {
   String get filterType => _filterType;
 
   List<Map<String, dynamic>> get notificationDetails {
-    List<Map<String, dynamic>> allNotifications = _notification?.data.notifications
-            .map((notif) => {
-                  "id": notif.id,
-                  "title": notif.title,
-                  "message": notif.message,
-                  "is_read": notif.isRead,
-                  "notifiable_id": notif.notifiableId
-                })
-            .toList() ??
-        [];
+    List<Map<String, dynamic>> allNotifications =
+        _notification?.data.notifications
+                .map((notif) => {
+                      "id": notif.id,
+                      "title": notif.title,
+                      "message": notif.message,
+                      "is_read": notif.isRead,
+                      "notifiable_id": notif.notifiableId
+                    })
+                .toList() ??
+            [];
 
     // ✅ Apply filtering based on selected filter type
     if (_filterType == "unread") {
@@ -65,7 +66,8 @@ class NotificationProvider extends ChangeNotifier {
     print("Fetching notifications for User ID: $userId");
 
     try {
-      final response = await apiService.getNotification(token: token, userId: userId);
+      final response =
+          await apiService.getNotification(token: token, userId: userId);
 
       if (response != null && response.data.notifications.isNotEmpty) {
         setNotification(response);
@@ -83,7 +85,8 @@ class NotificationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> updateStatusToRead(BuildContext context, int notificationId) async {
+  Future<void> updateStatusToRead(
+      BuildContext context, int notificationId) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     String token = authProvider.token ?? '';
     int userId = authProvider.userId ?? 0;
@@ -95,10 +98,7 @@ class NotificationProvider extends ChangeNotifier {
 
     try {
       final response = await apiService.patchNotificationStatus(
-        token: token, 
-        userId: userId, 
-        notifId: notificationId
-      );
+          token: token, userId: userId, notifId: notificationId);
 
       if (response != null) {
         print("updateStatusToRead(): ${response.data.notifications}");
@@ -106,7 +106,8 @@ class NotificationProvider extends ChangeNotifier {
 
       // ✅ Fix: Create a new NotificationData instance with updated notifications
       if (_notification != null) {
-        List<NotificationModel> updatedNotifications = _notification!.data.notifications.map((notif) {
+        List<NotificationModel> updatedNotifications =
+            _notification!.data.notifications.map((notif) {
           if (notif.id == notificationId) {
             return NotificationModel(
               id: notif.id,
@@ -126,13 +127,12 @@ class NotificationProvider extends ChangeNotifier {
 
         // ✅ Create a new NotificationData object
         _notification = NotificationResponse(
-          success: true, 
-          message: "Notification $notificationId marked as read.", 
+          success: true,
+          message: "Notification $notificationId marked as read.",
           data: NotificationData(notifications: updatedNotifications),
         );
         notifyListeners();
       }
-      
     } catch (e) {
       print("Error updating notification status: $e");
       return;

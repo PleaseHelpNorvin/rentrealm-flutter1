@@ -7,7 +7,7 @@ import '../../PROVIDERS/notification_provider.dart';
 class NotificationsDetailsScreen extends StatefulWidget {
   final int notificationId;
   final String notificationTitle;
-  final String notificationMessage; 
+  final String notificationMessage;
   final int notifNotifiableInquiryId;
 
   const NotificationsDetailsScreen({
@@ -23,22 +23,26 @@ class NotificationsDetailsScreen extends StatefulWidget {
       _NotificationsDetailsScreenState();
 }
 
-class _NotificationsDetailsScreenState extends State<NotificationsDetailsScreen> {
-
+class _NotificationsDetailsScreenState
+    extends State<NotificationsDetailsScreen> {
   @override
   void initState() {
     super.initState();
-      Provider.of<NotificationProvider>(context, listen: false).updateStatusToRead(context, widget.notificationId);
- 
+    Provider.of<NotificationProvider>(context, listen: false)
+        .updateStatusToRead(context, widget.notificationId);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.notificationTitle, style: TextStyle( fontWeight: FontWeight.bold ),),
+        title: Text(
+          widget.notificationTitle,
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
-      body: Padding(padding: EdgeInsets.only(top: 10, bottom: 20, left: 10,right: 10),
+      body: Padding(
+        padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,9 +60,11 @@ class _NotificationsDetailsScreenState extends State<NotificationsDetailsScreen>
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/rentalAgreement', arguments: {
-                         'notifNotifiableInquiryId': widget.notifNotifiableInquiryId,
-                      });
+                      Navigator.pushNamed(context, '/rentalAgreement',
+                          arguments: {
+                            'notifNotifiableInquiryId':
+                                widget.notifNotifiableInquiryId,
+                          });
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
@@ -74,7 +80,7 @@ class _NotificationsDetailsScreenState extends State<NotificationsDetailsScreen>
             ],
           ),
         ),
-        ),
+      ),
     );
   }
 }
