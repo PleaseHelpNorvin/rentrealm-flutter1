@@ -961,5 +961,42 @@ class ApiService {
     }
   }
 
-  
+  Future<PickedRoomResponse?> deletePickedRoomById({
+    required int pickedRoomId,
+    required String token,
+  }) async {
+    try {
+      print("pickedRoomId: $pickedRoomId");
+      print("token: $token");
+
+      final uri = Uri.parse('$rest/tenant/picked_room/destroy/$pickedRoomId');
+      final headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      };
+
+      final response = await http.delete(uri, headers: headers);
+
+      print("Raw API response: ${response.body}");
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.body.isNotEmpty) {
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          print("responseData from deletePickedRoomById() Call: $responseData");
+          return PickedRoomResponse.fromJson(responseData);
+        } else {
+          print("Error: Empty response body.");
+          return null;
+        }
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print("Error in deletePickedRoomById: $e");
+      return null;
+    }
+  }
+
 }

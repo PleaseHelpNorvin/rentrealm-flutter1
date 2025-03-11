@@ -13,11 +13,13 @@ import '../MODELS/room_model.dart';
 class OuterCreateTenantScreen4 extends StatefulWidget {
   final int roomId;
   final int profileId;
+  final int pickedRoomId;
 
   const OuterCreateTenantScreen4({
     super.key,
     required this.roomId,
     required this.profileId,
+    required this.pickedRoomId,
   });
 
   @override
@@ -83,8 +85,10 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
       context,
       widget.profileId,
       widget.roomId,
+      widget.pickedRoomId,
       _selectedFile,
       _selectedTitle,
+      
     );
 
     ScaffoldMessenger.of(context).showSnackBar(

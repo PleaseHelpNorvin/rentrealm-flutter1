@@ -112,4 +112,36 @@ class PickedRoomProvider extends ChangeNotifier {
       print("Error in addRoomForUser: $e");
     }
   }
+// destroyPickedRoomResponse = await apiService.deletePickedRoomById(pickedRoomId: pickedRoomId, token: token); 
+
+  Future<void> destroyPickedRoom({
+  required int pickedRoomId,
+  required String token,
+}) async {
+  print("from destroyPickedRoom() pickedRoomId: $pickedRoomId");
+  print("from destroyPickedRoom() token: $token");
+
+  try {
+    final response = await apiService.deletePickedRoomById(
+      pickedRoomId: pickedRoomId,
+      token: token,
+    );
+
+    if (response != null && response.success) {
+      print("Room successfully removed.");
+
+      // Remove the deleted room from the list
+      _pickedRooms?.removeWhere((room) => room.id == pickedRoomId);
+      
+      // Update singlePickedRoom if necessary
+      singlePickedRoom = _pickedRooms!.isNotEmpty ? _pickedRooms!.first : null;
+
+      notifyListeners(); // ✅ Notify UI about the change
+    } else {
+      print("Failed to remove the picked room.");
+    }
+  } catch (e) {
+    print("Error in destroyPickedRoom: $e");
+  }
+}
 }

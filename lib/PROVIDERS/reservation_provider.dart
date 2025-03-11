@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/pickedRoom_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
 import 'package:rentealm_flutter/models/reservation_model.dart';
 
@@ -50,11 +52,12 @@ class ReservationProvider extends ChangeNotifier {
     BuildContext context,
     int profileId,
     int roomId,
+    int pickedRoomId,
     File? paymentProof,
     String? paymentMethod,
   ) async {
     initAuthDetails(context);
-
+    final pickedRoomProvider = Provider.of<PickedRoomProvider>(context, listen: false);
     if (token.isEmpty) {
       print("Error: Token is not available.");
       return;
@@ -89,8 +92,9 @@ class ReservationProvider extends ChangeNotifier {
       print("Reservation created successfully");
       print("createReservation(): $singleReservation");
 
+      // final destroyPickedRoomResponse = await apiService.deletePickedRoomById(pickedRoomId: pickedRoomId, token: token); 
+      await pickedRoomProvider.destroyPickedRoom(pickedRoomId: pickedRoomId, token: token);
       
-
     } else {
       print("Failed to create reservation");
     }
