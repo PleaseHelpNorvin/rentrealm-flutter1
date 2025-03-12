@@ -65,7 +65,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               notificationId: notification["id"],
               notificationTitle: notificationTitle,
               notificationMessage: notificationMessage,
-              notifNotifiableInquiryId: notifiableId ?? 0,
+              notifNotifiableReservationId: notifiableId ?? 0,
             ),
           ),
         );

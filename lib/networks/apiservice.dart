@@ -732,14 +732,42 @@ class ApiService {
     }
   }
 
-  Future<InquiryResponse?> getInquiryById({
-    required String token,
-    required int unquiryId,
-  }) async {
-    print("getInquiryById(): $token");
-    print("getInquiryById(): $unquiryId");
+  // Future<InquiryResponse?> getInquiryById({
+  //   required String token,
+  //   required int unquiryId,
+  // }) async {
+  //   print("getInquiryById(): $token");
+  //   print("getInquiryById(): $unquiryId");
 
-    final uri = Uri.parse('$rest/tenant/inquiry/show/$unquiryId');
+  //   final uri = Uri.parse('$rest/tenant/inquiry/show/$unquiryId');
+
+  //   try {
+  //     final response = await http.get(uri, headers: {
+  //       "Content-Type": "application/json",
+  //       "Accept": "application/json",
+  //       "Authorization": "Bearer $token",
+  //     });
+
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       print("Raw API response: ${response.body}");
+  //       final Map<String, dynamic> responseData = jsonDecode(response.body);
+  //       print("responseData from InquiryResponse() Call: $responseData");
+  //       return InquiryResponse.fromJson(responseData);
+  //     } else {
+  //       print('Error: ${response.statusCode} - ${response.body}');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print('Exception: $e');
+  //     return null;
+  //   }
+  // }
+
+  Future<ReservationResponse?>showReservation({
+    required int reservationId,
+    required String token,
+  }) async {
+    final uri = Uri.parse("$rest/tenant/reservation/show/$reservationId");
 
     try {
       final response = await http.get(uri, headers: {
@@ -751,8 +779,8 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Raw API response: ${response.body}");
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print("responseData from InquiryResponse() Call: $responseData");
-        return InquiryResponse.fromJson(responseData);
+        print("responseData from showReservation() Call: $responseData");
+        return ReservationResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;

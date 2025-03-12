@@ -8,10 +8,10 @@ import 'package:rentealm_flutter/screens/PAYMENT/checkout.dart';
 import 'package:signature/signature.dart';
 
 class RentalAgreementScreen extends StatefulWidget {
-  final int notifNotifiableInquiryId;
+  final int notifNotifiableReservationId;
   const RentalAgreementScreen({
     super.key,
-    required this.notifNotifiableInquiryId,
+    required this.notifNotifiableReservationId,
     
     });
 
@@ -66,7 +66,7 @@ class _RentalAgreementScreenState extends State<RentalAgreementScreen> {
                     children: [
                       TextSpan(
                         text:
-                            "inquiry_id: ${widget.notifNotifiableInquiryId}",
+                            "Reservation_id: ${widget.notifNotifiableReservationId}",
                         style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
                       // Bold text for "Payment Obligation"
@@ -221,7 +221,7 @@ class _RentalAgreementScreenState extends State<RentalAgreementScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => CheckoutScreen(
-                        inquiryId: widget.notifNotifiableInquiryId,
+                        reservationId: widget.notifNotifiableReservationId,
                         signaturePngString: file, // Pass the File instead of String
                       ),
                     ),

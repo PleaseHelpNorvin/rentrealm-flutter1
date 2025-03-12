@@ -71,39 +71,39 @@ class InquiryProvider extends ChangeNotifier{
   }
 
 
-  Future<void> fetchInquiryById(BuildContext context, int inquiryId) async {
-    print("fetchInquiryById() called"); // Debug log
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    String? token = authProvider.token;
+  // Future<void> fetchInquiryById(BuildContext context, int inquiryId) async {
+  //   print("fetchInquiryById() called"); // Debug log
+  //   final authProvider = Provider.of<AuthProvider>(context, listen: false);
+  //   String? token = authProvider.token;
 
-    if (token == null) {
-      print("Error: Token is null");
-      return;
-    }
-    _isLoading = true;
-    notifyListeners();
+  //   if (token == null) {
+  //     print("Error: Token is null");
+  //     return;
+  //   }
+  //   _isLoading = true;
+  //   notifyListeners();
 
-    print("inquiryId: $inquiryId");
-    print("token: $token");
+  //   print("inquiryId: $inquiryId");
+  //   print("token: $token");
 
-    try {
-      final response = await apiService.getInquiryById(token: token, unquiryId: inquiryId);
+  //   try {
+  //     final response = await apiService.getInquiryById(token: token, unquiryId: inquiryId);
 
-      if(response != null) {
-        setInquiry(response);
-        print("fetched fetchInquiryById() from response");
-      }else {
-        print("No Inquiry found");
-        setInquiry(null);
-      }
-    } catch (e) {
-      print("Error fetching notifications: $e");
-      return;
-    }finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
+  //     if(response != null) {
+  //       setInquiry(response);
+  //       print("fetched fetchInquiryById() from response");
+  //     }else {
+  //       print("No Inquiry found");
+  //       setInquiry(null);
+  //     }
+  //   } catch (e) {
+  //     print("Error fetching notifications: $e");
+  //     return;
+  //   }finally {
+  //     _isLoading = false;
+  //     notifyListeners();
+  //   }
+  // }
 
 
   

@@ -115,4 +115,30 @@ class ReservationProvider extends ChangeNotifier {
       print("Failed to fetch reservations");
     }
   }
+  // showReservation
+Future<void> fetchReservationById(BuildContext context, int reservationId) async {
+   _isLoading = true;
+  notifyListeners();
+
+  initAuthDetails(context);
+  print("fetchReservationById(): token: $token");
+  print("fetchReservationById() reservationId: $reservationId");
+
+  final response = await apiService.showReservation(reservationId: reservationId, token: token);
+
+  if (response != null && response.success) {
+    // if (response.data.reservations.isNotEmpty) {
+      singleReservation = response.data;
+      print("fetchReservationById(): roomId = ${singleReservation?.reservations.first.roomId}");
+    // } else {
+      // print("No reservation found for ID: $reservationId");
+    // }
+  } else {
+    print("Failed to fetch reservation");
+  }
+
+    _isLoading = false;
+  notifyListeners();
+}
+
 }

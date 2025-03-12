@@ -26,7 +26,7 @@ class PaymentProvider extends ChangeNotifier {
     profileId = profileProvider.userProfile?.data.id;
   }
 
-  Future<void> processPayment(BuildContext context, int inquiryId, int roomId, String startDate, int persons, File signatureStringSvg, double totalPrice) async {
+  Future<void> processPayment(BuildContext context, int reservationId, int roomId, String startDate, int persons, File signatureStringSvg, double totalPrice) async {
     initAuthDetails(context);
 
     print('Token: $token, Profile ID: $profileId');

@@ -103,8 +103,8 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
               case '/rentalAgreement':
                 final args = settings.arguments as Map<String, dynamic>?;
                 page = RentalAgreementScreen(
-                    notifNotifiableInquiryId:
-                        args?['notifNotifiableInquiryId']);
+                    notifNotifiableReservationId:
+                        args?['notifNotifiableReservationId']);
                 break;
               default:
                 if (_currentIndex == 0) {
