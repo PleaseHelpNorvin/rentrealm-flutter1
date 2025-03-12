@@ -7,16 +7,16 @@ import 'package:intl/intl.dart';  // For formatting dates
 import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
-import '../../PROVIDERS/inquiry_provider.dart';
 import '../../MODELS/room_model.dart';
+import '../../PROVIDERS/reservation_provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
   final File signaturePngString;
-  final int inquiryId;
+  final int reservationId;
 
   const CheckoutScreen({
     super.key,
-    required this.inquiryId,
+    required this.reservationId,
     required this.signaturePngString,
   });
 
@@ -33,25 +33,35 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final inquiryProvider = Provider.of<InquiryProvider>(context, listen: false);
-      inquiryProvider.fetchInquiryById(context, widget.inquiryId).then((_) {
-        final int? inquiryRoomId = inquiryProvider.inquiry?.data.inquiries.single.roomId;
-        if (inquiryRoomId != null) {
-          Provider.of<RoomProvider>(context, listen: false).fetchRoomById(context, inquiryRoomId);
-          _updateTotalPrice();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final reservationProvider = Provider.of<ReservationProvider>(context, listen: false);
+      
+      await reservationProvider.fetchReservationById(context, widget.reservationId);
+      
+      if (!mounted) return;
 
-          /// 🛠 Use Future.microtask to ensure provider is accessed after build
-          Future.microtask(() {
-            try {
-              final paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
-              paymentProvider.initAuthDetails(context); // Initialize details
-            } catch (e) {
-              print("Error accessing PaymentProvider: $e");
-            }
-          });
+      final int? reservationRoomId = reservationProvider.singleReservation?.reservations.first.roomId;
+      print("Reservation Room ID: $reservationRoomId");
+
+      if (reservationRoomId != null) {
+        final roomProvider = Provider.of<RoomProvider>(context, listen: false);
+        
+        await roomProvider.fetchRoomById(context, reservationRoomId);
+        
+        if (mounted) {
+          setState(() {}); // Ensures UI updates after fetching room data
         }
-      });
+
+        // Initialize PaymentProvider AFTER data fetching
+        Future.microtask(() {
+          try {
+            final paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
+            paymentProvider.initAuthDetails(context);
+          } catch (e) {
+            print("Error accessing PaymentProvider: $e");
+          }
+        });
+      }
     });
   }
 
@@ -89,80 +99,92 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _callProcessPayment() {
     final paymentProvider = Provider.of<PaymentProvider>(context, listen: false); 
     final rentalagreementProvider = Provider.of<RentalagreementProvider>(context, listen: false);
-    final inquiryProvider = Provider.of<InquiryProvider>(context, listen: false);
-    final inquiry = inquiryProvider.inquiry?.data.inquiries.single;
+    final reservationProvider = Provider.of<ReservationProvider>(context, listen: false);
+    final reservation= reservationProvider.singleReservation?.reservations.first;
 
-    if (inquiry == null) {
+    if (reservation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Inquiry details not available.")),
+        const SnackBar(content: Text("Reservation details not available.")),
       );
       return;
     }
     
-    int inquiryId = inquiry.id;
-    int roomId = inquiry.roomId;
+    int reservationId = reservation.id;
+    int roomId = reservation.roomId;
     String startDate = selectedDate != null
         ? DateFormat("yyyy-MM-dd").format(selectedDate!)
         : DateFormat("yyyy-MM-dd").format(DateTime.now());
     int persons = personCount;
 
-    paymentProvider.processPayment(context, inquiryId, roomId, startDate, persons, widget.signaturePngString, totalPrice);
-    rentalagreementProvider.storeRentalAgreement(context, inquiryId, roomId, startDate, persons, widget.signaturePngString, totalPrice, _additionalPersonDescController.text);
+    paymentProvider.processPayment(context, reservationId, roomId, startDate, persons, widget.signaturePngString, totalPrice);
+    rentalagreementProvider.storeRentalAgreement(context, reservationId, roomId, startDate, persons, widget.signaturePngString, totalPrice, _additionalPersonDescController.text);
   }
   
 
-  @override
-  Widget build(BuildContext context) {
-    final inquiryProvider = Provider.of<InquiryProvider>(context, listen: false);
-    final int? inquiryRoomId = inquiryProvider.inquiry?.data.inquiries.single.roomId;
+@override
+Widget build(BuildContext context) {
+  return Consumer<ReservationProvider>(
+    builder: (context, reservationProvider, child) {
+      final singleReservation = reservationProvider.singleReservation;
 
-    if (inquiryRoomId == null) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
+      // 🛑 Ensure reservation data is loaded
+      if (singleReservation == null) {
+        return const Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        );
+      }
+
+      // ❗ Prevent 'No Element' Error
+      if (singleReservation.reservations.isEmpty) {
+        return const Scaffold(
+          body: Center(child: Text("No Reservations Found")),
+        );
+      }
+
+      final int reservationRoomId = singleReservation.reservations.first.roomId;
+
+      return Scaffold(
+        appBar: AppBar(title: const Text("Rent Payment")),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildRoomCard(),
+                    _buildTextCard(),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.blue, width: 1),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+                  ),
+                  onPressed: () {
+                    // _callProcessPayment();
+                  },
+                  child: const Text("Pay"),
+                ),
+              ),
+            ),
+          ],
         ),
       );
-    }
+    },
+  );
+}
 
-    return Scaffold(
-      appBar: AppBar(title: const Text("Checkout")),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildRoomCard(),
-                  _buildTextCard(),
-                ],
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(color: Colors.blue, width: 1),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
-                ),
-                onPressed: () {
-                  _callProcessPayment();
-                },
-                child: const Text("Pay"),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildTextCard() {
     final roomProvider = Provider.of<RoomProvider>(context, listen: false);
@@ -185,7 +207,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             children: [
               const Center(
                 child: Text(
-                  "Inquiry Details",
+                  "Rent Details",
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
                 ),
               ),
