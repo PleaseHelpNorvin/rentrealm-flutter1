@@ -48,12 +48,12 @@ class UserProvider extends ChangeNotifier {
         } else {
           print("Failed to fetch user data");
           AlertUtils.showErrorAlert(context,
-              message: "Failed to fetch user data");
+              message: "Failed to fetch user data", barrierDismissible: true);
         }
       } catch (e) {
         print("Error: $e");
         AlertUtils.showErrorAlert(context,
-          title: "Exception", message: "Something went wrong: $e"
+          title: "Exception", message: "Something went wrong: $e", barrierDismissible: true
         );
       }
     } else {}

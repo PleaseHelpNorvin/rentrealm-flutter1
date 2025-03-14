@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:rentealm_flutter/MODELS/room_model.dart';
 import 'package:rentealm_flutter/models/inquiry_model.dart';
 import 'package:rentealm_flutter/models/property_model.dart';
@@ -14,6 +15,7 @@ import '../API/rest.dart';
 
 import '../MODELS/profile_model.dart';
 import '../MODELS/user_model.dart';
+import '../models/billing_model.dart';
 import '../models/notification_model.dart';
 import '../models/pickedRoom_model.dart';
 
@@ -791,9 +793,9 @@ class ApiService {
     }
   }
 
-  Future<PropertyResponse?> postRentalAgreement({
+  Future<RentalAgreementResponse?> postRentalAgreement({
     required String token,
-    required int inquiryId,
+    required int reservationId,
     required String rentStartDate,
     required int personCount,
     required double totalMonthlyDue,
@@ -806,10 +808,10 @@ class ApiService {
       final request = http.MultipartRequest('POST', uri);
 
       // Add fields to the request body (non-file fields)
-      request.fields['inquiry_id'] = inquiryId.toString();
+      request.fields['reservation_id'] = reservationId.toString();
       request.fields['rent_start_date'] = rentStartDate;
       request.fields['person_count'] = personCount.toString();
-      request.fields['total_monthly_due'] = totalMonthlyDue.toString();
+      request.fields['total_amount'] = totalMonthlyDue.toString();
       if (description != null) {
         request.fields['description'] = description;
       }
@@ -836,7 +838,7 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(responseBody);
         print('Response from API: $responseData');
-        return PropertyResponse.fromJson(responseData);
+        return RentalAgreementResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${responseBody}');
         return null;
@@ -1023,4 +1025,17 @@ class ApiService {
       return null;
     }
   }
+
+  Future<BillingResponse?>getBillingForRentalAgreement({
+    required String token,
+    required int rentalagreementId,
+  }) async{
+    print("getBillingForRentalAgreement REACHED!!!");
+    print("from getBillingForRentalAgreement() $token");
+    print("from getBillingForRentalAgreement() $rentalagreementId");
+
+    final uri = Uri.parse('$rest/tenant/billing/getbillingforrentalagreement/$rentalagreementId');
+    
+  }
+  
 }

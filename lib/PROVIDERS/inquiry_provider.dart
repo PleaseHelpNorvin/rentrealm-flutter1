@@ -65,7 +65,8 @@ class InquiryProvider extends ChangeNotifier{
       AlertUtils.showErrorAlert(
         context,
         title: "Error",
-        message: "Failed to send inquiry. Please try again.",
+        message: "Failed to send inquiry. Please try again.", 
+        barrierDismissible: true,
       );
     }
   }
