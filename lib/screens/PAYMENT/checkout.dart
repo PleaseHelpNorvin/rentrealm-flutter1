@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';  // For formatting dates
 import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
+import '../../CUSTOMS/alert_utils.dart';
 import '../../MODELS/room_model.dart';
 import '../../PROVIDERS/reservation_provider.dart';
 
@@ -29,10 +30,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   DateTime? selectedDate; // Store selected date
   int personCount = 1; // Default value of 1 person fuc
   double totalPrice = 0.0;
+  bool _isDepositChecked = false; // Default to checked
+  bool _termsCondition = false;
+  bool _showError = false;
 
   @override
   void initState() {
     super.initState();
+    
+    // _isDepositChecked = false;
+    // _termsCondition = false;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final reservationProvider = Provider.of<ReservationProvider>(context, listen: false);
       
@@ -49,7 +56,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         await roomProvider.fetchRoomById(context, reservationRoomId);
         
         if (mounted) {
-          setState(() {}); // Ensures UI updates after fetching room data
+          setState(() {
+             _updateTotalPrice();
+          }); // Ensures UI updates after fetching room data
         }
 
         // Initialize PaymentProvider AFTER data fetching
@@ -74,10 +83,60 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _updateTotalPrice() {
     final roomProvider = Provider.of<RoomProvider>(context, listen: false);
     final room = roomProvider.singleRoom;
+    
+    double basePrice = room?.rentPrice ?? 0.0;
+    
     setState(() {
-      totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
-    });
+    totalPrice = _isDepositChecked ? basePrice + (room?.rentPrice ?? 0) : basePrice;
+  });
   }
+
+
+  void _showTermsAndConditionsDialog() {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevent closing by tapping outside
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text("Terms and Conditions"),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                "1. Rent is due on the 1st of every month.\n"
+                "2. A late fee of ₱500 will be charged after a 5-day grace period.\n"
+                "3. The security deposit is refundable upon contract completion.\n"
+                "4. No illegal activities allowed within the premises.\n"
+                "5. The tenant is responsible for any damages caused.\n"
+                "6. Subleasing is strictly prohibited without written consent.\n"
+                "7. If a visitor stays for more than one day on the premises, a charge of ₱50 will be applied and reflected in the monthly billing.\n",
+                style: TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _termsCondition = false; // Uncheck if user declines
+              });
+              Navigator.of(context).pop();
+            },
+            child: const Text("Decline"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text("Accept"),
+          ),
+        ],
+      );
+    },
+  );
+}
 
   // **Improved Date Picker Function**
   Future<void> _selectDate(BuildContext context) async {
@@ -96,8 +155,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     }
   }
 
-  void _callProcessPayment() {
-    final paymentProvider = Provider.of<PaymentProvider>(context, listen: false); 
+  void _callProcessPayment() async {
+    // final paymentProvider = Provider.of<PaymentProvider>(context, listen: false); 
     final rentalagreementProvider = Provider.of<RentalagreementProvider>(context, listen: false);
     final reservationProvider = Provider.of<ReservationProvider>(context, listen: false);
     final reservation= reservationProvider.singleReservation?.reservations.first;
@@ -109,6 +168,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       return;
     }
     
+      // Validation: Prevent submission if additional person field is required
+    if (personCount > 1 && _additionalPersonDescController.text.trim().isEmpty) {
+      setState(() {
+        _showError = true;  // Show error message
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill in the additional person description!")),
+      );
+      return;
+    }
+
     int reservationId = reservation.id;
     int roomId = reservation.roomId;
     String startDate = selectedDate != null
@@ -116,8 +187,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         : DateFormat("yyyy-MM-dd").format(DateTime.now());
     int persons = personCount;
 
-    paymentProvider.processPayment(context, reservationId, roomId, startDate, persons, widget.signaturePngString, totalPrice);
-    rentalagreementProvider.storeRentalAgreement(context, reservationId, roomId, startDate, persons, widget.signaturePngString, totalPrice, _additionalPersonDescController.text);
+    await rentalagreementProvider.storeRentalAgreement(context, reservationId, roomId, startDate, persons, widget.signaturePngString, totalPrice, _additionalPersonDescController.text);
   }
   
 
@@ -141,7 +211,7 @@ Widget build(BuildContext context) {
         );
       }
 
-      final int reservationRoomId = singleReservation.reservations.first.roomId;
+      // final int reservationRoomId = singleReservation.reservations.first.roomId;
 
       return Scaffold(
         appBar: AppBar(title: const Text("Rent Payment")),
@@ -171,10 +241,21 @@ Widget build(BuildContext context) {
                     side: const BorderSide(color: Colors.blue, width: 1),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
                   ),
-                  onPressed: () {
-                    // _callProcessPayment();
-                  },
-                  child: const Text("Pay"),
+                onPressed: () {
+                  if (!_isDepositChecked || !_termsCondition) {
+                    if (context.mounted) {
+                      AlertUtils.showErrorAlert(
+                        context,
+                        title: "Action Required",
+                        message: "Please accept the terms and conditions and select the deposit option.",
+                        barrierDismissible: false, // ✅ Prevent dismissing outside
+                      );
+                    }
+                  } else {
+                    _callProcessPayment();
+                  }
+                },
+                child: const Text("Pay"),
                 ),
               ),
             ),
@@ -190,7 +271,7 @@ Widget build(BuildContext context) {
     final roomProvider = Provider.of<RoomProvider>(context, listen: false);
     final room = roomProvider.singleRoom;
 
-    totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
+    // totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
 
     return SizedBox(
       width: double.infinity,
@@ -243,14 +324,59 @@ Widget build(BuildContext context) {
 
               _buildPersonCounter(room),
               const Divider(),
-
-              _buildRow("Total Price per Month:", "₱${totalPrice.toStringAsFixed(2)}", isBold: true),
+              _buildAdd1MonthDeposit(),
+              _buildAcceptTheTermsCondition(),
+              const Divider(),
+              _buildRow("Total Price:", "₱${totalPrice.toStringAsFixed(2)} ", isBold: true),
             ],
           ),
         ),
       ),
     );
   }
+
+  Widget _buildAdd1MonthDeposit() {
+    return Row(
+      children: [
+        Checkbox(
+          value: _isDepositChecked,
+          onChanged: (bool? newValue) {
+            setState(() {
+              _isDepositChecked = newValue ?? false;
+              _updateTotalPrice(); // Update total price when checkbox changes
+            });
+          },
+        ),
+        const Text(
+          "1 Month Deposit",
+          style: TextStyle(fontSize: 12),
+        ),
+      ],
+    );
+  }
+
+Widget _buildAcceptTheTermsCondition() {
+  return Row(
+    children: [
+      Checkbox(
+        value: _termsCondition,
+        onChanged: (bool? newValue) {
+          setState(() {
+            _termsCondition = newValue ?? false;
+          });
+
+          if (newValue == true) {
+            _showTermsAndConditionsDialog();
+          }
+        },
+      ),
+      const Text(
+        "I accept the Terms and Conditions",
+        style: TextStyle(fontSize: 12),
+      ),
+    ],
+  );
+}
 
   Widget _buildPersonCounter(Room? room) {
     int maxCapacity = room?.capacity ?? 1;
@@ -272,7 +398,7 @@ Widget build(BuildContext context) {
                     if (personCount > 1) {
                       setState(() {
                         personCount--;
-                        totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
+                        // totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
                       });
                     }
                   },
@@ -284,7 +410,7 @@ Widget build(BuildContext context) {
                     if (personCount < maxCapacity) {
                       setState(() {
                         personCount++;
-                        totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
+                        // totalPrice = ((room?.rentPrice ?? 0) as num).toDouble() * personCount;
                       });
                     }
                   },
@@ -294,21 +420,33 @@ Widget build(BuildContext context) {
           ],
         ),
         // Show text input field when personCount is greater than 1
-        if (personCount > 1)
-          Padding(
-            padding: const EdgeInsets.only(top: 10),
-            child: TextField(
-              controller: _additionalPersonDescController,
-              decoration: InputDecoration(
-                labelText: "whats your relationship of the added person?",
-                border: OutlineInputBorder(),
+      if (personCount > 1)
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: _additionalPersonDescController,
+                decoration: InputDecoration(
+                  labelText: "What's your relationship with the added person?",
+                  border: OutlineInputBorder(),
+                  errorText: _showError ? "This field is required!" : null,
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _showError = value.trim().isEmpty;
+                  });
+                },
               ),
-              onChanged: (value) {
-                // Handle the input change if needed
-                print("Additional Person Details: $value");
-              },
-            ),
+              // if (_showError)
+              //   const Text(
+              //     "This field is required!",
+              //     style: TextStyle(color: Colors.red, fontSize: 12),
+              //   ),
+            ],
           ),
+        ),
         if (personCount >= maxCapacity)
           const Text("Limit Reached!", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
       ],

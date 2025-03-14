@@ -59,16 +59,16 @@ class AuthProvider extends ChangeNotifier {
           );
         } else {
           AlertUtils.showErrorAlert(context,
-              message: "Token or UserId is missing.");
+              message: "Token or UserId is missing.", barrierDismissible: true);
         }
       } else {
         setAuthenticationStatus(false);
-        AlertUtils.showErrorAlert(context, message: "Login failed.");
+        AlertUtils.showErrorAlert(context, message: "Login failed." , barrierDismissible: true);
       }
     } catch (e) {
       setAuthenticationStatus(false);
       AlertUtils.showErrorAlert(context,
-          title: "Exception", message: "Something went wrong: $e");
+          title: "Exception", message: "Something went wrong: $e" , barrierDismissible: true);
     } finally {
       _isLoading = false;
       notifyListeners();

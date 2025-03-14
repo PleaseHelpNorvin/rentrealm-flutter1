@@ -92,14 +92,14 @@ class ProfileProvider extends ChangeNotifier {
 
     // Check if token and userId are null
     if (userId == null || token == null) {
-      AlertUtils.showErrorAlert(context, message: 'User is not authenticated.');
+      AlertUtils.showErrorAlert(context, message: 'User is not authenticated.', barrierDismissible: true);
       return; // Exit the method if userId or token is null
     }
 
     print("sendProfilePicture() called with: ${compressedFile}");
 
     if (compressedFile == null) {
-      AlertUtils.showErrorAlert(context, message: 'No file selected');
+      AlertUtils.showErrorAlert(context, message: 'No file selected', barrierDismissible: true);
     } else {
       print("sendProfilePicture() called with: ${compressedFile.path}");
       print(
@@ -133,7 +133,7 @@ class ProfileProvider extends ChangeNotifier {
       });
     } else {
       AlertUtils.showErrorAlert(context,
-          message: "Failed to update profile picture.");
+          message: "Failed to update profile picture." , barrierDismissible: true);
     }
     // await loadUserProfile(context);
   }
@@ -235,6 +235,7 @@ class ProfileProvider extends ChangeNotifier {
       setUserProfile(null);
       AlertUtils.showErrorAlert(context,
           title: "Its Not You Its Us",
+          barrierDismissible: true,
           message: "Something wrong with the server", onConfirmBtnTap: () {
         return;
       });
@@ -252,11 +253,11 @@ class ProfileProvider extends ChangeNotifier {
         return userProfile != null; // Return true if profile exists
       } catch (e) {
         print("Error loading user profile: $e");
-        AlertUtils.showErrorAlert(context,
+        AlertUtils.showErrorAlert(context , barrierDismissible: true,
             message: "Failed to load user profile.");
       }
     } else {
-      AlertUtils.showErrorAlert(context, message: "User not authenticated.");
+      AlertUtils.showErrorAlert(context, message: "User not authenticated.", barrierDismissible: true);
     }
     return false; // Default return value
   }

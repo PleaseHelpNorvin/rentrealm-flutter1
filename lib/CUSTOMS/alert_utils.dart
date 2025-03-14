@@ -25,17 +25,23 @@ class AlertUtils {
   }
 
   // Error Alert
-  static void showErrorAlert(BuildContext context,
-      {String? title, String? message, VoidCallback? onConfirmBtnTap}) {
+  static void showErrorAlert(
+    BuildContext context, {
+    String? title,
+    String? message,
+    VoidCallback? onConfirmBtnTap,
+    required bool barrierDismissible,
+  }) {
     QuickAlert.show(
       context: context,
       type: QuickAlertType.error,
       title: title ?? 'Error',
       text: message ?? 'Something went wrong!',
+      barrierDismissible: barrierDismissible, // ✅ Ensure it is set
       onConfirmBtnTap: () {
-        Navigator.of(context).pop(); // Close the dialog
+        Navigator.of(context, rootNavigator: true).pop(); // ✅ Ensure alert is dismissed
         if (onConfirmBtnTap != null) {
-          onConfirmBtnTap(); // Execute additional logic if provided
+          onConfirmBtnTap(); // ✅ Execute additional logic if provided
         }
       },
     );
@@ -49,8 +55,11 @@ class AlertUtils {
       type: QuickAlertType.info,
       title: title ?? 'Information',
       text: message ?? 'Here is some information!',
+      barrierDismissible: false, // Prevents tapping outside to dismiss
       onConfirmBtnTap: () {
-        Navigator.of(context).pop(); // Close the dialog
+        if (context.mounted) {
+          Navigator.of(context, rootNavigator: true).pop(); // 🔥 Ensure only the alert is closed
+        }
         if (onConfirmBtnTap != null) {
           onConfirmBtnTap(); // Execute additional logic if provided
         }

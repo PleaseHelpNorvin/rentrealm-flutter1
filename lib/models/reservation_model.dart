@@ -46,6 +46,7 @@ class ReservationResponse {
     final int id;
     final int profileId;
     final int roomId;
+    final String reservationCode;
     final String paymentMethod;
     final List<String> reservationPaymentProofUrl;
     final String status;
@@ -58,6 +59,7 @@ class ReservationResponse {
       required this.id,
       required this.profileId,
       required this.roomId,
+      required this.reservationCode,
       required this.paymentMethod,
       required this.reservationPaymentProofUrl,
       required this.status,
@@ -73,6 +75,7 @@ class ReservationResponse {
       profileId: json['profile_id'],
       roomId: json['room_id'],
       paymentMethod: json['payment_method'],
+      reservationCode: json['reservation_code'],
       reservationPaymentProofUrl: json['reservation_payment_proof_url'] != null
           ? List<String>.from(jsonDecode(json['reservation_payment_proof_url']))
           : [],
@@ -83,4 +86,21 @@ class ReservationResponse {
       updatedAt: json['updated_at'],
     );
   }
+
+   // Add this method to resolve the error
+    Map<String, dynamic> toJson() {
+      return {
+        'id': id,
+        'profile_id': profileId,
+        'room_id': roomId,
+        'payment_method': paymentMethod,
+        'reservation_code': reservationCode,
+        'reservation_payment_proof_url': jsonEncode(reservationPaymentProofUrl),
+        'status': status,
+        'approved_by': approvedBy,
+        'approval_date': approvalDate,
+        'created_at': createdAt,
+        'updated_at': updatedAt,
+      };
+    }
 }
