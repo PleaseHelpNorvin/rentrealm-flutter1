@@ -17,6 +17,7 @@ import '../MODELS/profile_model.dart';
 import '../MODELS/user_model.dart';
 import '../models/billing_model.dart';
 import '../models/notification_model.dart';
+import '../models/paymongo_model.dart';
 import '../models/pickedRoom_model.dart';
 
 class ApiService {
@@ -765,7 +766,7 @@ class ApiService {
   //   }
   // }
 
-  Future<ReservationResponse?>showReservation({
+  Future<ReservationResponse?> showReservation({
     required int reservationId,
     required String token,
   }) async {
@@ -880,7 +881,7 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Raw API response: ${response.body}");
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print("responseData from InquiryResponse() Call: $responseData");
+        print("responseData from postPickedRoomByUser() Call: $responseData");
         return PickedRoomResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
@@ -909,7 +910,7 @@ class ApiService {
     if (response.statusCode == 200 || response.statusCode == 201) {
       print("Raw API response: ${response.body}");
       final Map<String, dynamic> responseData = jsonDecode(response.body);
-      print("responseData from InquiryResponse() Call: $responseData");
+      print("responseData from getPickedRoomsByUser() Call: $responseData");
       return PickedRoomResponse.fromJson(responseData);
     } else {
       print('Error: ${response.statusCode} - ${response.body}');
@@ -980,7 +981,7 @@ class ApiService {
     if (response.statusCode == 200 || response.statusCode == 201) {
       print("Raw API response: ${response.body}");
       final Map<String, dynamic> responseData = jsonDecode(response.body);
-      print("responseData from InquiryResponse() Call: $responseData");
+      print("responseData from getReservations() Call: $responseData");
       return ReservationResponse.fromJson(responseData);
     } else {
       print('Error: ${response.statusCode} - ${response.body}');
@@ -1026,16 +1027,78 @@ class ApiService {
     }
   }
 
-  Future<BillingResponse?>getBillingForRentalAgreement({
+  Future<BillingResponse?> getBillingForRentalAgreement({
     required String token,
     required int rentalagreementId,
-  }) async{
+  }) async {
     print("getBillingForRentalAgreement REACHED!!!");
     print("from getBillingForRentalAgreement() $token");
     print("from getBillingForRentalAgreement() $rentalagreementId");
 
-    final uri = Uri.parse('$rest/tenant/billing/getbillingforrentalagreement/$rentalagreementId');
-    
+    final uri = Uri.parse(
+        '$rest/tenant/billing/getbillingforrentalagreement/$rentalagreementId');
+
+    final headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    final response = await http.get(uri, headers: headers);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      print("Raw API response: ${response.body}");
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      print(
+          "responseData from getBillingForRentalAgreement() Call: $responseData");
+      return BillingResponse.fromJson(responseData);
+    } else {
+      print('Error: ${response.statusCode} - ${response.body}');
+      return null;
+    }
   }
-  
+
+  Future<PaymongoResponse?> postPaymongo({
+    required String token,
+    required int billingId,
+    required double amount,
+    required String paymentDescription,
+  }) async {
+    print("PAYMONGOPOST() REACHED!");
+    print("from PaymongoPost $token");
+    print("from PaymongoPost $billingId");
+    print("from PaymongoPost $amount");
+    print("from PaymongoPost $paymentDescription");
+    final uri = Uri.parse('$rest/tenant/payment/process-payment');
+    try {
+      final headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      };
+      final body = {
+        "billing_id": billingId.toString(),
+        "amount": amount,
+        "payment_description": paymentDescription,
+      };
+
+      final request = await http.post(
+        uri,
+        headers: headers,
+        body: jsonEncode(body),
+      );
+
+      if (request.statusCode == 200 || request.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(request.body);
+        print('from postPaymongo():  $responseData');
+        return PaymongoResponse.fromJson(responseData);
+      } else {
+        print('Error: ${request.statusCode} - ${request.body}');
+        return null;
+      }
+    } catch (e) {
+      print("Exception: $e");
+      return null;
+    }
+  }
 }

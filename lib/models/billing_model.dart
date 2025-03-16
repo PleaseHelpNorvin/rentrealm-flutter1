@@ -11,22 +11,15 @@ class BillingResponse {
     required this.data,
   });
 
-  factory BillingResponse.fromJson(String str) =>
-      BillingResponse.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
+  // FIX: Accepts a Map instead of a String
+  factory BillingResponse.fromJson(Map<String, dynamic> json) =>
+      BillingResponse.fromMap(json);
 
   factory BillingResponse.fromMap(Map<String, dynamic> json) => BillingResponse(
         success: json["success"],
         message: json["message"],
         data: BillingData.fromMap(json["data"]),
       );
-
-  Map<String, dynamic> toMap() => {
-        "success": success,
-        "message": message,
-        "data": data.toMap(),
-      };
 }
 
 class BillingData {
@@ -35,8 +28,8 @@ class BillingData {
   BillingData({required this.billings});
 
   factory BillingData.fromMap(Map<String, dynamic> json) => BillingData(
-        billings: List<Billing>.from(
-            json["billings"].map((x) => Billing.fromMap(x))),
+        billings:
+            List<Billing>.from(json["billings"].map((x) => Billing.fromMap(x))),
       );
 
   Map<String, dynamic> toMap() => {

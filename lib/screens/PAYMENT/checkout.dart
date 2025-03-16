@@ -3,10 +3,11 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';  // For formatting dates
+import 'package:intl/intl.dart'; // For formatting dates
 import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
+import 'package:rentealm_flutter/models/profile_model.dart';
 import '../../CUSTOMS/alert_utils.dart';
 import '../../MODELS/room_model.dart';
 import '../../PROVIDERS/reservation_provider.dart';
@@ -26,7 +27,8 @@ class CheckoutScreen extends StatefulWidget {
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
-  final TextEditingController _additionalPersonDescController = TextEditingController();
+  final TextEditingController _additionalPersonDescController =
+      TextEditingController();
   DateTime? selectedDate; // Store selected date
   int personCount = 1; // Default value of 1 person fuc
   double totalPrice = 0.0;
@@ -37,34 +39,38 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // _isDepositChecked = false;
     // _termsCondition = false;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final reservationProvider = Provider.of<ReservationProvider>(context, listen: false);
-      
-      await reservationProvider.fetchReservationById(context, widget.reservationId);
-      
+      final reservationProvider =
+          Provider.of<ReservationProvider>(context, listen: false);
+
+      await reservationProvider.fetchReservationById(
+          context, widget.reservationId);
+
       if (!mounted) return;
 
-      final int? reservationRoomId = reservationProvider.singleReservation?.reservations.first.roomId;
+      final int? reservationRoomId =
+          reservationProvider.singleReservation?.reservations.first.roomId;
       print("Reservation Room ID: $reservationRoomId");
 
       if (reservationRoomId != null) {
         final roomProvider = Provider.of<RoomProvider>(context, listen: false);
-        
+
         await roomProvider.fetchRoomById(context, reservationRoomId);
-        
+
         if (mounted) {
           setState(() {
-             _updateTotalPrice();
+            _updateTotalPrice();
           }); // Ensures UI updates after fetching room data
         }
 
         // Initialize PaymentProvider AFTER data fetching
         Future.microtask(() {
           try {
-            final paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
+            final paymentProvider =
+                Provider.of<PaymentProvider>(context, listen: false);
             paymentProvider.initAuthDetails(context);
           } catch (e) {
             print("Error accessing PaymentProvider: $e");
@@ -83,60 +89,60 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void _updateTotalPrice() {
     final roomProvider = Provider.of<RoomProvider>(context, listen: false);
     final room = roomProvider.singleRoom;
-    
+
     double basePrice = room?.rentPrice ?? 0.0;
-    
+
     setState(() {
-    totalPrice = _isDepositChecked ? basePrice + (room?.rentPrice ?? 0) : basePrice;
-  });
+      totalPrice =
+          _isDepositChecked ? basePrice + (room?.rentPrice ?? 0) : basePrice;
+    });
   }
 
-
   void _showTermsAndConditionsDialog() {
-  showDialog(
-    context: context,
-    barrierDismissible: false, // Prevent closing by tapping outside
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text("Terms and Conditions"),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "1. Rent is due on the 1st of every month.\n"
-                "2. A late fee of ₱500 will be charged after a 5-day grace period.\n"
-                "3. The security deposit is refundable upon contract completion.\n"
-                "4. No illegal activities allowed within the premises.\n"
-                "5. The tenant is responsible for any damages caused.\n"
-                "6. Subleasing is strictly prohibited without written consent.\n"
-                "7. If a visitor stays for more than one day on the premises, a charge of ₱50 will be applied and reflected in the monthly billing.\n",
-                style: TextStyle(fontSize: 14),
-              ),
-            ],
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Prevent closing by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Terms and Conditions"),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: const [
+                Text(
+                  "1. Rent is due on the 1st of every month.\n"
+                  "2. A late fee of ₱500 will be charged after a 5-day grace period.\n"
+                  "3. The security deposit is refundable upon contract completion.\n"
+                  "4. No illegal activities allowed within the premises.\n"
+                  "5. The tenant is responsible for any damages caused.\n"
+                  "6. Subleasing is strictly prohibited without written consent.\n"
+                  "7. If a visitor stays for more than one day on the premises, a charge of ₱50 will be applied and reflected in the monthly billing.\n",
+                  style: TextStyle(fontSize: 14),
+                ),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _termsCondition = false; // Uncheck if user declines
-              });
-              Navigator.of(context).pop();
-            },
-            child: const Text("Decline"),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: const Text("Accept"),
-          ),
-        ],
-      );
-    },
-  );
-}
+          actions: [
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _termsCondition = false; // Uncheck if user declines
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text("Decline"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text("Accept"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // **Improved Date Picker Function**
   Future<void> _selectDate(BuildContext context) async {
@@ -156,10 +162,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _callProcessPayment() async {
-    // final paymentProvider = Provider.of<PaymentProvider>(context, listen: false); 
-    final rentalagreementProvider = Provider.of<RentalagreementProvider>(context, listen: false);
-    final reservationProvider = Provider.of<ReservationProvider>(context, listen: false);
-    final reservation= reservationProvider.singleReservation?.reservations.first;
+    // final paymentProvider = Provider.of<PaymentProvider>(context, listen: false);
+    final rentalagreementProvider =
+        Provider.of<RentalagreementProvider>(context, listen: false);
+    final reservationProvider =
+        Provider.of<ReservationProvider>(context, listen: false);
+    final reservation =
+        reservationProvider.singleReservation?.reservations.first;
 
     if (reservation == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -167,15 +176,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       );
       return;
     }
-    
-      // Validation: Prevent submission if additional person field is required
-    if (personCount > 1 && _additionalPersonDescController.text.trim().isEmpty) {
+
+    // Validation: Prevent submission if additional person field is required
+    if (personCount > 1 &&
+        _additionalPersonDescController.text.trim().isEmpty) {
       setState(() {
-        _showError = true;  // Show error message
+        _showError = true; // Show error message
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in the additional person description!")),
+        const SnackBar(
+            content: Text("Please fill in the additional person description!")),
       );
       return;
     }
@@ -187,85 +198,99 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         : DateFormat("yyyy-MM-dd").format(DateTime.now());
     int persons = personCount;
 
-    await rentalagreementProvider.storeRentalAgreement(context, reservationId, roomId, startDate, persons, widget.signaturePngString, totalPrice, _additionalPersonDescController.text);
+    String _paymentDescription =
+        "Initial Payment for Rental Agreement [${reservation.reservationCode}]";
+
+    await rentalagreementProvider.storeRentalAgreement(
+        context,
+        reservationId,
+        roomId,
+        startDate,
+        persons,
+        widget.signaturePngString,
+        totalPrice,
+        _additionalPersonDescController.text,
+        _paymentDescription);
   }
-  
 
-@override
-Widget build(BuildContext context) {
-  return Consumer<ReservationProvider>(
-    builder: (context, reservationProvider, child) {
-      final singleReservation = reservationProvider.singleReservation;
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<ReservationProvider>(
+      builder: (context, reservationProvider, child) {
+        final singleReservation = reservationProvider.singleReservation;
 
-      // 🛑 Ensure reservation data is loaded
-      if (singleReservation == null) {
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
-      }
+        // 🛑 Ensure reservation data is loaded
+        if (singleReservation == null) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-      // ❗ Prevent 'No Element' Error
-      if (singleReservation.reservations.isEmpty) {
-        return const Scaffold(
-          body: Center(child: Text("No Reservations Found")),
-        );
-      }
+        // ❗ Prevent 'No Element' Error
+        if (singleReservation.reservations.isEmpty) {
+          return const Scaffold(
+            body: Center(child: Text("No Reservations Found")),
+          );
+        }
 
-      // final int reservationRoomId = singleReservation.reservations.first.roomId;
+        // final int reservationRoomId = singleReservation.reservations.first.roomId;
 
-      return Scaffold(
-        appBar: AppBar(title: const Text("Rent Payment")),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildRoomCard(),
-                    _buildTextCard(),
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.blue, width: 1),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+        return Scaffold(
+          appBar: AppBar(title: const Text("Rent Payment")),
+          body: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildRoomCard(),
+                      _buildTextCard(),
+                    ],
                   ),
-                onPressed: () {
-                  if (!_isDepositChecked || !_termsCondition) {
-                    if (context.mounted) {
-                      AlertUtils.showErrorAlert(
-                        context,
-                        title: "Action Required",
-                        message: "Please accept the terms and conditions and select the deposit option.",
-                        barrierDismissible: false, // ✅ Prevent dismissing outside
-                      );
-                    }
-                  } else {
-                    _callProcessPayment();
-                  }
-                },
-                child: const Text("Pay"),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
-
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      side: const BorderSide(color: Colors.blue, width: 1),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(3)),
+                    ),
+                    onPressed: () {
+                      if (!_isDepositChecked || !_termsCondition) {
+                        if (context.mounted) {
+                          AlertUtils.showErrorAlert(
+                            context,
+                            title: "Action Required",
+                            message:
+                                "Please accept the terms and conditions and select the deposit option.",
+                            barrierDismissible:
+                                false, // ✅ Prevent dismissing outside
+                          );
+                        }
+                      } else {
+                        _callProcessPayment();
+                      }
+                    },
+                    child: const Text("Pay"),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Widget _buildTextCard() {
     final roomProvider = Provider.of<RoomProvider>(context, listen: false);
@@ -289,18 +314,23 @@ Widget build(BuildContext context) {
               const Center(
                 child: Text(
                   "Rent Details",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black),
                 ),
               ),
               const Divider(thickness: 3),
 
               // **Improved Date Picker UI**
-              const Text("Rent Start Date:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              const Text("Rent Start Date:",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               const SizedBox(height: 8),
               GestureDetector(
                 onTap: () => _selectDate(context),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(5),
@@ -327,7 +357,8 @@ Widget build(BuildContext context) {
               _buildAdd1MonthDeposit(),
               _buildAcceptTheTermsCondition(),
               const Divider(),
-              _buildRow("Total Price:", "₱${totalPrice.toStringAsFixed(2)} ", isBold: true),
+              _buildRow("Total Price:", "₱${totalPrice.toStringAsFixed(2)} ",
+                  isBold: true),
             ],
           ),
         ),
@@ -355,28 +386,28 @@ Widget build(BuildContext context) {
     );
   }
 
-Widget _buildAcceptTheTermsCondition() {
-  return Row(
-    children: [
-      Checkbox(
-        value: _termsCondition,
-        onChanged: (bool? newValue) {
-          setState(() {
-            _termsCondition = newValue ?? false;
-          });
+  Widget _buildAcceptTheTermsCondition() {
+    return Row(
+      children: [
+        Checkbox(
+          value: _termsCondition,
+          onChanged: (bool? newValue) {
+            setState(() {
+              _termsCondition = newValue ?? false;
+            });
 
-          if (newValue == true) {
-            _showTermsAndConditionsDialog();
-          }
-        },
-      ),
-      const Text(
-        "I accept the Terms and Conditions",
-        style: TextStyle(fontSize: 12),
-      ),
-    ],
-  );
-}
+            if (newValue == true) {
+              _showTermsAndConditionsDialog();
+            }
+          },
+        ),
+        const Text(
+          "I accept the Terms and Conditions",
+          style: TextStyle(fontSize: 12),
+        ),
+      ],
+    );
+  }
 
   Widget _buildPersonCounter(Room? room) {
     int maxCapacity = room?.capacity ?? 1;
@@ -384,12 +415,14 @@ Widget _buildAcceptTheTermsCondition() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Maximum Room Capacity: $maxCapacity", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+        Text("Maximum Room Capacity: $maxCapacity",
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
         const SizedBox(height: 5),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text("Persons:", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            const Text("Persons:",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             Row(
               children: [
                 IconButton(
@@ -403,7 +436,9 @@ Widget _buildAcceptTheTermsCondition() {
                     }
                   },
                 ),
-                Text("$personCount", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text("$personCount",
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
                 IconButton(
                   icon: const Icon(Icons.add, color: Colors.green),
                   onPressed: () {
@@ -420,35 +455,37 @@ Widget _buildAcceptTheTermsCondition() {
           ],
         ),
         // Show text input field when personCount is greater than 1
-      if (personCount > 1)
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: _additionalPersonDescController,
-                decoration: InputDecoration(
-                  labelText: "What's your relationship with the added person?",
-                  border: OutlineInputBorder(),
-                  errorText: _showError ? "This field is required!" : null,
+        if (personCount > 1)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: _additionalPersonDescController,
+                  decoration: InputDecoration(
+                    labelText:
+                        "What's your relationship with the added person?",
+                    border: OutlineInputBorder(),
+                    errorText: _showError ? "This field is required!" : null,
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _showError = value.trim().isEmpty;
+                    });
+                  },
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    _showError = value.trim().isEmpty;
-                  });
-                },
-              ),
-              // if (_showError)
-              //   const Text(
-              //     "This field is required!",
-              //     style: TextStyle(color: Colors.red, fontSize: 12),
-              //   ),
-            ],
+                // if (_showError)
+                //   const Text(
+                //     "This field is required!",
+                //     style: TextStyle(color: Colors.red, fontSize: 12),
+                //   ),
+              ],
+            ),
           ),
-        ),
         if (personCount >= maxCapacity)
-          const Text("Limit Reached!", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          const Text("Limit Reached!",
+              style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
       ],
     );
   }
@@ -459,10 +496,15 @@ Widget _buildAcceptTheTermsCondition() {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+          Text(label,
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           Text(
             value,
-            style: TextStyle(fontSize: 16, fontWeight: isBold ? FontWeight.bold : FontWeight.normal, color: Colors.black),
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+                color: Colors.black),
           ),
         ],
       ),
@@ -484,28 +526,28 @@ Widget _buildAcceptTheTermsCondition() {
             child: Row(
               children: [
                 room.roomPictureUrls.isNotEmpty
-                ? CachedNetworkImage(
-                    imageUrl: room.roomPictureUrls.first,
-                    fit: BoxFit.cover,
-                    width: 150,
-                    height: 180,
-                    placeholder: (context, url) => Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                    errorWidget: (context, url, error) => Center(
-                      child: Text(
-                        'Failed to load image',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 12, color: Colors.red),
+                    ? CachedNetworkImage(
+                        imageUrl: room.roomPictureUrls.first,
+                        fit: BoxFit.cover,
+                        width: 150,
+                        height: 180,
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Center(
+                          child: Text(
+                            'Failed to load image',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 12, color: Colors.red),
+                          ),
+                        ),
+                      )
+                    : Image.asset(
+                        'assets/images/rentrealm_logo.png',
+                        fit: BoxFit.cover,
+                        width: 150,
+                        height: 150,
                       ),
-                    ),
-                  )
-                : Image.asset(
-                    'assets/images/rentrealm_logo.png',
-                    fit: BoxFit.cover,
-                    width: 150,
-                    height: 150,
-                  ),
                 const SizedBox(width: 10),
 
                 // Column to display roomCode and rentPrice vertically

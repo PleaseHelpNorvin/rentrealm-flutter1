@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
 // import 'package:rentealm_flutter/NETWORKS/apiservice.dart';
-// 
+//
 import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
 
 import '../networks/apiservice.dart';
@@ -20,12 +20,12 @@ class BillingProvider extends ChangeNotifier {
 
   void initAuthDetails(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
 
     token = authProvider.token ?? 'no token';
     profileId = profileProvider.userProfile?.data.id;
   }
-
 
   Future<void> fetchBillingForRentalAgreement(BuildContext context) async {
     initAuthDetails(context);
@@ -36,12 +36,11 @@ class BillingProvider extends ChangeNotifier {
     // int? rentalAgreementId = rentalAgreementProvder.
 
     // if (profileId) {
-      
+
     // }
 
     print("from fetchBillingForRentalAgreement() ");
 
-  // await response = await apiService.getBillingForRentalAgreement(token: token, rentalAgreementId: );
-    
+    // await response = await apiService.getBillingForRentalAgreement(token: token, rentalAgreementId: );
   }
 }
