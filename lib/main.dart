@@ -1,46 +1,43 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/inquiry_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/notification_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/room_provider.dart';
-// import 'package:rentealm_flutter/screens/homelogged.dart';
-import 'package:rentealm_flutter/screens/outer_create_tenant_screen1.dart';
+import 'package:app_links/app_links.dart';
 
 import 'PROVIDERS/auth_provider.dart';
 import 'PROVIDERS/pickedRoom_provider.dart';
-// import 'PROVIDERS/pickedroom_provider.dart';
 import 'PROVIDERS/reservation_provider.dart';
 import 'PROVIDERS/theme_provider.dart';
 import 'PROVIDERS/tenant_provider.dart';
 import 'PROVIDERS/property_provider.dart';
-import './PROVIDERS/profile_provider.dart';
-import './PROVIDERS/user_provider.dart';
+import 'PROVIDERS/profile_provider.dart';
+import 'PROVIDERS/user_provider.dart';
+import 'PROVIDERS/inquiry_provider.dart';
+import 'PROVIDERS/notification_provider.dart';
+import 'PROVIDERS/payment_provider.dart';
+import 'PROVIDERS/rentalAgreement_provider.dart';
+import 'PROVIDERS/room_provider.dart';
 
-import './SCREENS/AUTH/login.dart';
-// import './SCREENS/AUTH/register.dart';
-import './SCREENS/PROFILE/UPDATE/edit_address_screen.dart';
-import './SCREENS/PROFILE/UPDATE/edit_identification_screen.dart';
-import './SCREENS/PROFILE/UPDATE/edit_profile_screen.dart';
-import './SCREENS/PROFILE/UPDATE/edit_user_screen.dart';
+import 'SCREENS/AUTH/login.dart';
+import 'SCREENS/PROFILE/UPDATE/edit_address_screen.dart';
+import 'SCREENS/PROFILE/UPDATE/edit_identification_screen.dart';
+import 'SCREENS/PROFILE/UPDATE/edit_profile_screen.dart';
+import 'SCREENS/PROFILE/UPDATE/edit_user_screen.dart';
 import 'SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
 import 'SCREENS/get_started.dart';
 import 'SCREENS/TENANT/CREATE/create_tenant_screen1.dart';
-import 'dart:io';
-
-import 'package:uni_links/uni_links.dart';
-import './screens/payment_response_screen/payment_success_screen.dart';
-import './screens/payment_response_screen/payment_failed_screen.dart';
+import 'SCREENS/payment_response_screen/payment_success_screen.dart';
+import 'SCREENS/payment_response_screen/payment_failed_screen.dart';
+import 'screens/outer_create_tenant_screen1.dart';
 
 /// Overrides HTTP security to allow self-signed certificates (for testing)
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 
@@ -57,39 +54,43 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamSubscription? _sub;
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
 
   @override
   void initState() {
     super.initState();
-    _handleIncomingLinks();
+    _appLinks = AppLinks();
+    _handleInitialAndIncomingLinks();
   }
 
-  /// Handles deep linking when the app is opened from an external link.
-  void _handleIncomingLinks() async {
-    // Handle initial deep link when the app starts
-    Uri? uri = await getInitialUri();
-    if (uri != null) {
-      _navigateBasedOnUri(uri);
-    }
+  /// Handles both initial and ongoing app links
+  void _handleInitialAndIncomingLinks() async {
+    try {
+      // Handle initial deep link when the app starts
 
-    // Listen for deep links when the app is running
-     _sub = linkStream.listen((String? link) {
-    if (link != null) {
-      Uri uri = Uri.parse(link);
-      _navigateBasedOnUri(uri);
+      Uri? initialLink = await _appLinks.getInitialLink();
+      if (initialLink != null) {
+        _navigateBasedOnUri(initialLink);
+      }
+
+      // Listen for deep links when the app is running
+      _linkSubscription = _appLinks.uriLinkStream.listen((Uri uri) {
+        _navigateBasedOnUri(uri);
+      }, onError: (err) {
+        print("Error handling deep link: $err");
+      });
+    } catch (e) {
+      print("Error initializing app links: $e");
     }
-  }, onError: (err) {
-    print("Error handling deep link: $err");
-  });
-}
+  }
 
   /// Navigates to the appropriate screen based on the received URI.
   void _navigateBasedOnUri(Uri uri) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (uri.host == "payment-success") {
+      if (uri.path == "/payment-success") {
         Navigator.pushNamed(context, '/payment-success');
-      } else if (uri.host == "payment-failed") {
+      } else if (uri.path == "/payment-failed") {
         Navigator.pushNamed(context, '/payment-failed');
       }
     });
@@ -97,7 +98,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
-    _sub?.cancel();
+    _linkSubscription?.cancel();
     super.dispose();
   }
 
@@ -136,7 +137,8 @@ class _MyAppState extends State<MyApp> {
             home: const GetStartedScreen(),
             routes: {
               '/get_started': (context) => GetStartedScreen(),
-              '/outercreatetenantscreen1': (context) => OuterCreateTenantScreen1(),
+              '/outercreatetenantscreen1': (context) =>
+                  OuterCreateTenantScreen1(),
               '/login': (context) => LoginScreen(),
               '/edituser': (context) => EditUserScreen(),
               '/editprofile': (context) => EditProfileScreen(),
