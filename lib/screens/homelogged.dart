@@ -34,7 +34,7 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final token = authProvider.token;
       final userId = authProvider.userId;
-
+      print("UserID from HOMELOGGED() $userId");
       // final profileProvider =
       //     // Provider.of<ProfileProvider>(context, listen: false);
       //     Provider.of<ProfileProvider>(context, listen: false)
