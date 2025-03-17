@@ -56,8 +56,7 @@ class PickedRoomProvider extends ChangeNotifier {
           await apiService.getPickedRoomsByUser(userId: userId, token: token);
 
       if (response != null &&
-          response.success &&
-          response.data.pickedRooms != null) {
+          response.success) {
         pickedRooms = response.data.pickedRooms; // ✅ Update list
         singlePickedRoom = response.data.pickedRooms.isNotEmpty
             ? response.data.pickedRooms.first
