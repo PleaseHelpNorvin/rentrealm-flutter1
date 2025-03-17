@@ -219,14 +219,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       builder: (context, reservationProvider, child) {
         final singleReservation = reservationProvider.singleReservation;
 
-        // 🛑 Ensure reservation data is loaded
+        // Ensure reservation data is loaded
         if (singleReservation == null) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
 
-        // ❗ Prevent 'No Element' Error
+        // revent 'No Element' Error
         if (singleReservation.reservations.isEmpty) {
           return const Scaffold(
             body: Center(child: Text("No Reservations Found")),

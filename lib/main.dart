@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/inquiry_provider.dart';
@@ -29,12 +31,16 @@ import 'SCREENS/get_started.dart';
 import 'SCREENS/TENANT/CREATE/create_tenant_screen1.dart';
 import 'dart:io';
 
+import 'package:uni_links/uni_links.dart';
+import './screens/payment_response_screen/payment_success_screen.dart';
+import './screens/payment_response_screen/payment_failed_screen.dart';
+
+/// Overrides HTTP security to allow self-signed certificates (for testing)
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
-      ..badCertificateCallback =
-          (X509Certificate cert, String host, int port) => true;
+      ..badCertificateCallback = (X509Certificate cert, String host, int port) => true;
   }
 }
 
@@ -43,8 +49,57 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  StreamSubscription? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _handleIncomingLinks();
+  }
+
+  /// Handles deep linking when the app is opened from an external link.
+  void _handleIncomingLinks() async {
+    // Handle initial deep link when the app starts
+    Uri? uri = await getInitialUri();
+    if (uri != null) {
+      _navigateBasedOnUri(uri);
+    }
+
+    // Listen for deep links when the app is running
+     _sub = linkStream.listen((String? link) {
+    if (link != null) {
+      Uri uri = Uri.parse(link);
+      _navigateBasedOnUri(uri);
+    }
+  }, onError: (err) {
+    print("Error handling deep link: $err");
+  });
+}
+
+  /// Navigates to the appropriate screen based on the received URI.
+  void _navigateBasedOnUri(Uri uri) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (uri.host == "payment-success") {
+        Navigator.pushNamed(context, '/payment-success');
+      } else if (uri.host == "payment-failed") {
+        Navigator.pushNamed(context, '/payment-failed');
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,16 +136,16 @@ class MyApp extends StatelessWidget {
             home: const GetStartedScreen(),
             routes: {
               '/get_started': (context) => GetStartedScreen(),
-              '/outercreatetenantscreen1': (context) =>
-                  OuterCreateTenantScreen1(),
-              // '/register': (context) => RegisterScreen(),
+              '/outercreatetenantscreen1': (context) => OuterCreateTenantScreen1(),
               '/login': (context) => LoginScreen(),
               '/edituser': (context) => EditUserScreen(),
               '/editprofile': (context) => EditProfileScreen(),
               '/editaddress': (context) => EditAddressScreen(),
               '/editidentification': (context) => EditIdentificationScreen(),
               '/createprofile1': (context) => CreateProfileScreen1(),
-              '/createtenant1': (context) => CreateTenantScreen1()
+              '/createtenant1': (context) => CreateTenantScreen1(),
+              '/payment-success': (context) => PaymentSuccessScreen(),
+              '/payment-failed': (context) => PaymentFailedScreen(),
             },
           );
         },
