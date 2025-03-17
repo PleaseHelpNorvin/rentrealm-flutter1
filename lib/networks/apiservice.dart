@@ -1076,7 +1076,7 @@ class ApiService {
         "Authorization": "Bearer $token",
       };
       final body = {
-        "billing_id": billingId.toString(),
+        "billing_id": billingId,
         "amount": amount,
         "payment_description": paymentDescription,
       };
