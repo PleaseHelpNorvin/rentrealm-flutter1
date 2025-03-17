@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:rentealm_flutter/MODELS/room_model.dart';
 import 'package:rentealm_flutter/models/inquiry_model.dart';
 import 'package:rentealm_flutter/models/property_model.dart';
@@ -513,6 +511,7 @@ class ApiService {
       print('Exception: $e');
       return null;
     }
+    return null;
   }
 
   Future<PropertyResponse?> getProperty(
