@@ -1076,7 +1076,7 @@ class ApiService {
         "Authorization": "Bearer $token",
       };
       final body = {
-        "billing_id": billingId.toString(),
+        "billing_id": billingId,
         "amount": amount,
         "payment_description": paymentDescription,
       };
@@ -1100,4 +1100,40 @@ class ApiService {
       return null;
     }
   }
+
+  Future<RetrievePaymongoPaymentResponse?>getRetrievePaymongoPayment({
+    required String token, 
+    required int billingId
+  }) async {
+    print("from getRetrievePayment(): token");
+    print("from getRetrievePayment(): billingId");
+  final uri = Uri.parse("$rest/tenant/payment/retrieve-payment/$billingId");
+  final header = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Authorization": "Bearer $token",
+  };
+    try {
+      final response = await http.get(
+        uri,
+        headers: header,
+      );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          print("responseData from getRetrievePayment Call: $responseData");
+          return RetrievePaymongoPaymentResponse.fromJson(responseData); // Corrected this line
+        } else if (response.statusCode == 404) {
+          print('Error: ${response.statusCode} - ${response.body}');
+          print('navigating to create tenant screen');
+          return null;
+        }
+    } catch (e) {
+      print('Exception: $e');
+        return null;
+    }
+    return null;
+  }
+
+  
 }

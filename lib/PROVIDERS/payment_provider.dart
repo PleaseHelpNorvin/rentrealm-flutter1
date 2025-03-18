@@ -2,12 +2,16 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 // import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
 import 'package:rentealm_flutter/networks/apiservice.dart';
 import 'package:rentealm_flutter/screens/PAYMENT/payment.dart';
+
+import '../models/billing_model.dart';
+import '../models/paymongo_model.dart';
 
 class PaymentProvider extends ChangeNotifier {
   final ApiService apiService = ApiService();
@@ -21,15 +25,34 @@ class PaymentProvider extends ChangeNotifier {
 
   /// 🔹 Private variable to store checkout_url
   String? _checkoutUrl;
-
   /// ✅ Getter to retrieve checkout_url
   String? get checkoutUrl => _checkoutUrl;
-
   /// ✅ Setter to update checkout_url and notify listeners
   void setCheckoutUrl(String url) {
     _checkoutUrl = url;
     notifyListeners(); // Notify UI of the change
   }
+  
+  // private list 
+  List<Billing> _billings = [];
+  // getter
+  List<Billing> get billings => _billings;
+  // setter
+  set billings(List<Billing> newBillings) {
+    _billings = newBillings;
+    print("setBillings() REACHED!");
+    notifyListeners();
+  }
+  // private variable to store 
+  RetrievePaymongoPaymentResponse? _paymongoPaymentResponse;
+  //getter to retrieve 
+  RetrievePaymongoPaymentResponse? get paymongoPaymentResponse => _paymongoPaymentResponse;
+  // setter to update and notifyListeners
+  set paymongoPaymentResponse(RetrievePaymongoPaymentResponse? newResponse) {
+    _paymongoPaymentResponse = newResponse;
+    notifyListeners();  // Notify UI about the update
+  }
+
 
   /// ✅ Initialize token and profileId (Call this in the beginning)
   void initAuthDetails(BuildContext context) {
@@ -94,10 +117,28 @@ class PaymentProvider extends ChangeNotifier {
         /// 🔹 Update checkout URL
         setCheckoutUrl(procressPaymentResponse.data.checkoutUrl);
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PaymentScreen()));
+            context, MaterialPageRoute(builder: (context) => PaymentScreen(billingId: billingId)));
       } else {
         print("payment failed");
       }
     }
   }
+
+  Future<void> fetchRetrievePayment(BuildContext context,{required int billingId}) async {
+    initAuthDetails(context);
+    print("from fetchPaymongoDetails(): $billingId");
+    print("from fetchPaymongoDetails(): $token");
+
+    _isLoading = true;
+    notifyListeners();
+
+    final response = await apiService.getRetrievePaymongoPayment(billingId: billingId, token: token);
+    if(response != null) {
+      Navigator.pushNamed(context, '/');
+    }
+    _isLoading = false;
+    notifyListeners();
+  }
+
 }
+
