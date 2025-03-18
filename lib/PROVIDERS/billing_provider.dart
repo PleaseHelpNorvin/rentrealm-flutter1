@@ -5,6 +5,7 @@ import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
 //
 import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
 
+import '../models/billing_model.dart';
 import '../networks/apiservice.dart';
 import 'auth_provider.dart';
 import 'profile_provider.dart';
@@ -17,6 +18,18 @@ class BillingProvider extends ChangeNotifier {
 
   late String token;
   late int? profileId;
+
+    // Private Billing List
+  List<Billing> _billings = [];
+
+  // Getter: Get billing list
+  List<Billing> get billings => _billings;
+
+  // Setter: Update billing list
+  set billings(List<Billing> newBillings) {
+    _billings = newBillings;
+    notifyListeners();
+  }
 
   void initAuthDetails(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -43,4 +56,25 @@ class BillingProvider extends ChangeNotifier {
 
     // await response = await apiService.getBillingForRentalAgreement(token: token, rentalAgreementId: );
   }
+
+  // Future<void> fetchBillingDetails(BuildContext context, int billingId) async {
+  //   initAuthDetails(context);
+  //   print("from fetchBillingId(): $billingId");
+  //   print("from fetchBillingId(): $token");
+
+  //   _isLoading = true;
+  //   notifyListeners();
+
+  //   final response = await apiService.getBillingDetails(
+  //     token: token,
+  //     billingId: billingId,
+  //   );
+
+  //   if (response != null && response.success) {
+  //     billings = response.data.billings; // Update using setter
+  //   }
+
+  //   _isLoading = false;
+  //   notifyListeners();
+  // }
 }

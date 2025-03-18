@@ -47,6 +47,7 @@ class Billing {
   final String remainingBalance;
   final DateTime billingMonth;
   final String status;
+  final String? checkoutSessionId;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -60,6 +61,7 @@ class Billing {
     required this.remainingBalance,
     required this.billingMonth,
     required this.status,
+    this.checkoutSessionId,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -74,6 +76,7 @@ class Billing {
         remainingBalance: json["remaining_balance"],
         billingMonth: DateTime.parse(json["billing_month"]),
         status: json["status"],
+        checkoutSessionId: json["checkout_session_id"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
       );
@@ -88,6 +91,7 @@ class Billing {
         "remaining_balance": remainingBalance,
         "billing_month": billingMonth.toIso8601String(),
         "status": status,
+        "checkout_session_id": checkoutSessionId,
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
       };

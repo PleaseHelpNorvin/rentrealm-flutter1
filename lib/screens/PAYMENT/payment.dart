@@ -6,7 +6,8 @@ import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 import '../payment_response_screen/payment_success_screen.dart';
 
 class PaymentScreen extends StatefulWidget {
-  const PaymentScreen({super.key});
+  final int billingId;
+  const PaymentScreen({super.key, required this.billingId});
 
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
@@ -38,7 +39,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   Navigator.pop(context, true); // Payment success
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => PaymentSuccessScreen()),
+                    MaterialPageRoute(builder: (context) => PaymentSuccessScreen(billingId: widget.billingId,)),
                   );
 
                   return NavigationDecision.prevent;

@@ -69,3 +69,34 @@ class PaymongoErrorData {
 
   Map<String, dynamic> toJson() => {'code': code, 'detail': detail};
 }
+
+
+class RetrievePaymongoPaymentResponse {
+  final String paymentId;
+  final String status;
+  final String? referenceNumber;
+
+  RetrievePaymongoPaymentResponse({
+    required this.paymentId,
+    required this.status,
+    this.referenceNumber,
+  });
+
+  // Factory method to create an instance from JSON
+  factory RetrievePaymongoPaymentResponse.fromJson(Map<String, dynamic> json) {
+    return RetrievePaymongoPaymentResponse(
+      paymentId: json['payment_id'] ?? '',
+      status: json['status'] ?? '',
+      referenceNumber: json['reference_number'],
+    );
+  }
+
+  // Convert the instance to JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'payment_id': paymentId,
+      'status': status,
+      'reference_number': referenceNumber,
+    };
+  }
+}

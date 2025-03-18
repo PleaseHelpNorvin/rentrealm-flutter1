@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/billing_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 
 class PaymentSuccessScreen extends StatefulWidget {
-  const PaymentSuccessScreen({super.key});
+  final int billingId;
+
+  const PaymentSuccessScreen({super.key, required this.billingId});
 
   @override
   State<PaymentSuccessScreen> createState() => _PaymentSuccessScreenState();
@@ -9,18 +14,40 @@ class PaymentSuccessScreen extends StatefulWidget {
 
 class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
   @override
+  void initState() {
+    super.initState();
+    
+    // Debugging: Print billingId when screen initializes
+    print("initState: Received billingId = ${widget.billingId}");
+
+    // final billingProvider = Provider.of<BillingProvider>(context, listen: false);
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   print("Fetching billing details for ID: ${widget.billingId}");
+      // await billingProvider.fetchBillingDetails(context, widget.billingId);
+    // });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final billingProvider = Provider.of<BillingProvider>(context, listen: false);
+
+    // Debugging: Print billingId inside build method
+    print("build: widget.billingId = ${widget.billingId}");
+
+    // Prevent crash if billings list is empty
     return Scaffold(
       body: SizedBox(
-        width: double.infinity, // Make sure it takes full width
+        width: double.infinity,
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Center vertically
-            crossAxisAlignment: CrossAxisAlignment.center, // Center horizontally
-            children: const [
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text("Received BillingId: ${widget.billingId}"),
+              // Text("Fetched BillingId: $billingId"),
               Text(
-                "✅", // Large emoji
+                "✅",
                 style: TextStyle(fontSize: 100),
               ),
               SizedBox(height: 20),
@@ -31,7 +58,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
               SizedBox(height: 10),
               Text(
                 "Your payment was processed successfully.",
-                textAlign: TextAlign.center, // Ensure text is centered
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -45,14 +72,19 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
             foregroundColor: Colors.white,
             side: const BorderSide(color: Colors.blue, width: 1),
             shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(3)),
+              borderRadius: BorderRadius.circular(3),
+            ),
           ),
           onPressed: () {
-            Navigator.pushNamed(context, '/'); // Go back to previous screen
+            passBillingIdToRetrievePaymongoDetails(widget.billingId);
           },
-          child: const Text("Go Back"),
+          child: const Text("Go Back"), 
         ),
       ),
     );
   }
+  void passBillingIdToRetrievePaymongoDetails(int billingId) async {
+    Provider.of<PaymentProvider>(context, listen: false).fetchRetrievePayment(context, billingId: billingId);
+  } 
 }
+
