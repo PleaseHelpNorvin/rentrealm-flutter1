@@ -169,28 +169,28 @@ class RegisterScreenState extends State<RegisterScreen> {
                   ),
 
                   const SizedBox(height: 20),
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     Navigator.pushNamed(context, '/login');
-                  //   },
-                  //   child: RichText(
-                  //     text: TextSpan(
-                  //       text: "Already have an account? ",
-                  //       style: const TextStyle(
-                  //         color: Colors.black, // Default text color
-                  //       ),
-                  //       children: <TextSpan>[
-                  //         TextSpan(
-                  //           text: 'Login Here',
-                  //           style: TextStyle(
-                  //             color: Colors.blue,
-                  //             // decoration: TextDecoration.underline, // Corrected underline
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  // ),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/outercreatetenantscreen1');
+                    },
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Already have an account? ",
+                        style: const TextStyle(
+                          color: Colors.black, // Default text color
+                        ),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: 'Login Here',
+                            style: TextStyle(
+                              color: Colors.blue,
+                              // decoration: TextDecoration.underline, // Corrected underline
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),

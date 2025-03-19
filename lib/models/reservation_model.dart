@@ -69,6 +69,22 @@ class ReservationResponse {
       required this.updatedAt,
     });
 
+  factory Reservation.empty() {
+    return Reservation(
+      id: 0,
+      profileId: 0,
+      roomId: 0,
+      reservationCode: '',
+      paymentMethod: '',
+      reservationPaymentProofUrl: [],
+      status: '',
+      approvedBy: null,
+      approvalDate: null,
+      createdAt: '',
+      updatedAt: '',
+    );
+  }
+
   factory Reservation.fromJson(Map<String, dynamic> json) {
     return Reservation(
       id: json['id'],
@@ -103,4 +119,5 @@ class ReservationResponse {
         'updated_at': updatedAt,
       };
     }
+
 }
