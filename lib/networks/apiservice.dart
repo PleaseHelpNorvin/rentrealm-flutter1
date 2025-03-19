@@ -848,6 +848,40 @@ class ApiService {
       return null;
     }
   }
+  Future<RentalAgreementResponse?> getIndexRentalAgreementByProfileId({
+    required String token,
+    required int? profileId,
+  }) async {
+    print("from getIndexRentalAgreement(): token: $token");
+    final uri = Uri.parse("$rest/tenant/rental_agreement/index-profileId/$profileId");
+
+    final headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: headers,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Raw API response: ${response.body}");
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getIndexRentalAgreement(): Call: $responseData");
+        return RentalAgreementResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print("EXCEPTION: $e");
+      return null;
+    }
+  }
+
 
   Future<PickedRoomResponse?> postPickedRoomByUser({
     required int userId,

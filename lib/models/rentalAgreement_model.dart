@@ -15,7 +15,7 @@ class RentalAgreementResponse {
   });
 
   factory RentalAgreementResponse.fromJson(Map<String, dynamic> json) {
-    var data = json['data']['rentalAgreement'];
+    var data = json['data']['rental_agreements'];
 
     List<RentalAgreement> agreements = [];
     if (data is List) {
@@ -37,7 +37,7 @@ class RentalAgreementResponse {
 // Rental Agreement Model
 class RentalAgreement {
   final int id;
-  final int reservationId;
+  final int? reservationId;
   final String rentStartDate;
   final String? rentEndDate;
   final int personCount;
@@ -52,7 +52,7 @@ class RentalAgreement {
 
   RentalAgreement({
     required this.id,
-    required this.reservationId,
+    this.reservationId,
     required this.rentStartDate,
     this.rentEndDate,
     required this.personCount,
@@ -66,28 +66,39 @@ class RentalAgreement {
     required this.reservation,
   });
 
-  factory RentalAgreement.fromJson(Map<String, dynamic> json) {
-    return RentalAgreement(
-      id: json['id'] ?? 0,
-      reservationId: json['reservation_id'] is int
-          ? json['reservation_id']
-          : int.tryParse(json['reservation_id'].toString()) ?? 0,
-      rentStartDate: json['rent_start_date'] ?? '',
-      rentEndDate: json['rent_end_date'], // Nullable, so no default needed
-      personCount: json['person_count'] is int
-          ? json['person_count']
-          : int.tryParse(json['person_count'].toString()) ?? 0,
-      totalAmount: json['total_amount'] is double
-          ? json['total_amount']
-          : double.tryParse(json['total_amount'].toString()) ?? 0.0,
-      description: json['description'] ?? '',
-      signaturePngString: json['signature_png_string'] ?? '',
-      agreementCode: json['agreement_code'] ?? '',
-      status: json['status'] ?? '',
-      createdAt: json['created_at'] ?? '',
-      updatedAt: json['updated_at'] ?? '',
-      reservation: Reservation.fromJson(json['reservation'] ?? {}),
-    );
+ factory RentalAgreement.fromJson(Map<String, dynamic> json) {
+  return RentalAgreement(
+    id: json['id'] ?? 0,
+    reservationId: json['reservation_id'] != null
+        ? (json['reservation_id'] is int
+            ? json['reservation_id']
+            : int.tryParse(json['reservation_id'].toString()) ?? 0)
+        : 0, // Ensure default value
+
+    rentStartDate: json['rent_start_date'] ?? '',
+    rentEndDate: json['rent_end_date']?? '', // This can be null, which is fine
+
+    personCount: json['person_count'] != null
+        ? (json['person_count'] is int
+            ? json['person_count']
+            : int.tryParse(json['person_count'].toString()) ?? 0)
+        : 0, // Ensure default value
+
+    totalAmount: json['total_amount'] != null
+        ? (json['total_amount'] is double
+            ? json['total_amount']
+            : double.tryParse(json['total_amount'].toString()) ?? 0.0)
+        : 0.0, // Ensure default value
+
+    description: json['description'] ?? '',
+    signaturePngString: json['signature_png_string'] ?? '',
+    agreementCode: json['agreement_code'] ?? '',
+    status: json['status'] ?? '',
+    createdAt: json['created_at'] ?? '',
+    updatedAt: json['updated_at'] ?? '',
+reservation: json['reservation'] != null
+    ? Reservation.fromJson(json['reservation'])
+    : Reservation.empty(),    );
   }
 
   Map<String, dynamic> toJson() {

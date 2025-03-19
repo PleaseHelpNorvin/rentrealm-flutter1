@@ -6,9 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 // import 'package:rentealm_flutter/models/inquiry_model.dart';
-import '../models/property_model.dart';
+// import '../models/property_model.dart';
 
-import '../Models/rentalAgreement_model.dart';
+// import '../Models/rentalAgreement_model.dart';
+import '../models/rentalAgreement_model.dart';
 import '../networks/apiservice.dart';
 import 'profile_provider.dart';
 
@@ -21,7 +22,19 @@ class RentalagreementProvider extends ChangeNotifier {
   late String token;
   late int? profileId;
 
-  // List<RentalAgreement> _rentalAgreementData = [];
+
+    // Private List to Store Rental Agreements
+  List<RentalAgreement> _rentalAgreements = [];
+
+  // Getter to access the rental agreements
+  List<RentalAgreement> get rentalAgreements => _rentalAgreements;
+
+  // Setter to update rental agreements and notify listeners
+  void setRentalAgreements(List<RentalAgreement> agreements) {
+    _rentalAgreements = agreements;
+    notifyListeners(); // Notify UI to rebuild
+  }
+
 
   void initAuthDetails(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -91,6 +104,23 @@ class RentalagreementProvider extends ChangeNotifier {
       );
     } else {
       print("Strong rental agreement failed");
+    }
+  }
+
+  Future<void> fetchIndexRentalAgreement(BuildContext context) async {
+    initAuthDetails(context);
+
+    print("from fetchIndexRentalAgreement(): $token");
+    print("from from fetchIndexRentalAgreement(): $profileId");
+
+    final response = await apiService.getIndexRentalAgreementByProfileId(token: token, profileId: profileId);
+    if (response != null && response.success) {
+      print("Fetched ${response.rentalAgreements.length} rental agreements.");
+
+  _rentalAgreements = response.rentalAgreements; 
+
+      // Optionally, notify listeners if you're using Provider to update the UI
+      notifyListeners();
     }
   }
 }
