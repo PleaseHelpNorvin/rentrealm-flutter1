@@ -1167,4 +1167,65 @@ class ApiService {
     }
     return null;
   }
-}
+
+  Future<RentalAgreementPdfUrlResponse?>getRentalAgreementUrl({
+    required String token, 
+    required String agreementCode
+  }) async {
+    print("from getRentalAgreementUrl(): $token");
+    print("from getRentalAgreementUrl(): $agreementCode");
+    final uri = Uri.parse("$rest/tenant/rental_agreement/view-pdf/$agreementCode");
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.get(uri, headers: header);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getRentalAgreementUrl Call: $responseData");
+        return RentalAgreementPdfUrlResponse.fromJson(
+            responseData); // Corrected this line
+      } else if (response.statusCode == 404) {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      
+    }
+  }
+
+
+  Future<RentalAgreementPdfUrlResponse?>getReceiptByProfileId({
+    required String token, 
+    required int? profileId
+  }) async {
+    print("from getReceiptByProfileId(): $token");
+    print("from getReceiptByProfileId(): $profileId");
+    final uri = Uri.parse("$rest/notyet/$profileId");
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.get(uri, headers: header);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getRentalAgreementUrl Call: $responseData");
+        return RentalAgreementPdfUrlResponse.fromJson(
+            responseData); // Corrected this line
+      } else if (response.statusCode == 404) {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      
+    }
+  }
+} 

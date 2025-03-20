@@ -140,5 +140,18 @@ class PaymentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchReceiptsByProfileId(BuildContext context) async {
+    initAuthDetails(context);
+    print("from fetchReceiptsByProfileId(): $profileId");
+    print("from fetchReceiptsByProfileId(): $token");
+
+    _isLoading = true;
+    notifyListeners();
+
+    final response = await apiService.getReceiptByProfileId(token: token, profileId: profileId);
+    
+    _isLoading = false;
+    notifyListeners();
+  }
 }
 

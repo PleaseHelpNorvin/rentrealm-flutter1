@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 import 'package:rentealm_flutter/screens/CONTRACT/contract_details.dart';
-
-// import '../../Models/rentalAgreement_model.dart';
 import '../../PROVIDERS/rentalAgreement_provider.dart';
 import '../../models/rentalAgreement_model.dart';
 
@@ -14,34 +13,66 @@ class ContractScreen extends StatefulWidget {
 }
 
 class _ContractScreenState extends State<ContractScreen> {
-  List<String> contract = [
-    "Welcome to the app!",
-    "Your profile has been updated.",
-    "New message from support."
-  ]; // ✅ Static contract
+  bool isShowingContracts = true; // Toggle between contracts & receipts
 
   @override
   void initState() {
     super.initState();
-    print("contract screen Initialized!");
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final rentalAgreementProvider =
-          Provider.of<RentalagreementProvider>(context, listen: false);
-      rentalAgreementProvider.fetchIndexRentalAgreement(context);
+      Provider.of<RentalagreementProvider>(context, listen: false)
+          .fetchIndexRentalAgreement(context);
+
+          Provider.of<PaymentProvider>(context, listen:  false)
+          .fetchReceiptsByProfileId(context);
     });
   }
 
   Future<void> _refreshData() async {
     await Future.delayed(Duration(seconds: 2)); // Simulate data fetching
-    setState(() {
-      contract = [
-        "New system update available!",
-        "Reminder: Check your tasks"
-      ]; // Simulated new data
-    });
+    setState(() {}); // Refresh UI
   }
 
-  Widget _buildNoDataCard() {
+  Widget _buildToggleButtons() {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildButton("Contracts", true),
+          SizedBox(width: 10),
+          _buildButton("Receipts", false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButton(String text, bool showContracts) {
+    bool isSelected = (isShowingContracts == showContracts);
+    return ElevatedButton(
+      onPressed: () {
+        setState(() {
+          isShowingContracts = showContracts;
+        });
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected ? Colors.blue : Colors.white,
+        foregroundColor: isSelected ? Colors.white : Colors.blue,
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.15,
+          vertical: 5,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(3),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(5),
+        child: Text(text),
+      ),
+    );
+  }
+
+  Widget _buildNoDataCard(String message) {
     return Padding(
       padding: EdgeInsets.all(10),
       child: Center(
@@ -54,7 +85,7 @@ class _ContractScreenState extends State<ContractScreen> {
               Icon(Icons.search_off, size: 50, color: Colors.grey),
               SizedBox(height: 10),
               Text(
-                "No contract found",
+                message,
                 style: TextStyle(fontSize: 18, color: Colors.grey),
               ),
             ],
@@ -64,18 +95,17 @@ class _ContractScreenState extends State<ContractScreen> {
     );
   }
 
-  Widget _buildcontractListCard(RentalAgreement contract) {
+  Widget _buildContractListCard(RentalAgreement contract) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
-          context, 
+          context,
           MaterialPageRoute(
-            builder: (context) => 
-              ContractDetailsScreen(contractCode: contract.agreementCode),
-            )
-        
+            builder: (context) =>
+                ContractDetailsScreen(contractCode: contract.agreementCode),
+          ),
         );
-      },  
+      },
       child: Card(
         elevation: 1,
         shape: RoundedRectangleBorder(
@@ -86,11 +116,25 @@ class _ContractScreenState extends State<ContractScreen> {
         child: ListTile(
           leading: Icon(Icons.list, color: Colors.blue),
           title: Text(contract.agreementCode ?? "No Title",
-              style: TextStyle(fontSize: 16)), // Assuming `title` exists
-          // subtitle: Text(contract.description ??
-          //     "No Description"), // Assuming `description` exists
+              style: TextStyle(fontSize: 16)),
           trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
         ),
+      ),
+    );
+  }
+
+  Widget _buildReceiptListCard(String receipt) {
+    return Card(
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        side: BorderSide(color: Colors.green, width: 3),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+      child: ListTile(
+        leading: Icon(Icons.receipt_long, color: Colors.green),
+        title: Text(receipt, style: TextStyle(fontSize: 16)),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
       ),
     );
   }
@@ -102,27 +146,35 @@ class _ContractScreenState extends State<ContractScreen> {
         onRefresh: _refreshData,
         child: Column(
           children: [
+            _buildToggleButtons(), // ✅ Buttons for switching
             Expanded(
               child: Padding(
                 padding:
                     EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
                 child: Consumer<RentalagreementProvider>(
-                  // ✅ Correct: Using the Provider
                   builder: (context, rentalAgreementProvider, child) {
-                    final contracts = rentalAgreementProvider
-                        .rentalAgreements; // Get the list from provider
+                    final contracts = rentalAgreementProvider.rentalAgreements;
+                    final receipts = ["Receipt #001", "Receipt #002"];
 
-                    if (contracts.isEmpty) {
-                      return _buildNoDataCard();
+                    if (isShowingContracts) {
+                      return contracts.isEmpty
+                          ? _buildNoDataCard("No contracts found")
+                          : ListView.builder(
+                              itemCount: contracts.length,
+                              itemBuilder: (context, index) {
+                                return _buildContractListCard(contracts[index]);
+                              },
+                            );
+                    } else {
+                      return receipts.isEmpty
+                          ? _buildNoDataCard("No receipts found")
+                          : ListView.builder(
+                              itemCount: receipts.length,
+                              itemBuilder: (context, index) {
+                                return _buildReceiptListCard(receipts[index]);
+                              },
+                            );
                     }
-
-                    return ListView.builder(
-                      itemCount: contracts.length,
-                      itemBuilder: (context, index) {
-                        return _buildcontractListCard(
-                            contracts[index]); // ✅ Using card widget
-                      },
-                    );
                   },
                 ),
               ),
