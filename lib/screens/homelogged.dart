@@ -77,9 +77,9 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
             switch (settings.name) {
               case '/':
                 if (_currentIndex == 0) {
-                  page = const ContractScreen();
+                  page =  ContractScreen();
                 } else if (_currentIndex == 1) {
-                  page = const RentScreen();
+                  page =  RentScreen();
                 } else if (_currentIndex == 2) {
                   page = const HomeScreen();
                 } else if (_currentIndex == 3) {
@@ -108,9 +108,9 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
                 break;
               default:
                 if (_currentIndex == 0) {
-                  page = const ContractScreen();
+                  page =  ContractScreen();
                 } else if (_currentIndex == 1) {
-                  page = const RentScreen();
+                  page =  RentScreen();
                 } else if (_currentIndex == 2) {
                   page = const HomeScreen();
                 } else if (_currentIndex == 3) {

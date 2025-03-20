@@ -55,6 +55,7 @@ dependencies:
   webview_flutter_android: ^4.3.2
   webview_flutter_wkwebview: ^3.18.4
   app_links: ^6.4.0
+  flutter_pdfview: ^1.4.0
   
 dev_dependencies:
   flutter_test:

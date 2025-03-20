@@ -119,3 +119,35 @@ reservation: json['reservation'] != null
     };
   }
 }
+
+class RentalAgreementPdfUrlResponse {
+  final bool success;
+  final String message;
+  final PdfUrl data;
+
+  RentalAgreementPdfUrlResponse({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  factory RentalAgreementPdfUrlResponse.fromJson(Map<String, dynamic> json) {
+    return RentalAgreementPdfUrlResponse(
+      success: json['success'],
+      message: json['message'],
+      data: PdfUrl.fromJson(json['data']),
+    );
+  }
+}
+
+class PdfUrl {
+  final String pdfUrl;
+
+  PdfUrl({required this.pdfUrl});
+
+  factory PdfUrl.fromJson(Map<String, dynamic> json) {
+    return PdfUrl(
+      pdfUrl: json['pdf_url'],
+    );
+  }
+}

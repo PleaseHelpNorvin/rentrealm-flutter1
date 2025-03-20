@@ -35,6 +35,16 @@ class RentalagreementProvider extends ChangeNotifier {
     notifyListeners(); // Notify UI to rebuild
   }
 
+  String? _pdfUrl;
+
+  String? get pdfUrl => _pdfUrl;
+
+  void _setPdfUrl(String url) {
+    _pdfUrl = url;
+    notifyListeners();
+  }
+
+  
 
   void initAuthDetails(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -118,9 +128,23 @@ class RentalagreementProvider extends ChangeNotifier {
       print("Fetched ${response.rentalAgreements.length} rental agreements.");
 
   _rentalAgreements = response.rentalAgreements; 
-
-      // Optionally, notify listeners if you're using Provider to update the UI
       notifyListeners();
     }
+  }
+
+  Future<void>fetchRentalAgreementUrl(BuildContext context, String agreementCode) async {
+    initAuthDetails(context);
+    print("from fetchIndexRentalAgreement(): $token");
+    print("from from fetchIndexRentalAgreement(): $agreementCode");
+
+    final response = await apiService.getRentalAgreementUrl(token: token, agreementCode: agreementCode);
+
+    if (response != null && response.success) {
+      _setPdfUrl(response.data.pdfUrl); // Update private field using setter
+      print("PDF URL fetched: $_pdfUrl");
+    }  else {
+      print("Failed to fetch PDF URL");
+    }
+    
   }
 }
