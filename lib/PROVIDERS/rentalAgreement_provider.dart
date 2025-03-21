@@ -65,6 +65,7 @@ class RentalagreementProvider extends ChangeNotifier {
     double totalPrice,
     String? description,
     String paymentDescription,
+    bool isAdvancePaymentChecked,
   ) async {
     initAuthDetails(context);
     print("from storeRentalAgreement()");
@@ -78,6 +79,7 @@ class RentalagreementProvider extends ChangeNotifier {
     print("reservationId: $totalPrice");
     print("reservationId: $description");
     print("reservationId: $reservationId");
+    print("reservationId: $isAdvancePaymentChecked");
 
     if (token == 'no token' || profileId == null) {
       print("Error: Missing authentication details");
@@ -92,7 +94,9 @@ class RentalagreementProvider extends ChangeNotifier {
       personCount: persons,
       totalMonthlyDue: totalPrice,
       description: description,
+      isAdvancePaymentChecked: isAdvancePaymentChecked,
       svgSignatureString: signaturePngString, // Send the File object here
+
     );
 
     if (response != null && response.success) {
@@ -110,10 +114,10 @@ class RentalagreementProvider extends ChangeNotifier {
         startDate,
         persons,
         totalPrice,
-        paymentDescription,
+        paymentDescription
       );
     } else {
-      print("Strong rental agreement failed");
+      print("Store rental agreement failed");
     }
   }
 

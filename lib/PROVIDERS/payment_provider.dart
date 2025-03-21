@@ -11,6 +11,7 @@ import 'package:rentealm_flutter/networks/apiservice.dart';
 import 'package:rentealm_flutter/screens/PAYMENT/payment.dart';
 
 import '../models/billing_model.dart';
+import '../models/payment_model.dart';
 import '../models/paymongo_model.dart';
 
 class PaymentProvider extends ChangeNotifier {
@@ -53,6 +54,20 @@ class PaymentProvider extends ChangeNotifier {
     notifyListeners();  // Notify UI about the update
   }
 
+    ReceiptsResponse ? _receiptResponse;
+    ReceiptsResponse ? get receiptResponse => _receiptResponse;
+
+    set receiptResponse(ReceiptsResponse ? newReceiptResponse) {
+      _receiptResponse = newReceiptResponse;
+      notifyListeners();
+    }
+
+    List<Receipt> _receipts = [];
+    List<Receipt> get receipts => _receipts;
+    set receipts(List<Receipt> newReceipts) { // Setter
+      _receipts = newReceipts;
+      notifyListeners();
+    }
 
   /// ✅ Initialize token and profileId (Call this in the beginning)
   void initAuthDetails(BuildContext context) {
@@ -88,9 +103,8 @@ class PaymentProvider extends ChangeNotifier {
     print("persons: $persons");
     print("rentalagreementId: $rentalagreementId");
     // print("signatureStringSvg.path: ${signatureStringSvg.path}");
-    print("persons: $persons");
+    // print("persons: $persons");
     print("totalPrice: $totalPrice");
-
     if (token == 'no token' || profileId == null) {
       print("Error: Missing authentication details");
       return;
@@ -150,6 +164,10 @@ class PaymentProvider extends ChangeNotifier {
 
     final response = await apiService.getReceiptByProfileId(token: token, profileId: profileId);
     
+    if (response != null && response.success) {
+      _receipts = response.receipts;
+      notifyListeners(); 
+    }
     _isLoading = false;
     notifyListeners();
   }

@@ -210,7 +210,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         widget.signaturePngString,
         totalPrice,
         _additionalPersonDescController.text,
-        _paymentDescription);
+        _paymentDescription,
+        _isDepositChecked);
   }
 
   @override
