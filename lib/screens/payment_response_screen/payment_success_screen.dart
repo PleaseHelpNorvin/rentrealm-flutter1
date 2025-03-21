@@ -32,7 +32,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
     final billingProvider = Provider.of<BillingProvider>(context, listen: false);
 
     // Debugging: Print billingId inside build method
-    print("build: widget.billingId = ${widget.billingId}");
+    // print("build: widget.billingId = ${widget.billingId}");
 
     // Prevent crash if billings list is empty
     return Scaffold(

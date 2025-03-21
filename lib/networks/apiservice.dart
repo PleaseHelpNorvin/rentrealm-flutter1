@@ -15,6 +15,7 @@ import '../MODELS/profile_model.dart';
 import '../MODELS/user_model.dart';
 import '../models/billing_model.dart';
 import '../models/notification_model.dart';
+import '../models/payment_model.dart';
 import '../models/paymongo_model.dart';
 import '../models/pickedRoom_model.dart';
 
@@ -800,6 +801,7 @@ class ApiService {
     required int personCount,
     required double totalMonthlyDue,
     required String? description,
+    required bool? isAdvancePaymentChecked,
     required File svgSignatureString, // Now a File object
   }) async {
     final uri = Uri.parse('$rest/tenant/rental_agreement/store');
@@ -812,6 +814,7 @@ class ApiService {
       request.fields['rent_start_date'] = rentStartDate;
       request.fields['person_count'] = personCount.toString();
       request.fields['total_amount'] = totalMonthlyDue.toString();
+      request.fields['is_advance_payment'] = isAdvancePaymentChecked == true ? '1' : '0';
       if (description != null) {
         request.fields['description'] = description;
       }
@@ -848,6 +851,7 @@ class ApiService {
       return null;
     }
   }
+
   Future<RentalAgreementResponse?> getIndexRentalAgreementByProfileId({
     required String token,
     required int? profileId,
@@ -1194,18 +1198,19 @@ class ApiService {
         return null;
       }
     } catch (e) {
-      
+      print("EXCEPTION: $e");
+      return null;
     }
   }
 
 
-  Future<RentalAgreementPdfUrlResponse?>getReceiptByProfileId({
+  Future<ReceiptsResponse ?>getReceiptByProfileId({
     required String token, 
     required int? profileId
   }) async {
     print("from getReceiptByProfileId(): $token");
     print("from getReceiptByProfileId(): $profileId");
-    final uri = Uri.parse("$rest/notyet/$profileId");
+    final uri = Uri.parse("$rest/tenant/payment/retrieve-receipt/$profileId");
     final header = {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -1218,14 +1223,16 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getRentalAgreementUrl Call: $responseData");
-        return RentalAgreementPdfUrlResponse.fromJson(
+        return ReceiptsResponse .fromJson(
             responseData); // Corrected this line
       } else if (response.statusCode == 404) {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
       }
     } catch (e) {
-      
+      print("EXCEPTION: $e");
+      return null;
     }
   }
+
 } 

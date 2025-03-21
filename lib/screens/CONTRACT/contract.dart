@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
+import 'package:rentealm_flutter/models/payment_model.dart';
 import 'package:rentealm_flutter/screens/CONTRACT/contract_details.dart';
+import 'package:rentealm_flutter/screens/CONTRACT/receipt_details.dart';
 import '../../PROVIDERS/rentalAgreement_provider.dart';
 import '../../models/rentalAgreement_model.dart';
 
@@ -123,18 +125,29 @@ class _ContractScreenState extends State<ContractScreen> {
     );
   }
 
-  Widget _buildReceiptListCard(String receipt) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: Colors.green, width: 3),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: ListTile(
-        leading: Icon(Icons.receipt_long, color: Colors.green),
-        title: Text(receipt, style: TextStyle(fontSize: 16)),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+  Widget _buildReceiptListCard(Receipt receipt) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => 
+            ReceiptDetailsScreen(paymongoPaymentReference: receipt.paymongoPaymentReference, receiptUrl: receipt.receiptUrl,)
+          ),
+        );
+      },
+      child: Card(
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.green, width: 3),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        child: ListTile(
+          leading: Icon(Icons.receipt_long, color: Colors.green),
+          title: Text(receipt.paymongoPaymentReference, style: TextStyle(fontSize: 16)),
+          trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        ),
       ),
     );
   }
@@ -149,22 +162,26 @@ class _ContractScreenState extends State<ContractScreen> {
             _buildToggleButtons(), // ✅ Buttons for switching
             Expanded(
               child: Padding(
-                padding:
-                    EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
-                child: Consumer<RentalagreementProvider>(
-                  builder: (context, rentalAgreementProvider, child) {
-                    final contracts = rentalAgreementProvider.rentalAgreements;
-                    final receipts = ["Receipt #001", "Receipt #002"];
+                padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
+                child: Consumer<PaymentProvider>(
+                  builder: (context, paymentProvider, child) {
+                    final receipts = paymentProvider.receipts; // ✅ Get receipts from provider
 
                     if (isShowingContracts) {
-                      return contracts.isEmpty
-                          ? _buildNoDataCard("No contracts found")
-                          : ListView.builder(
-                              itemCount: contracts.length,
-                              itemBuilder: (context, index) {
-                                return _buildContractListCard(contracts[index]);
-                              },
-                            );
+                      return Consumer<RentalagreementProvider>(
+                        builder: (context, rentalAgreementProvider, child) {
+                          final contracts = rentalAgreementProvider.rentalAgreements;
+
+                          return contracts.isEmpty
+                              ? _buildNoDataCard("No contracts found")
+                              : ListView.builder(
+                                  itemCount: contracts.length,
+                                  itemBuilder: (context, index) {
+                                    return _buildContractListCard(contracts[index]);
+                                  },
+                                );
+                        },
+                      );
                     } else {
                       return receipts.isEmpty
                           ? _buildNoDataCard("No receipts found")
@@ -179,6 +196,7 @@ class _ContractScreenState extends State<ContractScreen> {
                 ),
               ),
             ),
+
           ],
         ),
       ),
