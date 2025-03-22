@@ -32,8 +32,7 @@ class _PropertyMapScreenState extends State<PropertyMapScreen> {
       body: FlutterMap(
         options: MapOptions(
           // initialCenter: LatLng(widget.lat, widget.long), // ✅ uncomment for dynamic use
-          initialCenter:
-              LatLng(staticLat, staticLong), //comment for dynamic use
+          initialCenter: LatLng(staticLat, staticLong),
           initialZoom: 15.0,
         ),
         children: [
