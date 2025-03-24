@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
 import 'package:rentealm_flutter/SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
 import 'package:rentealm_flutter/models/profile_model.dart';
 import '../../PROVIDERS/pickedRoom_provider.dart';
@@ -64,9 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-        child: Consumer2<ProfileProvider, PickedRoomProvider>(
-          builder: (context, profileProvider, pickedRoomProvider, child) {
+        child: Consumer3<ProfileProvider, PickedRoomProvider, TenantProvider>(
+          builder: (context, profileProvider, pickedRoomProvider, tenantProvider,child) {
             final singlePickedRoom = pickedRoomProvider.singlePickedRoom;
+            // final tenantProvider = tenantProvider.;
 
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -81,16 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildWithTenantData() {
-    return Expanded(
-      child: Column(
-        children: [
-          Text("THIS IS TENANT DATA"),
-        ],
       ),
     );
   }
@@ -194,6 +186,29 @@ class _HomeScreenState extends State<HomeScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16),
                 ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildShowMonthlyCountdownDashboard() {
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("Congrats! your monthly billing starts now!")
               ],
             ),
           ),

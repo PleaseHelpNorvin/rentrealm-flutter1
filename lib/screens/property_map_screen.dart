@@ -24,10 +24,22 @@ class _PropertyMapScreenState extends State<PropertyMapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Apartment-${widget.propertyName}'s Location"),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.blue, // Same as AppBar background
+            border: Border(
+              bottom: BorderSide(color: Colors.blue.shade900, width: 3), // Blue border at the bottom
+            ),
+          ),
+          child: AppBar(
+            title: Text("Apartment-${widget.propertyName}'s Location"),
+            backgroundColor: Colors.transparent, // Make AppBar background transparent
+            foregroundColor: Colors.white,
+            elevation: 0, // Remove AppBar shadow
+          ),
+        ),
       ),
       body: FlutterMap(
         options: MapOptions(
