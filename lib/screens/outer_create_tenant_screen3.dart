@@ -42,16 +42,16 @@ class _OuterCreateTenantScreen3State extends State<OuterCreateTenantScreen3> {
   void initState() {
     super.initState();
     startTimer();
-Future.microtask(() async {
-    final roomProvider = Provider.of<RoomProvider>(context, listen: false);
-    await roomProvider.fetchRoomById(context, widget.roomId);
-    
-    if (mounted) {
-      setState(() {
-        imagePaths = List<String>.from(roomProvider.singleRoom?.roomPictureUrls ?? []);
-      });
-    }
-  });
+    Future.microtask(() async {
+      final roomProvider = Provider.of<RoomProvider>(context, listen: false);
+      await roomProvider.fetchRoomById(context, widget.roomId);
+      
+      if (mounted) {
+        setState(() {
+          imagePaths = List<String>.from(roomProvider.singleRoom?.roomPictureUrls ?? []);
+        });
+      }
+    });
   }
 
 
