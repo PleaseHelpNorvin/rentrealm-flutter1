@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../MODELS/tenant_model.dart';
-// import '../CUSTOMS/alert_utils.dart';
+// import '../MODELS/tenant_model.dart';
+import '../models/tenant_model.dart';
 import '../networks/apiservice.dart';
 import 'auth_provider.dart';
 import 'profile_provider.dart';
@@ -11,19 +11,35 @@ class TenantProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  TenantResponse? _tenant; // Nullable type here
-  TenantResponse? get tenant => _tenant;
+  TenantResponse? _tenant;
+  TenantBilling? _latestBilling;  // Updated to match the actual model name
+  List<TenantMaintenanceRequest> _maintenanceRequests = []; // Updated type
+  String? _nextBillingMonth;
+  RentalAgreement? _rentalAgreement;
 
+  // Getters
+  TenantResponse? get tenant => _tenant;
+  TenantBilling? get latestBilling => _latestBilling;
+  List<TenantMaintenanceRequest> get maintenanceRequests => _maintenanceRequests;
+  String? get nextBillingMonth => _nextBillingMonth;
+  RentalAgreement? get rentalAgreement => _rentalAgreement;
+
+  // Setters
   void setTenant(TenantResponse? tenant) {
-    // Nullable type here
     _tenant = tenant;
+    if (tenant != null) {
+      _latestBilling = tenant.data.latestBilling;
+      _maintenanceRequests = tenant.data.tenantMaintenanceRequest; // Fixed
+      _nextBillingMonth = tenant.data.nextBillingMonth;
+      _rentalAgreement = tenant.data.tenant.rentalAgreement;
+      print("setTenant() reached!");
+    }
     notifyListeners();
   }
 
   Future<void> fetchTenant(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final profileProvider =
-        Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
     int? profileId = profileProvider.userProfile?.data.id;
     String? token = authProvider.token;
 
@@ -31,27 +47,26 @@ class TenantProvider extends ChangeNotifier {
       print("fetchTenant(): profileId: $profileId");
       print("fetchTenant(): token: $token");
 
-      try {
-      // _isLoading = true;
-      // notifyListeners(); 
-      final response = await apiService.getTenantByProfileId(profileId: profileId, token: token);
-      if (response != null && response.success) {
-        print("responseData from getTenant Call: ${response.data.latestBilling.}");
-        print("responseData from getTenant Call: ${response.data.maintenanceRequests}");
-        print("responseData from getTenant Call: ${response.data.nextBillingMonth}");
-        print("responseData from getTenant Call: ${response.data.tenant}");
-      }
+      _isLoading = true;
+      notifyListeners();
 
+      try {
+        final response = await apiService.getTenantByProfileId(profileId: profileId, token: token);
+        if (response != null && response.success) {
+          print("responseData from fetchTenant Call: ${response.data.latestBilling?.billingMonth}");
+          print("responseData from fetchTenant Call: ${response.data.tenantMaintenanceRequest.first.description}"); // Fixed
+          print("responseData from fetchTenant Call: ${response.data.nextBillingMonth}");
+          print("responseData from fetchTenant Call: ${response.data.tenant.rentalAgreement.agreementCode}");
+          setTenant(response);
+        }
       } catch (e) {
         print("EXCEPTION: $e");
+      } finally {
+        _isLoading = false;
+        notifyListeners();
       }
-
-      
-
-
-
-      
     }
   }
 
+  
 }

@@ -969,27 +969,27 @@ class ApiService {
     }
   }
 
-  Future<ReservationResponse?> getReservations({required String token}) async {
-    final uri = Uri.parse('$rest/tenant/reservation/index');
+  // Future<ReservationResponse?> getReservations({required String token}) async {
+  //   final uri = Uri.parse('$rest/tenant/reservation/index');
 
-    final headers = {
-      "Content-Type": "application/json",
-      "Accept": "application/json",
-      "Authorization": "Bearer $token",
-    };
+  //   final headers = {
+  //     "Content-Type": "application/json",
+  //     "Accept": "application/json",
+  //     "Authorization": "Bearer $token",
+  //   };
 
-    final response = await http.get(uri, headers: headers);
+  //   final response = await http.get(uri, headers: headers);
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      print("Raw API response: ${response.body}");
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
-      print("responseData from getReservations() Call: $responseData");
-      return ReservationResponse.fromJson(responseData);
-    } else {
-      print('Error: ${response.statusCode} - ${response.body}');
-      return null;
-    }
-  }
+  //   if (response.statusCode == 200 || response.statusCode == 201) {
+  //     print("Raw API response: ${response.body}");
+  //     final Map<String, dynamic> responseData = jsonDecode(response.body);
+  //     print("responseData from getReservations() Call: $responseData");
+  //     return ReservationResponse.fromJson(responseData);
+  //   } else {
+  //     print('Error: ${response.statusCode} - ${response.body}');
+  //     return null;
+  //   }
+  // }
 
   Future<PickedRoomResponse?> deletePickedRoomById({
     required int pickedRoomId,
@@ -1198,6 +1198,42 @@ class ApiService {
       print("EXCEPTION: $e");
       return null;
     }
+  }
+
+  Future<ReservationResponse?>getReservationsByProfileId({
+    required int? profileId,
+    required String token
+  }) async {
+    print("from getReservationsByProfileId() ProfileId: $profileId");
+    print("from getReservationsByProfileId() token: $token");
+    final uri = Uri.parse('$rest/tenant/reservation/indexByProfileId/$profileId');
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: header
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from getTenant Call: $responseData");
+        return ReservationResponse.fromJson(responseData); // Corrected this line
+      } else if (response.statusCode == 404) {
+        print('Error: ${response.statusCode} - ${response.body}');
+        print('navigating to create tenant screen');
+        return null;
+      }
+
+    } catch (e) {
+      print("EXCEPTION: $e");
+      return null;
+    }
+    return null;
   }
 
   

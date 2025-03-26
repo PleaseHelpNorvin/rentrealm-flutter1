@@ -21,7 +21,7 @@ class ReservationProvider extends ChangeNotifier {
   // List of reservations
   List<Reservation>? _reservationList;
   List<Reservation>? get reservationList => _reservationList;
-
+  // Setter for reservationList
   set reservationList(List<Reservation>? reservations) {
     _reservationList = reservations;
     notifyListeners(); // Notify UI when list changes
@@ -98,11 +98,12 @@ class ReservationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchReservations() async {
+  Future<void> fetchReservations(context) async {
+    initAuthDetails(context);
     _isLoading = true;
     notifyListeners();
 
-    final response = await apiService.getReservations(token: token);
+    final response = await apiService.getReservationsByProfileId(token: token, profileId: profileId);
 
     _isLoading = false;
 
@@ -115,7 +116,9 @@ class ReservationProvider extends ChangeNotifier {
       print("Failed to fetch reservations");
     }
   }
-  // showReservation
+
+
+
 Future<void> fetchReservationById(BuildContext context, int reservationId) async {
    _isLoading = true;
   notifyListeners();
