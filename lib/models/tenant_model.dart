@@ -20,26 +20,26 @@ class TenantResponse {
 
 class TenantData {
   final Tenant tenant;
-  final Billing? latestBilling;
+  final TenantBilling? latestBilling;
   final String? nextBillingMonth;
-  final List<MaintenanceRequest> maintenanceRequests;
+  final List<TenantMaintenanceRequest> tenantMaintenanceRequest;
 
   TenantData({
     required this.tenant,
     this.latestBilling,
     this.nextBillingMonth,
-    required this.maintenanceRequests,
+    required this.tenantMaintenanceRequest,
   });
 
   factory TenantData.fromJson(Map<String, dynamic> json) {
     return TenantData(
       tenant: Tenant.fromJson(json['tenant']),
       latestBilling: json['latest_billing'] != null
-          ? Billing.fromJson(json['latest_billing'])
+          ? TenantBilling.fromJson(json['latest_billing'])
           : null,
       nextBillingMonth: json['next_billing_month'],
-      maintenanceRequests: (json['maintenance_requests'] as List<dynamic>?)
-              ?.map((e) => MaintenanceRequest.fromJson(e))
+      tenantMaintenanceRequest: (json['maintenance_requests'] as List<dynamic>?)
+              ?.map((e) => TenantMaintenanceRequest.fromJson(e))
               .toList() ??
           [],
     );
@@ -187,14 +187,14 @@ class UserProfile {
   }
 }
 
-class Billing {
+class TenantBilling {
   final String billingMonth;
   final String status;
   final String totalAmount;
   final String amountPaid;
   final String remainingBalance;
 
-  Billing({
+  TenantBilling({
     required this.billingMonth,
     required this.status,
     required this.totalAmount,
@@ -202,8 +202,8 @@ class Billing {
     required this.remainingBalance,
   });
 
-  factory Billing.fromJson(Map<String, dynamic> json) {
-    return Billing(
+  factory TenantBilling.fromJson(Map<String, dynamic> json) {
+    return TenantBilling(
       billingMonth: json['billing_month'],
       status: json['status'],
       totalAmount: json['total_amount'],
@@ -213,14 +213,14 @@ class Billing {
   }
 }
 
-class MaintenanceRequest {
+class TenantMaintenanceRequest {
   final int id;
   final String requestType;
   final String description;
   final String status;
   final String requestedAt;
 
-  MaintenanceRequest({
+  TenantMaintenanceRequest({
     required this.id,
     required this.requestType,
     required this.description,
@@ -228,8 +228,8 @@ class MaintenanceRequest {
     required this.requestedAt,
   });
 
-  factory MaintenanceRequest.fromJson(Map<String, dynamic> json) {
-    return MaintenanceRequest(
+  factory TenantMaintenanceRequest.fromJson(Map<String, dynamic> json) {
+    return TenantMaintenanceRequest(
       id: json['id'],
       requestType: json['request_type'],
       description: json['description'],

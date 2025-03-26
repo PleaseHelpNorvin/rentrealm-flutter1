@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/reservation_provider.dart';
 import 'package:rentealm_flutter/screens/RENT/inner_create_tenant_screen1.dart';
+import 'package:rentealm_flutter/screens/RENT/reservation_details.dart';
 
 import '../../PROVIDERS/property_provider.dart';
 import '../../models/property_model.dart';
+import '../../models/reservation_model.dart';
 import '../property_map_screen.dart';
 
 class RentScreen extends StatefulWidget {
@@ -28,15 +31,16 @@ class _RentScreenState extends State<RentScreen> {
     super.initState();
       Future.microtask(() {
         Provider.of<PropertyProvider>(context, listen: false).fetchProperties(context);
+        Provider.of<ReservationProvider>(context, listen: false).fetchReservations(context);
       });
   }
   
-  List<String> reservations = [
-    "Reservation 1",
-    "Reservation 2",
-    "Reservation 3",
-    "Reservation 4",
-  ];
+  // List<String> reservations = [
+  //   "Reservation 1",
+  //   "Reservation 2",
+  //   "Reservation 3",
+  //   "Reservation 4",
+  // ];
 
   Future<void> _refreshData() async {
     await Provider.of<PropertyProvider>(context, listen: false).fetchProperties(context);
@@ -366,34 +370,58 @@ class _RentScreenState extends State<RentScreen> {
   }
 
 
-  Widget _buildReservationList() {
-  if (reservations.isEmpty) {
-    return _buildNoDataCard();
-  }
+Widget _buildReservationList() {
+  return Consumer<ReservationProvider>(
+    builder: (context, reservationProvider, child) {
+      final reservations = reservationProvider.reservationList; // Get reservations
 
-  return ListView.builder(
-    itemCount: reservations.length,
-    itemBuilder: (context, index) {
-      return _buildReservationCard(reservations[index]);
+      if (reservations!.isEmpty) {
+        return _buildNoDataCard();
+      }
+
+      return ListView.builder(
+        itemCount: reservations.length,
+        itemBuilder: (context, index) {
+          return _buildReservationCard(reservations[index]); // Adjust based on your data structure
+        },
+      );
     },
   );
 }
 
-  Widget _buildReservationCard(String text) {
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(color: Colors.blue, width: 3),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      child: ListTile(
-        leading: Icon(Icons.home, color: Colors.blue),
-        title: Text(text, style: TextStyle(fontSize: 16)),
-        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+
+  Widget _buildReservationCard(Reservation reservation) {
+    return GestureDetector(
+      onTap: () {
+        print('Reservation tapped: ${reservation.reservationCode}');
+        // Example: Navigate to reservation details
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ReservationDetails(reservationId: reservation.id),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 1,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(color: Colors.blue, width: 3),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        child: ListTile(
+          leading: Icon(Icons.home, color: Colors.blue),
+          title: Text(
+            'Reservation Code: ${reservation.reservationCode}',
+            style: TextStyle(fontSize: 16),
+          ),
+          subtitle: Text('Status: ${reservation.status}'),
+          trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        ),
       ),
     );
   }
+
 
 
 

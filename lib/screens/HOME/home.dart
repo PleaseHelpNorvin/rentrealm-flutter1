@@ -5,7 +5,11 @@ import 'package:rentealm_flutter/SCREENS/PROFILE/CREATE/create_profile_screen1.d
 import 'package:rentealm_flutter/models/profile_model.dart';
 import '../../PROVIDERS/pickedRoom_provider.dart';
 import '../../PROVIDERS/profile_provider.dart';
+import '../../models/tenant_model.dart';
 import '../outer_create_tenant_screen4.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -72,25 +76,31 @@ class _HomeScreenState extends State<HomeScreen> {
           _profileCheckFuture =
               Provider.of<ProfileProvider>(context, listen: false)
                   .loadUserProfile(context);
-          
         });
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
         child: Consumer3<ProfileProvider, PickedRoomProvider, TenantProvider>(
-          builder: (context, profileProvider, pickedRoomProvider, tenantProvider,child) {
+          builder:
+              (context, profileProvider, pickedRoomProvider, tenantProvider, child) {
             final singlePickedRoom = pickedRoomProvider.singlePickedRoom;
-            // final tenantProvider = tenantProvider.;
+            final tenant = tenantProvider.tenant;
 
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
+                // ✅ Now both widgets are inside the `if` condition
+                if (tenant != null) ...[
+                  _buildShowMonthlyCountdownDashboard(tenant),
+                  _buildShowMaintenanceRequestsList(tenant),
+                ] else ...[
                   if (singlePickedRoom != null)
                     _buildContinueReservationPayment(
                         context, profileProvider, singlePickedRoom),
                   if (singlePickedRoom == null) _buildShowReservationSent(),
                 ],
+              ],
               ),
             );
           },
@@ -163,6 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+  
 
   Widget _buildShowReservationSent() {
     return SizedBox(
@@ -206,7 +217,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildShowMonthlyCountdownDashboard() {
+  Widget _buildShowMonthlyCountdownDashboard(TenantResponse? tenantResponse) {
+    if (tenantResponse == null) return SizedBox(); // Handle null tenant gracefully
+
+    final tenant = tenantResponse.data.tenant;
+    final latestBilling = tenantResponse.data.latestBilling;
+    final nextBillingMonth = tenantResponse.data.nextBillingMonth;
+
     return SizedBox(
       width: double.infinity,
       child: Card(
@@ -220,12 +237,239 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("Congrats! your monthly billing starts now!")
+                const Text(
+                  "Dashboard",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Rental Agreement Code: ${tenant.rentalAgreement.agreementCode}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Billing Status: ${latestBilling?.status ?? 'Not available'}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Next Billing Month: ${nextBillingMonth ?? 'No due date'}",
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16),
+                ),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildShowMaintenanceRequestsList(TenantResponse? tenantResponse) {
+  if (tenantResponse == null) return SizedBox();
+
+  final maintenanceRequests = tenantResponse.data.tenantMaintenanceRequest;
+
+  return SizedBox(
+    width: double.infinity,
+    child: Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title and Button in a Column (button below the title)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Maintenance Requests",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    _showAddMaintenanceRequestDialog(context);
+                  },
+                  icon: Icon(Icons.add),
+                  label: Text("Add Request"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+
+            // Show maintenance requests
+            if (maintenanceRequests.isEmpty)
+              Center(
+                child: Text(
+                  "No maintenance requests found.",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black54),
+                ),
+              )
+            else
+              SizedBox(
+                height: 300, // Prevents overflow
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: BouncingScrollPhysics(),
+                  itemCount: maintenanceRequests.length,
+                  itemBuilder: (context, index) {
+                    final request = maintenanceRequests[index];
+                    return Card(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+                      margin: EdgeInsets.symmetric(vertical: 5),
+                      child: ListTile(
+                        title: Text(
+                          "Issue: ${request.description}",
+                          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Status: ${request.status}", style: TextStyle(color: Colors.black87)),
+                            Text("Requested On: ${request.requestedAt}", style: TextStyle(color: Colors.black54)),
+                          ],
+                        ),
+                        leading: Icon(Icons.build, color: Colors.blue),
+                        trailing: Icon(
+                          request.status == "Completed" ? Icons.check_circle : Icons.pending,
+                          color: request.status == "Completed" ? Colors.green : Colors.red,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
+  // Function to show Add Maintenance Request dialog
+
+  void _showAddMaintenanceRequestDialog(BuildContext context) {
+    TextEditingController _descriptionController = TextEditingController();
+    File? _selectedImage; // Store selected image
+
+    void _pickImage() async {
+      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+      if (pickedFile != null) {
+        _selectedImage = File(pickedFile.path);
+      }
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+      ),
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              ),
+              child: Wrap(
+                children: [
+                  // Title
+                  Center(
+                    child: Text(
+                      "Add Maintenance Request",
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Description Input Field
+                  TextField(
+                    controller: _descriptionController,
+                    decoration: InputDecoration(
+                      labelText: "Describe the issue",
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    maxLines: 3,
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Image Picker Button
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                      if (pickedFile != null) {
+                        setState(() {
+                          _selectedImage = File(pickedFile.path);
+                        });
+                      }
+                    },
+                    icon: Icon(Icons.photo),
+                    label: Text("Add Photo"),
+                    style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Display Selected Image
+                  if (_selectedImage != null)
+                    Column(
+                      children: [
+                        Image.file(_selectedImage!, height: 150, fit: BoxFit.cover),
+                        const SizedBox(height: 10),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _selectedImage = null; // Remove the selected image
+                            });
+                          },
+                          child: Text("Remove Photo", style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+
+                  const SizedBox(height: 20),
+
+                  // Buttons (Cancel & Submit)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          // Submit logic here
+                          Navigator.of(context).pop();
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                        child: Text("Submit", style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
