@@ -1,4 +1,5 @@
 {
     "C_Cpp.errorSquiggles": "disabled",
-    "cmake.sourceDirectory": "C:/Users/Auksilyo-01/Desktop/rentrealm-flutter1/linux"
+    "cmake.sourceDirectory": "C:/Users/Auksilyo-01/Desktop/rentrealm-flutter1/linux",
+    "java.compile.nullAnalysis.mode": "automatic"
 }

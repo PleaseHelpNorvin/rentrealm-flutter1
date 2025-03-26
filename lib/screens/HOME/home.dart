@@ -20,18 +20,29 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _profileCheckFuture =
-        Future.value(false); // Prevent LateInitializationError
+    _profileCheckFuture = Future.value(false); // Prevent LateInitializationError
 
-    Future.microtask(() {
-      if (mounted) {
-        setState(() {
-          _profileCheckFuture =
-              Provider.of<ProfileProvider>(context, listen: false)
-                  .loadUserProfile(context);
-        });
-      }
+    Future.microtask(() => _initializeData());
+  }
+
+  Future<void> _initializeData() async {
+    if (!mounted) return;
+
+    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final pickedRoomProvider =
+        Provider.of<PickedRoomProvider>(context, listen: false);
+    final tenantProvider = Provider.of<TenantProvider>(context, listen: false);
+
+    setState(() {
+      _profileCheckFuture = profileProvider.loadUserProfile(context);
     });
+
+    pickedRoomProvider.fetchPickedRooms(
+      userProfileUserId: pickedRoomProvider.userId,
+      token: pickedRoomProvider.token,
+    );
+
+    await tenantProvider.fetchTenant(context);
   }
 
   @override
@@ -61,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _profileCheckFuture =
               Provider.of<ProfileProvider>(context, listen: false)
                   .loadUserProfile(context);
+          
         });
       },
       child: Padding(
@@ -88,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildContinueReservationPayment(
-      BuildContext context, ProfileProvider profileProvider, singlePickedRoom) {
+      BuildContext context, ProfileProvider profileProvider,  singlePickedRoom) {
     return GestureDetector(
       onTap: () {
         if (singlePickedRoom?.room.id != null) {

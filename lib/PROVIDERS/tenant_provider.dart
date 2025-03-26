@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-// import 'package:rentealm_flutter/MODELS/tenant_model.dart';
-// import 'package:rentealm_flutter/models/tenant_model.dart';
 import '../MODELS/tenant_model.dart';
-import '../CUSTOMS/alert_utils.dart';
-import '../NETWORKS/apiservice.dart';
+// import '../CUSTOMS/alert_utils.dart';
+import '../networks/apiservice.dart';
 import 'auth_provider.dart';
 import 'profile_provider.dart';
 
@@ -33,36 +31,26 @@ class TenantProvider extends ChangeNotifier {
       print("fetchTenant(): profileId: $profileId");
       print("fetchTenant(): token: $token");
 
-      // try {
+      try {
       // _isLoading = true;
-      // notifyListeners();
-
-      // Make API call
-      final response =
-          await apiService.getTenant(profileId: profileId, token: token);
-
+      // notifyListeners(); 
+      final response = await apiService.getTenantByProfileId(profileId: profileId, token: token);
       if (response != null && response.success) {
-        setTenant(response as TenantResponse?);
-        // setTenant(response); // Here, response is of type TenantResponse, which is nullable
-        print("fetchTenant(): ${response.message}");
-      } else {
-        print("Failed to fetch tenant data");
-        // setTenant(null); // Handle failure by setting tenant to null
-        Future.microtask(() {
-          Navigator.pushNamed(context, '/createtenant1');
-        });
+        print("responseData from getTenant Call: ${response.data.latestBilling.}");
+        print("responseData from getTenant Call: ${response.data.maintenanceRequests}");
+        print("responseData from getTenant Call: ${response.data.nextBillingMonth}");
+        print("responseData from getTenant Call: ${response.data.tenant}");
       }
-      // } catch (e) {
-      //   print("Error: $e");
-      //   // setTenant(null); // Handle errors by setting tenant to null
-      //   AlertUtils.showErrorAlert(context, title: "Exception", message: "Something went wrong: $e");
-      // } finally {
-      //   _isLoading = false; // Reset loading state after the operation
-      //   notifyListeners();
-      // }
-    } else {
-      print("Token or Profile ID is null.");
-      // setTenant(null); // Ensure tenant is set to null if token or profile ID is missing
+
+      } catch (e) {
+        print("EXCEPTION: $e");
+      }
+
+      
+
+
+
+      
     }
   }
 
