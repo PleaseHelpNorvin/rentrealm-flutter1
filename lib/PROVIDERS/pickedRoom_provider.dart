@@ -41,7 +41,7 @@ class PickedRoomProvider extends ChangeNotifier {
 
   // ✅ Fetch picked rooms for user
   Future<void> fetchPickedRooms({
-    required int userId,
+    required int userProfileUserId,
     required String token,
   }) async {
     _isLoading = true;
@@ -102,7 +102,7 @@ class PickedRoomProvider extends ChangeNotifier {
 
         await fetchPickedRooms(
           token: token,
-          userId: userId,
+          userProfileUserId: userId,
         );
       } else {
         print("Failed to pick room. API response was unsuccessful.");
