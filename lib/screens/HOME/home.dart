@@ -33,41 +33,62 @@ class _HomeScreenState extends State<HomeScreen> {
     if (!mounted) return;
 
     final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
-    final pickedRoomProvider =
-        Provider.of<PickedRoomProvider>(context, listen: false);
+    final pickedRoomProvider = Provider.of<PickedRoomProvider>(context, listen: false);
     final tenantProvider = Provider.of<TenantProvider>(context, listen: false);
 
+    // Step 1: Fetch user profile
+    final hasProfile = await profileProvider.loadUserProfile(context);
     setState(() {
-      _profileCheckFuture = profileProvider.loadUserProfile(context);
+      _profileCheckFuture = Future.value(hasProfile); // ✅ Ensure it updates correctly
     });
 
-    pickedRoomProvider.fetchPickedRooms(
-      userProfileUserId: pickedRoomProvider.userId,
-      token: pickedRoomProvider.token,
-    );
+    // Step 2: Fetch picked rooms only if profile exists
+    if (hasProfile && pickedRoomProvider.userId != null && pickedRoomProvider.token != null) {
+      pickedRoomProvider.fetchPickedRooms(
+        userProfileUserId: pickedRoomProvider.userId,
+        token: pickedRoomProvider.token,
+      );
+    }
 
-    await tenantProvider.fetchTenant(context);
+    // Step 3: Check if tenant already exists before fetching
+    if (tenantProvider.tenant == null) {
+      await tenantProvider.fetchTenant(context);
+    } else {
+      print("Tenant data already exists, skipping fetch.");
+    }
   }
+
+
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<bool>(
-        future: _profileCheckFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+  @override
+Widget build(BuildContext context) {
+  return Scaffold(
+    body: Consumer<ProfileProvider>(
+      builder: (context, profileProvider, child) {
+        if (profileProvider.isLoading) {
+          return const Center(child: CircularProgressIndicator()); // ✅ Show loader while fetching
+        }
 
-          if (snapshot.hasData && !snapshot.data!) {
-            return _buildNoDataCard();
-          }
+        return FutureBuilder<bool>(
+          future: _profileCheckFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          return _buildWithDataCard();
-        },
-      ),
-    );
-  }
+            if (!snapshot.hasData || snapshot.data == false) {
+              return _buildNoDataCard();
+            }
+
+            return _buildWithDataCard();
+          },
+        );
+      },
+    ),
+  );
+}
+
 
   Widget _buildWithDataCard() {
     return RefreshIndicator(
@@ -86,21 +107,25 @@ class _HomeScreenState extends State<HomeScreen> {
             final singlePickedRoom = pickedRoomProvider.singlePickedRoom;
             final tenant = tenantProvider.tenant;
 
+            // ✅ Show a loading spinner if any provider is still fetching data
+            if (profileProvider.isLoading || pickedRoomProvider.isLoading || tenantProvider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Column(
                 children: [
-                // ✅ Now both widgets are inside the `if` condition
-                if (tenant != null) ...[
-                  _buildShowMonthlyCountdownDashboard(tenant),
-                  _buildShowMaintenanceRequestsList(tenant),
-                ] else ...[
-                  if (singlePickedRoom != null)
-                    _buildContinueReservationPayment(
-                        context, profileProvider, singlePickedRoom),
-                  if (singlePickedRoom == null) _buildShowReservationSent(),
+                  if (tenant != null) ...[
+                    _buildShowMonthlyCountdownDashboard(tenant),
+                    _buildShowMaintenanceRequestsList(tenant),
+                  ] else ...[
+                    if (singlePickedRoom != null)
+                      _buildContinueReservationPayment(
+                          context, profileProvider, singlePickedRoom),
+                    if (singlePickedRoom == null) _buildShowReservationSent(),
+                  ],
                 ],
-              ],
               ),
             );
           },
@@ -108,6 +133,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
 
   Widget _buildContinueReservationPayment(
       BuildContext context, ProfileProvider profileProvider,  singlePickedRoom) {

@@ -40,8 +40,15 @@ class TenantProvider extends ChangeNotifier {
   Future<void> fetchTenant(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+
     int? profileId = profileProvider.userProfile?.data.id;
     String? token = authProvider.token;
+
+    // ✅ Avoid fetching again if tenant data already exists
+    if (_tenant != null) {
+      print("Tenant data already exists, skipping fetch.");
+      return;
+    }
 
     if (token != null && profileId != null) {
       print("fetchTenant(): profileId: $profileId");
@@ -51,12 +58,17 @@ class TenantProvider extends ChangeNotifier {
       notifyListeners();
 
       try {
-        final response = await apiService.getTenantByProfileId(profileId: profileId, token: token);
+        final response = await apiService.getTenantByProfileId(
+          profileId: profileId,
+          token: token,
+        );
+
         if (response != null && response.success) {
           print("responseData from fetchTenant Call: ${response.data.latestBilling?.billingMonth}");
-          print("responseData from fetchTenant Call: ${response.data.tenantMaintenanceRequest.first.description}"); // Fixed
+          print("responseData from fetchTenant Call: ${response.data.tenantMaintenanceRequest.first.description}");
           print("responseData from fetchTenant Call: ${response.data.nextBillingMonth}");
           print("responseData from fetchTenant Call: ${response.data.tenant.rentalAgreement.agreementCode}");
+
           setTenant(response);
         }
       } catch (e) {
@@ -67,6 +79,5 @@ class TenantProvider extends ChangeNotifier {
       }
     }
   }
-
   
 }

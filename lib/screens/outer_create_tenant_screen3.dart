@@ -205,30 +205,6 @@ class _OuterCreateTenantScreen3State extends State<OuterCreateTenantScreen3> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                      // SharedPreferences prefs = await SharedPreferences.getInstance();
-                      // bool? isRegistered = prefs.getBool('isRegistered');
-                      // int? profileId = prefs.getInt('profileId');
-
-                      // if (isRegistered == true && profileId != null) {
-                      //   // User is already registered and has a profile, go to confirm inquiry
-                      //   Navigator.pushReplacement(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => OuterCreateTenantScreen4(
-                      //         roomId: widget.roomId,
-                      //         profileId: profileId, // Pass saved profileId
-                      //       ),
-                      //     ),
-                      //   );
-                      // } else {
-                      //   // If not registered or no profile, go to register screen
-                      //   Navigator.pushReplacement(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => RegisterScreen(roomId: widget.roomId),
-                      //     ),
-                      //   );
-                      // }
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
