@@ -88,7 +88,6 @@ class _OuterCreateTenantScreen4State extends State<OuterCreateTenantScreen4> {
       widget.pickedRoomId,
       _selectedFile,
       _selectedTitle,
-      
     );
 
     ScaffoldMessenger.of(context).showSnackBar(

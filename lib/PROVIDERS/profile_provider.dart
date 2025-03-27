@@ -249,16 +249,25 @@ class ProfileProvider extends ChangeNotifier {
 
     if (token != null && userId != null) {
       try {
+        setLoading(true); // ✅ Show loading
+
         await fetchUserProfile(context, token: token, userId: userId);
+        
         return userProfile != null; // Return true if profile exists
       } catch (e) {
         print("Error loading user profile: $e");
-        AlertUtils.showErrorAlert(context , barrierDismissible: true,
+        AlertUtils.showErrorAlert(context, 
+            barrierDismissible: true, 
             message: "Failed to load user profile.");
+      } finally {
+        setLoading(false); // ✅ Hide loading
       }
     } else {
-      AlertUtils.showErrorAlert(context, message: "User not authenticated.", barrierDismissible: true);
+      AlertUtils.showErrorAlert(context, 
+          message: "User not authenticated.", 
+          barrierDismissible: true);
     }
+    
     return false; // Default return value
   }
 

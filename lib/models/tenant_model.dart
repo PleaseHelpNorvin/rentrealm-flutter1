@@ -51,8 +51,8 @@ class Tenant {
   final int profileId;
   final int rentalAgreementId;
   final String status;
-  final String? evacuationDate;
-  final String? moveOutDate;
+  final String? evacuationDate; // Nullable
+  final String? moveOutDate; // Nullable
   final DateTime createdAt;
   final DateTime updatedAt;
   final RentalAgreement rentalAgreement;
@@ -63,8 +63,8 @@ class Tenant {
     required this.profileId,
     required this.rentalAgreementId,
     required this.status,
-    this.evacuationDate,
-    this.moveOutDate,
+    this.evacuationDate, // Keep it nullable
+    this.moveOutDate, // Keep it nullable
     required this.createdAt,
     required this.updatedAt,
     required this.rentalAgreement,
@@ -77,8 +77,8 @@ class Tenant {
       profileId: json['profile_id'],
       rentalAgreementId: json['rental_agreement_id'],
       status: json['status'],
-      evacuationDate: json['evacuation_date'],
-      moveOutDate: json['move_out_date'],
+      evacuationDate: json['evacuation_date'] as String?, // Nullable
+      moveOutDate: json['move_out_date'] as String?, // Nullable
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
       rentalAgreement: RentalAgreement.fromJson(json['rental_agreement']),
@@ -86,6 +86,7 @@ class Tenant {
     );
   }
 }
+
 
 class RentalAgreement {
   final int id;
@@ -122,19 +123,21 @@ class RentalAgreement {
     return RentalAgreement(
       id: json['id'],
       reservationId: json['reservation_id'],
-      agreementCode: json['agreement_code'],
-      rentStartDate: json['rent_start_date'],
-      rentEndDate: json['rent_end_date'],
-      personCount: json['person_count'],
-      totalAmount: json['total_amount'],
+      agreementCode: json['agreement_code'] ?? '', // Default to empty string
+      rentStartDate: json['rent_start_date'] ?? '',
+      rentEndDate: json['rent_end_date'] as String?, // Nullable
+      personCount: json['person_count'] ?? 0,
+      totalAmount: json['total_amount'] ?? '0.00',
       isAdvancePayment: json['is_advance_payment'] == 1,
-      description: json['description'],
-      signaturePngString: json['signature_png_string'],
-      status: json['status'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      description: json['description'] ?? '',
+      signaturePngString: json['signature_png_string'] ?? '',
+      status: json['status'] ?? '',
+      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
+      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : DateTime.now(),
     );
   }
+
+
 }
 
 class UserProfile {
@@ -172,30 +175,31 @@ class UserProfile {
     return UserProfile(
       id: json['id'],
       userId: json['user_id'],
-      profilePictureUrl: json['profile_picture_url'],
-      phoneNumber: json['phone_number'],
-      socialMediaLinks: json['social_media_links'],
-      occupation: json['occupation'],
-      driverLicenseNumber: json['driver_license_number'],
-      nationalId: json['national_id'],
-      passportNumber: json['passport_number'],
-      socialSecurityNumber: json['social_security_number'],
+      profilePictureUrl: json['profile_picture_url'] ?? '',
+      phoneNumber: json['phone_number'] ?? '',
+      socialMediaLinks: json['social_media_links'] ?? '',
+      occupation: json['occupation'] ?? '',
+      driverLicenseNumber: json['driver_license_number'] as String?,
+      nationalId: json['national_id'] ?? '',
+      passportNumber: json['passport_number'] as String?, 
+      socialSecurityNumber: json['social_security_number'] as String?, 
       steps: json['steps'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
   }
+
 }
 
 class TenantBilling {
-  final String billingMonth;
+  final String? billingMonth;
   final String status;
   final String totalAmount;
   final String amountPaid;
   final String remainingBalance;
 
   TenantBilling({
-    required this.billingMonth,
+    this.billingMonth,
     required this.status,
     required this.totalAmount,
     required this.amountPaid,
@@ -204,7 +208,7 @@ class TenantBilling {
 
   factory TenantBilling.fromJson(Map<String, dynamic> json) {
     return TenantBilling(
-      billingMonth: json['billing_month'],
+      billingMonth: json['billing_month']?.toString(),
       status: json['status'],
       totalAmount: json['total_amount'],
       amountPaid: json['amount_paid'],
@@ -216,14 +220,14 @@ class TenantBilling {
 class TenantMaintenanceRequest {
   final int id;
   final String requestType;
-  final String description;
+  final String? description;
   final String status;
   final String requestedAt;
 
   TenantMaintenanceRequest({
     required this.id,
     required this.requestType,
-    required this.description,
+    this.description,
     required this.status,
     required this.requestedAt,
   });
@@ -232,7 +236,7 @@ class TenantMaintenanceRequest {
     return TenantMaintenanceRequest(
       id: json['id'],
       requestType: json['request_type'],
-      description: json['description'],
+      description: json['description'] ?? "No description",
       status: json['status'],
       requestedAt: json['requested_at'],
     );

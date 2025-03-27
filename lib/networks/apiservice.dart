@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:rentealm_flutter/MODELS/room_model.dart';
@@ -1258,7 +1259,7 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print("responseData from getTenant Call: $responseData");
+debugPrint("responseData from getTenant Call: ${jsonEncode(responseData)}", wrapWidth: 1024);
         return TenantResponse.fromJson(responseData); // Corrected this line
       } else if (response.statusCode == 404) {
         print('Error: ${response.statusCode} - ${response.body}');
