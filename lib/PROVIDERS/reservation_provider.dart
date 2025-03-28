@@ -31,9 +31,9 @@ class ReservationProvider extends ChangeNotifier {
   ReservationData? _singleReservation;
   ReservationData? get singleReservation => _singleReservation;
 
-  set singleReservation(ReservationData? reservation) {
+  void setSingleReservation(ReservationData? reservation) {
     _singleReservation = reservation;
-    notifyListeners(); // Notify UI when a single object changes
+    notifyListeners();
   }
 
   void initAuthDetails(BuildContext context) {
@@ -86,7 +86,8 @@ class ReservationProvider extends ChangeNotifier {
     _isLoading = false;
 
     if (response != null && response.success) {
-      singleReservation = response.data; // Store the newly created reservation
+      setSingleReservation(
+          response.data); // Store the newly created reservation
       print("Reservation created successfully");
       print("createReservation(): $singleReservation");
 
@@ -103,7 +104,8 @@ class ReservationProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final response = await apiService.getReservationsByProfileId(token: token, profileId: profileId);
+    final response = await apiService.getReservationsByProfileId(
+        token: token, profileId: profileId);
 
     _isLoading = false;
 
@@ -117,31 +119,33 @@ class ReservationProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> fetchReservationById(
+      BuildContext context, int reservationId) async {
+    _isLoading = true;
+    notifyListeners();
 
+    initAuthDetails(context);
+    print("fetchReservationById(): token: $token");
+    print("fetchReservationById() reservationId: $reservationId");
 
-Future<void> fetchReservationById(BuildContext context, int reservationId) async {
-   _isLoading = true;
-  notifyListeners();
+    final response = await apiService.showReservation(
+        reservationId: reservationId, token: token);
 
-  initAuthDetails(context);
-  print("fetchReservationById(): token: $token");
-  print("fetchReservationById() reservationId: $reservationId");
+    if (response != null && response.success) {
+      // if (response.data.reservations.isNotEmpty) {
+      // singleReservation = response.data;
+      setSingleReservation(response.data);
 
-  final response = await apiService.showReservation(reservationId: reservationId, token: token);
-
-  if (response != null && response.success) {
-    // if (response.data.reservations.isNotEmpty) {
-      singleReservation = response.data;
-      print("fetchReservationById(): roomId = ${singleReservation?.reservations.first.roomId}");
-    // } else {
+      print(
+          "fetchReservationById(): roomId = ${singleReservation?.reservations.first.roomId}");
+      // } else {
       // print("No reservation found for ID: $reservationId");
-    // }
-  } else {
-    print("Failed to fetch reservation");
-  }
+      // }
+    } else {
+      print("Failed to fetch reservation");
+    }
 
     _isLoading = false;
-  notifyListeners();
-}
-
+    notifyListeners();
+  }
 }

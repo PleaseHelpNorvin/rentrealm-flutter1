@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/reservation_provider.dart';
-import 'package:rentealm_flutter/models/reservation_model.dart';
+// import 'package:rentealm_flutter/models/reservation_model.dart';
+import 'package:intl/intl.dart';
 
 class ReservationDetails extends StatefulWidget {
   final int reservationId;
@@ -31,7 +32,7 @@ class _ReservationDetailsState extends State<ReservationDetails> {
         padding: const EdgeInsets.all(10),
         child: Consumer<ReservationProvider>(
           builder: (context, reservationProvider, child) {
-            final singleReservation = reservationProvider.singleReservation; 
+            final singleReservation = reservationProvider.singleReservation;
             final isLoading = reservationProvider.isLoading;
 
             if (isLoading) {
@@ -48,29 +49,40 @@ class _ReservationDetailsState extends State<ReservationDetails> {
                 : null;
 
             if (firstReservation == null) {
-              return const Center(child: Text("No reservation details available."));
+              return const Center(
+                  child: Text("No reservation details available."));
             }
+            String? approvalDateFormat = firstReservation.approvalDate != null
+                ? DateFormat('MM/dd/yyyy')
+                    .format(DateTime.parse(firstReservation.approvalDate!))
+                : "N/A";
 
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Reservation Code: ${singleReservation.reservations.first.reservationCode}",
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text(
+                      "Reservation Code: ${singleReservation.reservations.first.reservationCode}",
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
-                  Text("Payment Method: ${singleReservation.reservations.first.paymentMethod}",
+                  Text(
+                      "Payment Method: ${singleReservation.reservations.first.paymentMethod}",
                       style: const TextStyle(fontSize: 16)),
                   const SizedBox(height: 10),
                   Text("Status: ${singleReservation.reservations.first.status}",
                       style: const TextStyle(fontSize: 16)),
                   const SizedBox(height: 10),
                   Text("Room ID: ${firstReservation.roomId}",
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
-                  Text("Room ID: ${firstReservation.approvedBy} on ${firstReservation.approvalDate}",
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(
+                    "Status: ${firstReservation.approvedBy != null ? 'Approved By: ${firstReservation.approvedBy} on $approvalDateFormat' : 'Pending'}",
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 20),
-                  
                 ],
               ),
             );

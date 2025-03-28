@@ -104,6 +104,7 @@ class PickedRoomProvider extends ChangeNotifier {
           token: token,
           userProfileUserId: userId,
         );
+
       } else {
         print("Failed to pick room. API response was unsuccessful.");
       }
