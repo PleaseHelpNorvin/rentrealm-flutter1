@@ -15,7 +15,7 @@ import '../API/rest.dart';
 import '../MODELS/profile_model.dart';
 import '../MODELS/user_model.dart';
 import '../models/billing_model.dart';
-import '../models/dashboardData_model.dart';
+// import '../models/dashboardData_model.dart';
 import '../models/notification_model.dart';
 import '../models/payment_model.dart';
 import '../models/paymongo_model.dart';
@@ -781,7 +781,8 @@ class ApiService {
       request.fields['rent_start_date'] = rentStartDate;
       request.fields['person_count'] = personCount.toString();
       request.fields['total_amount'] = totalMonthlyDue.toString();
-      request.fields['is_advance_payment'] = isAdvancePaymentChecked == true ? '1' : '0';
+      request.fields['is_advance_payment'] =
+          isAdvancePaymentChecked == true ? '1' : '0';
       if (description != null) {
         request.fields['description'] = description;
       }
@@ -824,7 +825,8 @@ class ApiService {
     required int? profileId,
   }) async {
     print("from getIndexRentalAgreement(): token: $token");
-    final uri = Uri.parse("$rest/tenant/rental_agreement/index-profileId/$profileId");
+    final uri =
+        Uri.parse("$rest/tenant/rental_agreement/index-profileId/$profileId");
 
     final headers = {
       "Content-Type": "application/json",
@@ -841,7 +843,8 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("Raw API response: ${response.body}");
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print("responseData from getIndexRentalAgreement(): Call: $responseData");
+        print(
+            "responseData from getIndexRentalAgreement(): Call: $responseData");
         return RentalAgreementResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
@@ -852,7 +855,6 @@ class ApiService {
       return null;
     }
   }
-
 
   Future<PickedRoomResponse?> postPickedRoomByUser({
     required int userId,
@@ -1139,13 +1141,12 @@ class ApiService {
     return null;
   }
 
-  Future<RentalAgreementPdfUrlResponse?>getRentalAgreementUrl({
-    required String token, 
-    required String agreementCode
-  }) async {
+  Future<RentalAgreementPdfUrlResponse?> getRentalAgreementUrl(
+      {required String token, required String agreementCode}) async {
     print("from getRentalAgreementUrl(): $token");
     print("from getRentalAgreementUrl(): $agreementCode");
-    final uri = Uri.parse("$rest/tenant/rental_agreement/view-pdf/$agreementCode");
+    final uri =
+        Uri.parse("$rest/tenant/rental_agreement/view-pdf/$agreementCode");
     final header = {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -1170,11 +1171,8 @@ class ApiService {
     }
   }
 
-
-  Future<ReceiptsResponse ?>getReceiptByProfileId({
-    required String token, 
-    required int? profileId
-  }) async {
+  Future<ReceiptsResponse?> getReceiptByProfileId(
+      {required String token, required int? profileId}) async {
     print("from getReceiptByProfileId(): $token");
     print("from getReceiptByProfileId(): $profileId");
     final uri = Uri.parse("$rest/tenant/payment/retrieve-receipt/$profileId");
@@ -1190,8 +1188,7 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getRentalAgreementUrl Call: $responseData");
-        return ReceiptsResponse .fromJson(
-            responseData); // Corrected this line
+        return ReceiptsResponse.fromJson(responseData); // Corrected this line
       } else if (response.statusCode == 404) {
         print('Error: ${response.statusCode} - ${response.body}');
         return null;
@@ -1202,13 +1199,12 @@ class ApiService {
     }
   }
 
-  Future<ReservationResponse?>getReservationsByProfileId({
-    required int? profileId,
-    required String token
-  }) async {
+  Future<ReservationResponse?> getReservationsByProfileId(
+      {required int? profileId, required String token}) async {
     print("from getReservationsByProfileId() ProfileId: $profileId");
     print("from getReservationsByProfileId() token: $token");
-    final uri = Uri.parse('$rest/tenant/reservation/indexByProfileId/$profileId');
+    final uri =
+        Uri.parse('$rest/tenant/reservation/indexByProfileId/$profileId');
     final header = {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -1216,21 +1212,18 @@ class ApiService {
     };
 
     try {
-      final response = await http.get(
-        uri,
-        headers: header
-      );
+      final response = await http.get(uri, headers: header);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         print("responseData from getTenant Call: $responseData");
-        return ReservationResponse.fromJson(responseData); // Corrected this line
+        return ReservationResponse.fromJson(
+            responseData); // Corrected this line
       } else if (response.statusCode == 404) {
         print('Error: ${response.statusCode} - ${response.body}');
         print('navigating to create tenant screen');
         return null;
       }
-
     } catch (e) {
       print("EXCEPTION: $e");
       return null;
@@ -1238,7 +1231,6 @@ class ApiService {
     return null;
   }
 
-  
   Future<TenantResponse?> getTenantByProfileId({
     required int profileId,
     required String token,
@@ -1260,7 +1252,9 @@ class ApiService {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-debugPrint("responseData from getTenant Call: ${jsonEncode(responseData)}", wrapWidth: 1024);
+        debugPrint(
+            "responseData from getTenant Call: ${jsonEncode(responseData)}",
+            wrapWidth: 1024);
         return TenantResponse.fromJson(responseData); // Corrected this line
       } else if (response.statusCode == 404) {
         print('Error: ${response.statusCode} - ${response.body}');
@@ -1274,14 +1268,15 @@ debugPrint("responseData from getTenant Call: ${jsonEncode(responseData)}", wrap
     return null;
   }
 
-  Future<RentalAgreementResponse?>getActiveRentalAgreementByProfileId({
+  Future<RentalAgreementResponse?> getActiveRentalAgreementByProfileId({
     required int? profileId,
     required String token,
   }) async {
     print("from getActiveRentalAgreementByProfileId() profileId: $profileId");
     print("from getActiveRentalAgreementByProfileId() token: $token");
 
-    final uri = Uri.parse("$rest/tenant/rental_agreement/show-active-Rental-agreement/$profileId");
+    final uri = Uri.parse(
+        "$rest/tenant/rental_agreement/show-active-Rental-agreement/$profileId");
     final header = {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -1289,21 +1284,20 @@ debugPrint("responseData from getTenant Call: ${jsonEncode(responseData)}", wrap
     };
 
     try {
-      final response = await http.get(
-        uri,
-        headers: header
-      );
-      
+      final response = await http.get(uri, headers: header);
+
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        debugPrint("responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}", wrapWidth: 1024);
-        return RentalAgreementResponse.fromJson(responseData); // Corrected this line
+        debugPrint(
+            "responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}",
+            wrapWidth: 1024);
+        return RentalAgreementResponse.fromJson(
+            responseData); // Corrected this line
       } else if (response.statusCode == 404) {
         print('Error: ${response.statusCode} - ${response.body}');
         print('navigating to create tenant screen');
         return null;
       }
-
     } catch (e) {
       print("EXCEPTION: $e");
       return null;
@@ -1311,39 +1305,39 @@ debugPrint("responseData from getTenant Call: ${jsonEncode(responseData)}", wrap
     return null;
   }
 
-  Future<DashboardResponse?>getDashboardData({
-    required int rentalAgreementId, 
-    required String token, 
-    }) async {
-      print("from getDashboardData() rentalagreementId: $rentalAgreementId");
-      print("from getDashboardData() token: $token");
+  // Future<DashboardResponse?> getDashboardData({
+  //   required int rentalAgreementId,
+  //   required String token,
+  // }) async {
+  //   print("from getDashboardData() rentalagreementId: $rentalAgreementId");
+  //   print("from getDashboardData() token: $token");
 
-      final uri = Uri.parse("$rest/tenant/tenant/show-dashboard-data-for-agreement/$rentalAgreementId");
-      final header = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": "Bearer $token",
-      };
+  //   final uri = Uri.parse(
+  //       "$rest/tenant/tenant/show-dashboard-data-for-agreement/$rentalAgreementId");
+  //   final header = {
+  //     "Content-Type": "application/json",
+  //     "Accept": "application/json",
+  //     "Authorization": "Bearer $token",
+  //   };
 
-      try {
-        final response = await http.get(
-          uri,
-          headers: header
-        );
+  //   try {
+  //     final response = await http.get(uri, headers: header);
 
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          final Map<String, dynamic> responseData = jsonDecode(response.body);
-          debugPrint("responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}", wrapWidth: 1024);
-          return DashboardResponse.fromJson(responseData); // Corrected this line
-        } else if (response.statusCode == 404) {
-          print('Error: ${response.statusCode} - ${response.body}');
-          print('navigating to create tenant screen');
-          return null;
-        }
-      } catch (e) {
-        print("EXCEPTION: $e");
-        return null;
-      }
-      return null;
-    }
-} 
+  //     if (response.statusCode == 200 || response.statusCode == 201) {
+  //       final Map<String, dynamic> responseData = jsonDecode(response.body);
+  //       debugPrint(
+  //           "responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}",
+  //           wrapWidth: 1024);
+  //       return DashboardResponse.fromJson(responseData); // Corrected this line
+  //     } else if (response.statusCode == 404) {
+  //       print('Error: ${response.statusCode} - ${response.body}');
+  //       print('navigating to create tenant screen');
+  //       return null;
+  //     }
+  //   } catch (e) {
+  //     print("EXCEPTION: $e");
+  //     return null;
+  //   }
+  //   return null;
+  // }
+}

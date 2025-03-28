@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/dashboard_provider.dart';
+// import 'package:rentealm_flutter/PROVIDERS/dashboard_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 // import 'package:rentealm_flutter/models/inquiry_model.dart';
 // import '../models/property_model.dart';
@@ -24,8 +24,7 @@ class RentalagreementProvider extends ChangeNotifier {
   late String token;
   late int? profileId;
 
-
-    // Private List to Store Rental Agreements
+  // Private List to Store Rental Agreements
   List<RentalAgreement> _rentalAgreements = [];
 
   // Getter to access the rental agreements
@@ -45,8 +44,6 @@ class RentalagreementProvider extends ChangeNotifier {
     _pdfUrl = url;
     notifyListeners();
   }
-
-  
 
   void initAuthDetails(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -98,7 +95,6 @@ class RentalagreementProvider extends ChangeNotifier {
       description: description,
       isAdvancePaymentChecked: isAdvancePaymentChecked,
       svgSignatureString: signaturePngString, // Send the File object here
-
     );
 
     if (response != null && response.success) {
@@ -109,15 +105,14 @@ class RentalagreementProvider extends ChangeNotifier {
           Provider.of<PaymentProvider>(context, listen: false);
       print("Success response from storeRentalAgreement()");
       await paymentProvider.processPayment(
-        context,
-        reservationId,
-        roomId,
-        rentalagreementId,
-        startDate,
-        persons,
-        totalPrice,
-        paymentDescription
-      );
+          context,
+          reservationId,
+          roomId,
+          rentalagreementId,
+          startDate,
+          persons,
+          totalPrice,
+          paymentDescription);
     } else {
       print("Store rental agreement failed");
     }
@@ -129,49 +124,52 @@ class RentalagreementProvider extends ChangeNotifier {
     print("from fetchIndexRentalAgreement(): $token");
     print("from from fetchIndexRentalAgreement(): $profileId");
 
-    final response = await apiService.getIndexRentalAgreementByProfileId(token: token, profileId: profileId);
+    final response = await apiService.getIndexRentalAgreementByProfileId(
+        token: token, profileId: profileId);
     if (response != null && response.success) {
       print("Fetched ${response.rentalAgreements.length} rental agreements.");
 
-  _rentalAgreements = response.rentalAgreements; 
+      _rentalAgreements = response.rentalAgreements;
       notifyListeners();
     }
   }
 
-  Future<void>fetchRentalAgreementUrl(BuildContext context, String agreementCode) async {
+  Future<void> fetchRentalAgreementUrl(
+      BuildContext context, String agreementCode) async {
     initAuthDetails(context);
     print("from fetchIndexRentalAgreement(): $token");
     print("from from fetchIndexRentalAgreement(): $agreementCode");
 
-    final response = await apiService.getRentalAgreementUrl(token: token, agreementCode: agreementCode);
+    final response = await apiService.getRentalAgreementUrl(
+        token: token, agreementCode: agreementCode);
 
     if (response != null && response.success) {
       _setPdfUrl(response.data.pdfUrl); // Update private field using setter
       print("PDF URL fetched: $_pdfUrl");
-    }  else {
+    } else {
       print("Failed to fetch PDF URL");
     }
   }
 
-  Future<void>fetchActiveRentalAgreementByProfileId(BuildContext context) async {
+  Future<void> fetchActiveRentalAgreementByProfileId(
+      BuildContext context) async {
     initAuthDetails(context);
     print("from fetchActiveRentalAgreementByProfileId(): $token");
 
-   if (token == 'no token' || profileId == null) {
+    if (token == 'no token' || profileId == null) {
       print("Error: Missing authentication details");
       return;
     }
 
-    final response = await apiService.getActiveRentalAgreementByProfileId(profileId: profileId,token: token );
-    
+    final response = await apiService.getActiveRentalAgreementByProfileId(
+        profileId: profileId, token: token);
+
     if (response != null && response.success) {
       setRentalAgreements(response.rentalAgreements);
-      print("response from fetchActiveRentalAgreementByProfileId(): ${response.rentalAgreements.length}");
+      print(
+          "response from fetchActiveRentalAgreementByProfileId(): ${response.rentalAgreements.length}");
     } else {
       print("Failed to fetch active students");
     }
   }
-
 }
-
-
