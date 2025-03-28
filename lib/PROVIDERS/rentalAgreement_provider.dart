@@ -154,6 +154,9 @@ class RentalagreementProvider extends ChangeNotifier {
   Future<void> fetchActiveRentalAgreementByProfileId(
       BuildContext context) async {
     initAuthDetails(context);
+    _isLoading = true;
+    notifyListeners();
+
     print("from fetchActiveRentalAgreementByProfileId(): $token");
 
     if (token == 'no token' || profileId == null) {
@@ -171,5 +174,8 @@ class RentalagreementProvider extends ChangeNotifier {
     } else {
       print("Failed to fetch active students");
     }
+
+    _isLoading = false;
+    notifyListeners();
   }
 }
