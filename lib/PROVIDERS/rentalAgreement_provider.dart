@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/dashboard_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 // import 'package:rentealm_flutter/models/inquiry_model.dart';
 // import '../models/property_model.dart';
@@ -149,6 +151,27 @@ class RentalagreementProvider extends ChangeNotifier {
     }  else {
       print("Failed to fetch PDF URL");
     }
-    
   }
+
+  Future<void>fetchActiveRentalAgreementByProfileId(BuildContext context) async {
+    initAuthDetails(context);
+    print("from fetchActiveRentalAgreementByProfileId(): $token");
+
+   if (token == 'no token' || profileId == null) {
+      print("Error: Missing authentication details");
+      return;
+    }
+
+    final response = await apiService.getActiveRentalAgreementByProfileId(profileId: profileId,token: token );
+    
+    if (response != null && response.success) {
+      setRentalAgreements(response.rentalAgreements);
+      print("response from fetchActiveRentalAgreementByProfileId(): ${response.rentalAgreements.length}");
+    } else {
+      print("Failed to fetch active students");
+    }
+  }
+
 }
+
+

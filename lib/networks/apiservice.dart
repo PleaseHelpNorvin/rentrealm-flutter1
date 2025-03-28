@@ -15,6 +15,7 @@ import '../API/rest.dart';
 import '../MODELS/profile_model.dart';
 import '../MODELS/user_model.dart';
 import '../models/billing_model.dart';
+import '../models/dashboardData_model.dart';
 import '../models/notification_model.dart';
 import '../models/payment_model.dart';
 import '../models/paymongo_model.dart';
@@ -1272,4 +1273,77 @@ debugPrint("responseData from getTenant Call: ${jsonEncode(responseData)}", wrap
     }
     return null;
   }
+
+  Future<RentalAgreementResponse?>getActiveRentalAgreementByProfileId({
+    required int? profileId,
+    required String token,
+  }) async {
+    print("from getActiveRentalAgreementByProfileId() profileId: $profileId");
+    print("from getActiveRentalAgreementByProfileId() token: $token");
+
+    final uri = Uri.parse("$rest/tenant/rental_agreement/show-active-Rental-agreement/$profileId");
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.get(
+        uri,
+        headers: header
+      );
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        debugPrint("responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}", wrapWidth: 1024);
+        return RentalAgreementResponse.fromJson(responseData); // Corrected this line
+      } else if (response.statusCode == 404) {
+        print('Error: ${response.statusCode} - ${response.body}');
+        print('navigating to create tenant screen');
+        return null;
+      }
+
+    } catch (e) {
+      print("EXCEPTION: $e");
+      return null;
+    }
+    return null;
+  }
+
+  Future<DashboardResponse?>getDashboardData({
+    required int rentalAgreementId, 
+    required String token, 
+    }) async {
+      print("from getDashboardData() rentalagreementId: $rentalAgreementId");
+      print("from getDashboardData() token: $token");
+
+      final uri = Uri.parse("$rest/tenant/tenant/show-dashboard-data-for-agreement/$rentalAgreementId");
+      final header = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": "Bearer $token",
+      };
+
+      try {
+        final response = await http.get(
+          uri,
+          headers: header
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          debugPrint("responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}", wrapWidth: 1024);
+          return DashboardResponse.fromJson(responseData); // Corrected this line
+        } else if (response.statusCode == 404) {
+          print('Error: ${response.statusCode} - ${response.body}');
+          print('navigating to create tenant screen');
+          return null;
+        }
+      } catch (e) {
+        print("EXCEPTION: $e");
+        return null;
+      }
+      return null;
+    }
 } 

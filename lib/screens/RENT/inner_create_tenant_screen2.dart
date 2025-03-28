@@ -3,8 +3,13 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/pickedRoom_provider.dart';
+import 'package:rentealm_flutter/SCREENS/outer_create_tenant_screen4.dart';
+import 'package:rentealm_flutter/models/tenant_model.dart';
 
 import '../../MODELS/room_model.dart';
+import '../../PROVIDERS/reservation_provider.dart';
 import '../../PROVIDERS/room_provider.dart';
 
 class InnerCreateTenantScreen2 extends StatefulWidget {
@@ -115,8 +120,35 @@ Widget build(BuildContext context) {
             ),
           ),
           ElevatedButton(
-            onPressed: () {
-              // Handle navigation here
+            onPressed: () async {
+              await Provider.of<PickedRoomProvider>(context,listen: false).addRoomForUser(widget.roomId);
+              final reservationProvider = Provider.of<ReservationProvider>(context, listen:  false);
+              final int? profileId = reservationProvider.profileId;
+              if (profileId == null) {
+                print("no profileId found in inner_create_tenant_screen2");
+                return;
+              }
+              final int? userId = Provider.of<AuthProvider>(context, listen:false).userId;
+              if (userId == null) {
+                print("no userId found on inner_create_tenant_screen2");
+                return;
+              }
+
+              final String? token = Provider.of<AuthProvider>(context, listen: false).token;
+              if (token == null) {
+                print("no userId found on inner_create_tenant_screen2");
+                return;
+              }
+
+              await Provider.of<PickedRoomProvider>(context,listen: false).fetchPickedRooms(userProfileUserId: userId, token: token);
+              final int? pickedRoomId = Provider.of<PickedRoomProvider>(context, listen: false).singlePickedRoom?.id;
+              
+              if(pickedRoomId == null )
+              {
+                print("no singlePickedRoom on inner_create_tenant_screen2");
+                return;
+              }
+              Navigator.push(context, MaterialPageRoute(builder: (context) => OuterCreateTenantScreen4(roomId: widget.roomId, profileId: profileId, pickedRoomId: pickedRoomId)));
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,

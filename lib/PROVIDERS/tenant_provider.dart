@@ -56,19 +56,17 @@ class TenantProvider extends ChangeNotifier {
 
       _isLoading = true;
       notifyListeners();
-
+      
       try {
         final response = await apiService.getTenantByProfileId(
           profileId: profileId,
           token: token,
         );
-
         if (response != null && response.success) {
           print("responseData from fetchTenant Call: ${response.data.latestBilling?.billingMonth}");
           print("responseData from fetchTenant Call: ${response.data.tenantMaintenanceRequest.first.description}");
           print("responseData from fetchTenant Call: ${response.data.nextBillingMonth}");
           print("responseData from fetchTenant Call: ${response.data.tenant.rentalAgreement.agreementCode}");
-
           setTenant(response);
         }
       } catch (e) {
@@ -79,5 +77,4 @@ class TenantProvider extends ChangeNotifier {
       }
     }
   }
-  
 }
