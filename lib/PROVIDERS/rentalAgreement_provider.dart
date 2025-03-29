@@ -168,7 +168,10 @@ class RentalagreementProvider extends ChangeNotifier {
         profileId: profileId, token: token);
 
     if (response != null && response.success) {
-      setRentalAgreements(response.rentalAgreements);
+      _rentalAgreements = response.rentalAgreements;
+      notifyListeners();
+      // setRentalAgreements(response.rentalAgreements);
+
       print(
           "response from fetchActiveRentalAgreementByProfileId(): ${response.rentalAgreements.length}");
     } else {
