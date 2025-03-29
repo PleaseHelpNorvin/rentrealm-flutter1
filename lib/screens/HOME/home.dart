@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/reservation_provider.dart';
+import 'package:rentealm_flutter/models/reservation_model.dart';
+// import 'package:rentealm_flutter/PROVIDERS/reservation_provider.dart';
 // import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
+import '../../PROVIDERS/tenant_provider.dart';
 import 'package:rentealm_flutter/SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
+import '../../models/rentalAgreement_model.dart';
+// as rentalProviderRentalAgreements;
 // import 'package:rentealm_flutter/models/profile_model.dart';
 import '../../PROVIDERS/pickedRoom_provider.dart';
 import '../../PROVIDERS/profile_provider.dart';
-import '../../PROVIDERS/rentalAgreement_provider.dart';
+// import '../../PROVIDERS/rentalAgreement_provider.dart';
 import '../../models/tenant_model.dart';
-import '../../models/rentalAgreement_model.dart';
+// import '../../models/rentalAgreement_model.dart';
 import '../outer_create_tenant_screen4.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+
+import 'package:rentealm_flutter/models/rentalAgreement_model.dart'
+    as rentalModel;
+import 'package:rentealm_flutter/models/tenant_model.dart' as tenantModel;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -133,8 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 children: [
                   if (tenant != null) ...[
-                    _buildChangeActiveRentalAgreement(
-                        context, tenant, activeAgreements),
+                    _buildChangeActiveRentalAgreement(context, tenant),
                     _buildShowMonthlyCountdownDashboard(tenant),
                     _buildShowMaintenanceRequestsList(tenant),
                   ] else ...[
@@ -153,18 +162,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildChangeActiveRentalAgreement(
-      BuildContext context, TenantResponse? tenantResponse, activeAgreements) {
+      BuildContext context, TenantResponse? tenantResponse) {
     return SizedBox(
-      width: double.infinity, // Makes the button take the full width
+      width: double.infinity, // Makes the button take full width
       child: ElevatedButton(
-        onPressed: () {
-          _showActiveAgreementsListDialog(context, activeAgreements);
+        onPressed: () async {
+          // ✅ Ensure latest data is fetched before displaying dialog
+          // await Provider.of<RentalagreementProvider>(context, listen: false)
+          //     .fetchActiveRentalAgreementByProfileId(context);
+
+          // ✅ Show the dialog (it will read the latest data from Provider)
+          _showActiveAgreementsListDialog(context);
         },
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 15),
           backgroundColor: Colors.blue,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5), // Border radius of 5
+            borderRadius: BorderRadius.circular(5),
           ),
         ),
         child: const Text(
@@ -176,7 +190,10 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showActiveAgreementsListDialog(BuildContext context, activeAgreements) {
+  void _showActiveAgreementsListDialog(BuildContext context) async {
+    await Provider.of<RentalagreementProvider>(context, listen: false)
+        .fetchActiveRentalAgreementByProfileId(context);
+
     showModalBottomSheet(
       context: context,
       shape: RoundedRectangleBorder(
@@ -184,78 +201,87 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       backgroundColor: Colors.white,
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title Section
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        return Consumer<RentalagreementProvider>(
+          builder: (context, rentalAgreementProvider, child) {
+            final rentalAgreements = rentalAgreementProvider.rentalAgreements;
+
+            print("Rental Agreements inside modal: ${rentalAgreements.length}");
+
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "Select Active Rental Agreement",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  // Title Section
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Select Active Rental Agreement",
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.grey[700]),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.close, color: Colors.grey[700]),
-                    onPressed: () => Navigator.pop(context),
-                  ),
+                  Divider(),
+
+                  // No agreements available
+                  if (rentalAgreements.isEmpty)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          "No active agreements available.",
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      ),
+                    )
+                  else
+                    Expanded(
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: rentalAgreements.length,
+                        separatorBuilder: (context, index) =>
+                            Divider(height: 1),
+                        itemBuilder: (context, index) {
+                          final contract = rentalAgreements[index];
+
+                          String formattedDate = contract.rentStartDate != null
+                              ? DateFormat('MMMM dd, yyyy').format(
+                                  DateTime.parse(contract.rentStartDate))
+                              : "N/A";
+
+                          return ListTile(
+                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                            leading:
+                                Icon(Icons.description, color: Colors.blue),
+                            title: Text(
+                              "Contract #${contract.agreementCode}",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              "Start Date: $formattedDate",
+                              style: TextStyle(color: Colors.grey[700]),
+                            ),
+                            trailing: Icon(Icons.arrow_forward_ios,
+                                color: Colors.grey[600], size: 18),
+                            onTap: () {
+                              print("Selected contract: ${contract.id}");
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
+                    ),
                 ],
               ),
-              Divider(),
-
-              // No agreements available
-              if (activeAgreements.isEmpty)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Text(
-                      "No active agreements available.",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                  ),
-                )
-              else
-                // List of Agreements
-                Expanded(
-                  child: ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: activeAgreements.length,
-                    separatorBuilder: (context, index) => Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final contract = activeAgreements[index];
-
-                      // Format date properly
-                      String formattedDate = contract.rentStartDate != null
-                          ? DateFormat('MMMM dd, yyyy')
-                              .format(DateTime.parse(contract.rentStartDate))
-                          : "N/A";
-
-                      return ListTile(
-                        contentPadding: EdgeInsets.symmetric(vertical: 10),
-                        leading: Icon(Icons.description, color: Colors.blue),
-                        title: Text(
-                          "Contract #${contract.agreementCode}",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          "Start Date: $formattedDate",
-                          style: TextStyle(color: Colors.grey[700]),
-                        ),
-                        trailing: Icon(Icons.arrow_forward_ios,
-                            color: Colors.grey[600], size: 18),
-                        onTap: () {
-                          print("Selected contract: ${contract.id}");
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
