@@ -51,31 +51,31 @@ class _HomeScreenState extends State<HomeScreen> {
     final pickedRoomProvider =
         Provider.of<PickedRoomProvider>(context, listen: false);
     final tenantProvider = Provider.of<TenantProvider>(context, listen: false);
-    Provider.of<RentalagreementProvider>(context, listen: false)
-        .fetchActiveRentalAgreementByProfileId(context);
+    final rentalProvider =
+        Provider.of<RentalagreementProvider>(context, listen: false);
 
-    // Step 1: Fetch user profile
+    rentalProvider.fetchActiveRentalAgreementByProfileId(context);
+
     final hasProfile = await profileProvider.loadUserProfile(context);
+
     setState(() {
-      _profileCheckFuture =
-          Future.value(hasProfile); // ✅ Ensure it updates correctly
+      _profileCheckFuture = Future.value(hasProfile);
     });
 
-    // Step 2: Fetch picked rooms only if profile exists
     if (hasProfile &&
         pickedRoomProvider.userId != null &&
         pickedRoomProvider.token != null) {
-      pickedRoomProvider.fetchPickedRooms(
+      await pickedRoomProvider.fetchPickedRooms(
         userProfileUserId: pickedRoomProvider.userId,
         token: pickedRoomProvider.token,
       );
+
+      setState(() {}); // 🔥 UI refresh after rooms are fetched
     }
 
-    // Step 3: Check if tenant already exists before fetching
     if (tenantProvider.tenant == null) {
       await tenantProvider.fetchTenant(context);
-    } else {
-      print("Tenant data already exists, skipping fetch.");
+      setState(() {}); // 🔥 UI refresh after tenant is updated
     }
   }
 
@@ -270,8 +270,18 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             trailing: Icon(Icons.arrow_forward_ios,
                                 color: Colors.grey[600], size: 18),
-                            onTap: () {
+                            onTap: () async {
                               print("Selected contract: ${contract.id}");
+                              // await Provider.of<TenantProvider>(context,
+                              //         listen: false)
+                              //     .viewActiveAgreementsCountDown(
+                              //         context, contract.id);
+                              await Provider.of<RentalagreementProvider>(
+                                      context,
+                                      listen: false)
+                                  .viewRentalAgreementCountdown(
+                                      context, contract.id);
+
                               Navigator.pop(context);
                             },
                           );

@@ -75,7 +75,8 @@ class Tenant {
     return Tenant(
       id: json['id'],
       profileId: json['profile_id'],
-      rentalAgreementId: json['rental_agreement_id'],
+      rentalAgreementId:
+          int.tryParse(json["rental_agreement_id"].toString()) ?? 0,
       status: json['status'],
       evacuationDate: json['evacuation_date'] as String?, // Nullable
       moveOutDate: json['move_out_date'] as String?, // Nullable
@@ -86,7 +87,6 @@ class Tenant {
     );
   }
 }
-
 
 class RentalAgreement {
   final int id;
@@ -132,12 +132,14 @@ class RentalAgreement {
       description: json['description'] ?? '',
       signaturePngString: json['signature_png_string'] ?? '',
       status: json['status'] ?? '',
-      createdAt: json['created_at'] != null ? DateTime.parse(json['created_at']) : DateTime.now(),
-      updatedAt: json['updated_at'] != null ? DateTime.parse(json['updated_at']) : DateTime.now(),
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
+          : DateTime.now(),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
+          : DateTime.now(),
     );
   }
-
-
 }
 
 class UserProfile {
@@ -181,14 +183,13 @@ class UserProfile {
       occupation: json['occupation'] ?? '',
       driverLicenseNumber: json['driver_license_number'] as String?,
       nationalId: json['national_id'] ?? '',
-      passportNumber: json['passport_number'] as String?, 
-      socialSecurityNumber: json['social_security_number'] as String?, 
+      passportNumber: json['passport_number'] as String?,
+      socialSecurityNumber: json['social_security_number'] as String?,
       steps: json['steps'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );
   }
-
 }
 
 class TenantBilling {
