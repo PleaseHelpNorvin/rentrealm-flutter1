@@ -1305,39 +1305,42 @@ class ApiService {
     return null;
   }
 
-  // Future<DashboardResponse?> getDashboardData({
-  //   required int rentalAgreementId,
-  //   required String token,
-  // }) async {
-  //   print("from getDashboardData() rentalagreementId: $rentalAgreementId");
-  //   print("from getDashboardData() token: $token");
+  Future<RentalAgreementCountdownResponse?> getRentalAgreementCountdown({
+    required String token,
+    required int rentalAgreement,
+  }) async {
+    print('from GetRentalAgreementCountdown() token: $token');
+    print(
+        'from GetRentalAgreementCountdown() rentalAgreement: $rentalAgreement');
 
-  //   final uri = Uri.parse(
-  //       "$rest/tenant/tenant/show-dashboard-data-for-agreement/$rentalAgreementId");
-  //   final header = {
-  //     "Content-Type": "application/json",
-  //     "Accept": "application/json",
-  //     "Authorization": "Bearer $token",
-  //   };
+    final uri = Uri.parse(
+        "$rest/tenant/rental_agreement/view-contract-countdown/$rentalAgreement");
 
-  //   try {
-  //     final response = await http.get(uri, headers: header);
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
 
-  //     if (response.statusCode == 200 || response.statusCode == 201) {
-  //       final Map<String, dynamic> responseData = jsonDecode(response.body);
-  //       debugPrint(
-  //           "responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}",
-  //           wrapWidth: 1024);
-  //       return DashboardResponse.fromJson(responseData); // Corrected this line
-  //     } else if (response.statusCode == 404) {
-  //       print('Error: ${response.statusCode} - ${response.body}');
-  //       print('navigating to create tenant screen');
-  //       return null;
-  //     }
-  //   } catch (e) {
-  //     print("EXCEPTION: $e");
-  //     return null;
-  //   }
-  //   return null;
-  // }
+    try {
+      final response = await http.get(uri, headers: header);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        debugPrint(
+            "responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}",
+            wrapWidth: 1024);
+        return RentalAgreementCountdownResponse.fromJson(
+            responseData); // Corrected this line
+      } else if (response.statusCode == 404) {
+        print('Error: ${response.statusCode} - ${response.body}');
+        print('navigating to create tenant screen');
+        return null;
+      }
+    } catch (e) {
+      print("EXCEPTION $e");
+      return null;
+    }
+    return null;
+  }
 }

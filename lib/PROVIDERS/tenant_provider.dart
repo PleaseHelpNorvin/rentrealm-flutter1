@@ -12,7 +12,7 @@ class TenantProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   TenantResponse? _tenant;
-  TenantBilling? _latestBilling;  // Updated to match the actual model name
+  TenantBilling? _latestBilling; // Updated to match the actual model name
   List<TenantMaintenanceRequest> _maintenanceRequests = []; // Updated type
   String? _nextBillingMonth;
   RentalAgreement? _rentalAgreement;
@@ -20,7 +20,8 @@ class TenantProvider extends ChangeNotifier {
   // Getters
   TenantResponse? get tenant => _tenant;
   TenantBilling? get latestBilling => _latestBilling;
-  List<TenantMaintenanceRequest> get maintenanceRequests => _maintenanceRequests;
+  List<TenantMaintenanceRequest> get maintenanceRequests =>
+      _maintenanceRequests;
   String? get nextBillingMonth => _nextBillingMonth;
   RentalAgreement? get rentalAgreement => _rentalAgreement;
 
@@ -39,7 +40,8 @@ class TenantProvider extends ChangeNotifier {
 
   Future<void> fetchTenant(BuildContext context) async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final profileProvider = Provider.of<ProfileProvider>(context, listen: false);
+    final profileProvider =
+        Provider.of<ProfileProvider>(context, listen: false);
 
     int? profileId = profileProvider.userProfile?.data.id;
     String? token = authProvider.token;
@@ -56,18 +58,25 @@ class TenantProvider extends ChangeNotifier {
 
       _isLoading = true;
       notifyListeners();
-      
+
       try {
         final response = await apiService.getTenantByProfileId(
           profileId: profileId,
           token: token,
         );
         if (response != null && response.success) {
-          print("responseData from fetchTenant Call: ${response.data.latestBilling?.billingMonth}");
-          print("responseData from fetchTenant Call: ${response.data.tenantMaintenanceRequest.first.description}");
-          print("responseData from fetchTenant Call: ${response.data.nextBillingMonth}");
-          print("responseData from fetchTenant Call: ${response.data.tenant.rentalAgreement.agreementCode}");
+          print(
+              "responseData from fetchTenant Call: ${response.data.latestBilling?.billingMonth}");
+          print(
+              "responseData from fetchTenant Call: ${response.data.tenantMaintenanceRequest.first.description}");
+          print(
+              "responseData from fetchTenant Call: ${response.data.nextBillingMonth}");
+          print(
+              "responseData from fetchTenant Call: ${response.data.tenant.rentalAgreement.agreementCode}");
           setTenant(response);
+
+          _rentalAgreement = response.data.tenant.rentalAgreement;
+          notifyListeners();
         }
       } catch (e) {
         print("EXCEPTION: $e");

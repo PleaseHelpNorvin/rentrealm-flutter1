@@ -13,6 +13,7 @@ import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 // import '../Models/rentalAgreement_model.dart';
 import '../models/rentalAgreement_model.dart';
 import '../networks/apiservice.dart';
+import '../screens/HOME/rentalAgreementCountdown.dart';
 import 'profile_provider.dart';
 
 class RentalagreementProvider extends ChangeNotifier {
@@ -180,5 +181,47 @@ class RentalagreementProvider extends ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> viewRentalAgreementCountdown(
+      BuildContext context, int rentalAgreementId) async {
+    initAuthDetails(context);
+
+    _isLoading = true;
+    notifyListeners();
+
+    if (token == 'no token') {
+      print("Error: Missing authentication details");
+      return;
+    }
+
+    print("Fetching Rental Agreement Countdown with token: $token");
+
+    final response = await apiService.getRentalAgreementCountdown(
+        token: token, rentalAgreement: rentalAgreementId);
+
+    _isLoading = false;
+    notifyListeners();
+
+    if (response != null && response.success) {
+      print("Rental Agreement Data: ${response.data.toString()}");
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showModalBottomSheet(
+          context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          backgroundColor: Colors.white,
+          isScrollControlled: true,
+          builder: (context) {
+            return RentalAgreementDetailsModal(data: response.data);
+          },
+        );
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to load rental agreement details")),
+      );
+    }
   }
 }
