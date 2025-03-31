@@ -1377,58 +1377,67 @@ class ApiService {
     }
     return null;
   }
+Future<MaintenanceRequestResponse?> storeMaintenanceRequest({
+  required String token,
+  required int? tenantId, 
+  required String title, 
+  required String description, 
+  required int roomId, 
+  required File? savedImage
+}) async {
 
-  // Future<MaintenanceRequestResponse?>storeMaintenanceRequest({
-  //   required String token,
-  //   required int? profileId, 
-  //   required String title, 
-  //   required String description, 
-  //   required int roomId, 
-  //   required File? savedImage
-  // }) async {
+  print(" API Call - storeMaintenanceRequest()");
 
-  //   print("from storeMaintenanceRequest() token: $token");
-  //   print("from storeMaintenanceRequest() profileId: $profileId");
-  //   print("from storeMaintenanceRequest() title: $title");
-  //   print("from storeMaintenanceRequest() description: $description");
-  //   print("from storeMaintenanceRequest() roomId: $roomId");
-  //   print("from storeMaintenanceRequest() savedImage: ${savedImage?.path}");
+  // Ensure required fields are not empty or null
+  if (tenantId == null || title.isEmpty || description.isEmpty) {
+    print(" Missing required fields");
+    return null;
+  }
 
+  try {
+    Uri url = Uri.parse("$rest/landlord/maintenance_request/create-maintenance-request");
+    
+    var request = http.MultipartRequest("POST", url)
+      ..headers['Authorization'] = "Bearer $token"
+      ..headers['Accept'] = "application/json"
+      ..fields['title'] = title
+      ..fields['description'] = description
+      ..fields['room_id'] = roomId.toString();
 
-  //   try {
-  //     Uri url = Uri.parse("https://your-api.com/api/maintenance-requests");
-      
-  //   var request = http.MultipartRequest("POST", url)
-  //     ..headers['Authorization'] = "Bearer $token"
-  //     ..fields['title'] = title
-  //     ..fields['description'] = description
-  //     ..fields['room_id'] = roomId.toString()
-  //     ..fields['profile_id'] = profileId.toString();
+    if (tenantId != null) {
+      request.fields['tenant_id'] = tenantId.toString();
+    }
 
-  //   if (savedImage != null) {
-  //     request.files.add(
-  //       await http.MultipartFile.fromPath(
-  //         'image', // Match API field name
-  //         savedImage.path,
-  //       ),
-  //     );
-  //   }
+    // Handle file if image exists
+    if (savedImage != null) {
+      print("📷 Image exists at: ${savedImage.path}");
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'images[]', // Match API field name
+          savedImage.absolute.path,
+        ),
+      );
+    } else {
+      print(" No image selected");
+    }
 
-  //   var streamedResponse = await request.send();
-  //   var response = await http.Response.fromStream(streamedResponse);
+    var streamedResponse = await request.send();
+    var response = await http.Response.fromStream(streamedResponse);
+    
+    if (response.statusCode == 201) {
+      print("streamedResponse: ${streamedResponse}");
+      print("✅ Maintenance request submitted!");
+      return MaintenanceRequestResponse.fromJson(jsonDecode(response.body));
+    } else {
+      print(" Error: ${response.statusCode}");
+      print("Response: ${response.body}");
+      return null;
+    }
 
-  //     if (response.statusCode == 201) {
-  //       print("✅ Maintenance request submitted!");
-  //       return MaintenanceRequestResponse.fromJson(response.body);
-  //     } else {
-  //       print("❌ Error: ${response.statusCode}");
-  //       print("Response: ${response.body}");
-  //       return null;
-  //     }
+  } catch (e) {
+    print("storeMaintenanceRequest EXCEPTION: $e");
+    return null;
+  }
+}
 
-  //   } catch (e) {
-  //     print("storeMaintenanceRequest EXCEPTION: $e");
-  //     return null;
-  //   }
-  // }
 }
