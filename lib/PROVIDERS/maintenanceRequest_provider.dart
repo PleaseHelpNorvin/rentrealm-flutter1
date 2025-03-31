@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/tenant_provider.dart';
 
 import '../models/rentalAgreement_model.dart';
 import '../networks/apiservice.dart';
@@ -72,50 +73,47 @@ class MaintenancerequestProvider extends ChangeNotifier {
     return newImage;
   }
 
-  Future<void> createMaintenanceRequest(
+ Future<void> createMaintenanceRequest(
   BuildContext context, 
   String title,
   String description, 
   int roomId,
   File? imageFile
 ) async {
-  initAuthDetails(context);
+  try {
+    initAuthDetails(context);
+    int? tenantId = Provider.of<TenantProvider>(context, listen: false).tenant?.data.tenant.id;
 
-  if (token == 'no token' || profileId == null) {
-    print("❌ Error: Missing authentication details");
-    print("🛑 token: $token");
-    print("🛑 profileId: $profileId");
-    return;
+    if (token == 'no token' || profileId == null || tenantId == null) {
+      print("❌ Missing authentication details");
+      return;
+    }
+
+    File? savedImage;
+    if (imageFile != null) {
+      savedImage = await saveImagePermanently(imageFile);
+      print("✅ New image path: ${savedImage.path}");
+    } else {
+      print("⚠️ No image selected");
+    }
+
+    final response = await apiService.storeMaintenanceRequest(
+      token: token, 
+      tenantId: tenantId,
+      title: title, 
+      description: description, 
+      roomId: roomId, 
+      savedImage: savedImage
+    );
+
+    if (response != null) {
+      print("Maintenance request submitted successfully!");
+    } else {
+      print("Failed to submit maintenance request.");
+    }
+  } catch (e) {
+    print(" Error during request: $e");
   }
-
-  print("📌 from createMaintenanceRequest title: $title");
-  print("📌 from createMaintenanceRequest description: $description");
-  print("📌 from createMaintenanceRequest roomId: $roomId");
-  print("📌 from createMaintenanceRequest imageFile: $imageFile");
-
-  // File? savedImage;
-  
-  // if (imageFile != null) {
-  //   savedImage = await saveImagePermanently(imageFile);
-  //   print("✅ New image path: ${savedImage.path}");
-  // } else {
-  //   print("⚠️ No image selected");
-  // }
-
-  // final response = await apiService.storeMaintenanceRequest(
-  //   token: token, 
-  //   profileId: profileId, 
-  //   title: title, 
-  //   description: description, 
-  //   roomId: roomId, 
-  //   savedImage: savedImage // This now has a value or remains null
-  // );
-
-  // if (response != null) {
-  //   print("🎉 Maintenance request submitted successfully!");
-  // } else {
-  //   print("❌ Failed to submit maintenance request.");
-  // }
 }
 
 }
