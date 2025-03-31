@@ -132,8 +132,7 @@ class ReservationProvider extends ChangeNotifier {
         reservationId: reservationId, token: token);
 
     if (response != null && response.success) {
-      // if (response.data.reservations.isNotEmpty) {
-      // singleReservation = response.data;
+
       setSingleReservation(response.data);
 
       print(
