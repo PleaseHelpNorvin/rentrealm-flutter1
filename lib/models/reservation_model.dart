@@ -92,9 +92,12 @@ class ReservationResponse {
       roomId: json['room_id'],
       paymentMethod: json['payment_method'],
       reservationCode: json['reservation_code'],
-      reservationPaymentProofUrl: json['reservation_payment_proof_url'] != null
-          ? List<String>.from(jsonDecode(json['reservation_payment_proof_url']))
+     reservationPaymentProofUrl: json['reservation_payment_proof_url'] is List
+      ? List<String>.from(json['reservation_payment_proof_url'])
+      : json['reservation_payment_proof_url'] is String
+          ? [json['reservation_payment_proof_url']]
           : [],
+
       status: json['status'],
       approvedBy: json['approved_by'], // Can be null
       approvalDate: json['approval_date'], // Can be null

@@ -233,3 +233,64 @@ class RentalAgreementData {
     };
   }
 }
+
+
+class RoomsByProfileIdResponse {
+  final bool success;
+  final String message;
+  final List<RoomByProfileId> data;
+
+  RoomsByProfileIdResponse({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  // ✅ FIX: Accepts Map instead of String
+  factory RoomsByProfileIdResponse.fromJson(Map<String, dynamic> json) =>
+      RoomsByProfileIdResponse.fromMap(json);
+
+  String toJson() => json.encode(toMap());
+
+  factory RoomsByProfileIdResponse.fromMap(Map<String, dynamic> json) =>
+      RoomsByProfileIdResponse(
+        success: json["success"],
+        message: json["message"],
+        data: List<RoomByProfileId>.from(json["data"].map((x) => RoomByProfileId.fromMap(x))),
+      );
+
+  Map<String, dynamic> toMap() => {
+        "success": success,
+        "message": message,
+        "data": List<dynamic>.from(data.map((x) => x.toMap())),
+      };
+}
+
+class RoomByProfileId {
+  final int roomId;
+  final String roomCode;
+  final DateTime rentStartDate;
+  final DateTime? rentEndDate;
+
+  RoomByProfileId({
+    required this.roomId,
+    required this.roomCode,
+    required this.rentStartDate,
+    this.rentEndDate,
+  });
+
+  factory RoomByProfileId.fromMap(Map<String, dynamic> json) => RoomByProfileId(
+        roomId: json["room_id"],
+        roomCode: json["room_code"],
+        rentStartDate: DateTime.parse(json["rent_start_date"]),
+        rentEndDate:
+            json["rent_end_date"] != null ? DateTime.parse(json["rent_end_date"]) : null,
+      );
+
+  Map<String, dynamic> toMap() => {
+        "room_id": roomId,
+        "room_code": roomCode,
+        "rent_start_date": rentStartDate.toIso8601String(),
+        "rent_end_date": rentEndDate?.toIso8601String(),
+      };
+}

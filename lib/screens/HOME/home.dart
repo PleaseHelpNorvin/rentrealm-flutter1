@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +7,7 @@ import 'package:rentealm_flutter/PROVIDERS/reservation_provider.dart';
 import 'package:rentealm_flutter/models/reservation_model.dart';
 // import 'package:rentealm_flutter/PROVIDERS/reservation_provider.dart';
 // import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
+import '../../PROVIDERS/maintenanceRequest_provider.dart';
 import '../../PROVIDERS/tenant_provider.dart';
 import 'package:rentealm_flutter/SCREENS/PROFILE/CREATE/create_profile_screen1.dart';
 import '../../models/rentalAgreement_model.dart';
@@ -53,8 +55,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final tenantProvider = Provider.of<TenantProvider>(context, listen: false);
     final rentalProvider =
         Provider.of<RentalagreementProvider>(context, listen: false);
+    final maintenancerequestProvider = Provider.of<MaintenancerequestProvider>(context, listen:false);
 
     rentalProvider.fetchActiveRentalAgreementByProfileId(context);
+
 
     final hasProfile = await profileProvider.loadUserProfile(context);
 
@@ -77,6 +81,9 @@ class _HomeScreenState extends State<HomeScreen> {
       await tenantProvider.fetchTenant(context);
       setState(() {}); // 🔥 UI refresh after tenant is updated
     }
+
+    maintenancerequestProvider.fetchRoomByProfileId(context); 
+      setState(() {});
   }
 
   @override
@@ -120,13 +127,14 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-        child: Consumer4<ProfileProvider, PickedRoomProvider, TenantProvider,
-            RentalagreementProvider>(
+        child: Consumer5<ProfileProvider, PickedRoomProvider, TenantProvider,
+            RentalagreementProvider, MaintenancerequestProvider >(
           builder: (context, profileProvider, pickedRoomProvider,
-              tenantProvider, rentalAgreementProvider, child) {
+              tenantProvider, rentalAgreementProvider, maintenanceRequestProvider, child) {
             final singlePickedRoom = pickedRoomProvider.singlePickedRoom;
             final tenant = tenantProvider.tenant;
             final activeAgreements = rentalAgreementProvider.rentalAgreements;
+            final roomByProfileIdList = maintenanceRequestProvider.roomByProfileIdList;
 
             // ✅ Show a loading spinner if any provider is still fetching data
             if (profileProvider.isLoading ||
@@ -145,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (tenant != null) ...[
                     _buildChangeActiveRentalAgreement(context, tenant),
                     _buildShowMonthlyCountdownDashboard(tenant),
-                    _buildShowMaintenanceRequestsList(tenant),
+                    _buildShowMaintenanceRequestsList(tenant,roomByProfileIdList),
                   ] else ...[
                     if (singlePickedRoom != null)
                       _buildContinueReservationPayment(
@@ -182,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         child: const Text(
-          "Select Rental Agreement",
+          "Inspect Your Other Active Rental Agreement",
           style: TextStyle(
               color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
         ),
@@ -456,11 +464,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildShowMaintenanceRequestsList(TenantResponse? tenantResponse) {
+  Widget _buildShowMaintenanceRequestsList(TenantResponse? tenantResponse, List<RoomByProfileId> roomByProfileIdList) {
     if (tenantResponse == null) return SizedBox();
+
+    if (roomByProfileIdList == null) return SizedBox();
 
     final maintenanceRequests = tenantResponse.data.tenantMaintenanceRequest;
 
+      
     return SizedBox(
       width: double.infinity,
       child: Card(
@@ -485,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 10),
                   ElevatedButton.icon(
                     onPressed: () {
-                      _showAddMaintenanceRequestDialog(context);
+                      _showAddMaintenanceRequestDialog(context, roomByProfileIdList);
                     },
                     icon: Icon(Icons.add),
                     label: Text("Add Request"),
@@ -563,9 +574,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Function to show Add Maintenance Request dialog
 
-  void _showAddMaintenanceRequestDialog(BuildContext context) {
+    void _showAddMaintenanceRequestDialog(BuildContext context, List<RoomByProfileId> roomCodeLists) {
+    final _formKey = GlobalKey<FormState>(); // Form key for validation
+    TextEditingController _titleController = TextEditingController();
     TextEditingController _descriptionController = TextEditingController();
-    File? _selectedImage; // Store selected image
+    File? _selectedImage;
+    int? _selectedRoomId;
 
     showModalBottomSheet(
       context: context,
@@ -584,94 +598,133 @@ class _HomeScreenState extends State<HomeScreen> {
                 top: 16,
                 bottom: MediaQuery.of(context).viewInsets.bottom + 16,
               ),
-              child: Wrap(
-                children: [
-                  // Title
-                  Center(
-                    child: Text(
-                      "Add Maintenance Request",
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue),
+              child: Form(
+                key: _formKey, // Attach form key
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Title
+                    Center(
+                      child: Text(
+                        "Add Maintenance Request",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 20),
 
-                  // Description Input Field
-                  TextField(
-                    controller: _descriptionController,
-                    decoration: InputDecoration(
-                      labelText: "Describe the issue",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)),
-                    ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Image Picker Button
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      final pickedFile = await ImagePicker()
-                          .pickImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
+                    // Dropdown for Room Code Selection
+                    DropdownButtonFormField<int>(
+                      value: _selectedRoomId,
+                      onChanged: (newValue) {
                         setState(() {
-                          _selectedImage = File(pickedFile.path);
+                          _selectedRoomId = newValue;
                         });
-                      }
-                    },
-                    icon: Icon(Icons.photo),
-                    label: Text("Add Photo"),
-                    style:
-                        ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                  ),
-                  const SizedBox(height: 10),
+                      },
+                      decoration: InputDecoration(
+                        labelText: "Select Room Code",
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      items: roomCodeLists.map((room) {
+                        return DropdownMenuItem<int>(
+                          value: room.roomId,
+                          child: Text(room.roomCode),
+                        );
+                      }).toList(),
+                      validator: (value) => value == null ? "Please select a room code" : null, // Validation
+                    ),
+                    const SizedBox(height: 20),
 
-                  // Display Selected Image
-                  if (_selectedImage != null)
-                    Column(
+                    // Title Input Field
+                    TextFormField(
+                      controller: _titleController,
+                      decoration: InputDecoration(
+                        labelText: "Title of the issue",
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      validator: (value) => value == null || value.trim().isEmpty ? "Title cannot be empty" : null, // Validation
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Description Input Field
+                    TextFormField(
+                      controller: _descriptionController,
+                      decoration: InputDecoration(
+                        labelText: "Describe the issue",
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      maxLines: 3,
+                      validator: (value) => value == null || value.trim().isEmpty ? "Description cannot be empty" : null, // Validation
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Image Picker Button
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        if (pickedFile != null) {
+                          setState(() {
+                            _selectedImage = File(pickedFile.path);
+                          });
+                        }
+                      },
+                      icon: Icon(Icons.photo),
+                      label: Text("Add Photo"),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                    ),
+                    const SizedBox(height: 5),
+
+                    // Display Selected Image
+                    if (_selectedImage != null)
+                      Column(
+                        children: [
+                          Image.file(_selectedImage!, height: 150, fit: BoxFit.cover),
+                          const SizedBox(height: 10),
+                          TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedImage = null;
+                              });
+                            },
+                            child: Text("Remove Photo", style: TextStyle(color: Colors.red)),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(height: 5),
+
+                    // Buttons (Cancel & Submit)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Image.file(_selectedImage!,
-                            height: 150, fit: BoxFit.cover),
-                        const SizedBox(height: 10),
                         TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                        ),
+                        ElevatedButton(
                           onPressed: () {
-                            setState(() {
-                              _selectedImage =
-                                  null; // Remove the selected image
-                            });
+                            if (_formKey.currentState!.validate()) { // Validate before submitting
+                              String title = _titleController.text.trim();
+                              String description = _descriptionController.text.trim();
+                              int? roomId = _selectedRoomId;
+                              File? imageFile = _selectedImage; // Get image file path
+                              
+                              if (roomId == null) {
+                                print("Room ID is required.");
+                                return;
+                              }
+
+                              Provider.of<MaintenancerequestProvider>(context, listen: false)
+                                .createMaintenanceRequest(context, title, description, roomId, imageFile);
+                              Navigator.of(context).pop();
+                            }
                           },
-                          child: Text("Remove Photo",
-                              style: TextStyle(color: Colors.red)),
+                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                          child: Text("Submit", style: TextStyle(color: Colors.white)),
                         ),
                       ],
                     ),
-
-                  const SizedBox(height: 20),
-
-                  // Buttons (Cancel & Submit)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        child:
-                            Text("Cancel", style: TextStyle(color: Colors.red)),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Submit logic here
-                          Navigator.of(context).pop();
-                        },
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blue),
-                        child: Text("Submit",
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },
@@ -679,6 +732,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
 
   /// Widget shown when the user doesn't have a profile
   Widget _buildNoDataCard() {

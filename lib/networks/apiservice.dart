@@ -16,6 +16,7 @@ import '../MODELS/profile_model.dart';
 import '../MODELS/user_model.dart';
 import '../models/billing_model.dart';
 // import '../models/dashboardData_model.dart';
+import '../models/maintenanceRequest_model.dart';
 import '../models/notification_model.dart';
 import '../models/payment_model.dart';
 import '../models/paymongo_model.dart';
@@ -1343,4 +1344,91 @@ class ApiService {
     }
     return null;
   }
+
+  Future<RoomsByProfileIdResponse?>getRoomByProfileId({required String token, required int? profileId}) async {
+    print("from getRoomByProfileId() token: $token");
+    print("from getRoomByProfileId() profileId: $profileId");
+
+    final uri = Uri.parse("$rest/landlord/rental_agreement/get-rooms-by-profileid/$profileId");
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.get(uri, headers: header);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        debugPrint(
+            "responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}",
+            wrapWidth: 1024);
+        return RoomsByProfileIdResponse.fromJson(
+            responseData); // Corrected this line
+      } else if (response.statusCode == 404) {
+        print('Error: ${response.statusCode} - ${response.body}');
+        print('navigating to create tenant screen');
+        return null;
+      }
+    } catch (e) {
+      print("EXCEPTION $e");
+      return null;
+    }
+    return null;
+  }
+
+  // Future<MaintenanceRequestResponse?>storeMaintenanceRequest({
+  //   required String token,
+  //   required int? profileId, 
+  //   required String title, 
+  //   required String description, 
+  //   required int roomId, 
+  //   required File? savedImage
+  // }) async {
+
+  //   print("from storeMaintenanceRequest() token: $token");
+  //   print("from storeMaintenanceRequest() profileId: $profileId");
+  //   print("from storeMaintenanceRequest() title: $title");
+  //   print("from storeMaintenanceRequest() description: $description");
+  //   print("from storeMaintenanceRequest() roomId: $roomId");
+  //   print("from storeMaintenanceRequest() savedImage: ${savedImage?.path}");
+
+
+  //   try {
+  //     Uri url = Uri.parse("https://your-api.com/api/maintenance-requests");
+      
+  //   var request = http.MultipartRequest("POST", url)
+  //     ..headers['Authorization'] = "Bearer $token"
+  //     ..fields['title'] = title
+  //     ..fields['description'] = description
+  //     ..fields['room_id'] = roomId.toString()
+  //     ..fields['profile_id'] = profileId.toString();
+
+  //   if (savedImage != null) {
+  //     request.files.add(
+  //       await http.MultipartFile.fromPath(
+  //         'image', // Match API field name
+  //         savedImage.path,
+  //       ),
+  //     );
+  //   }
+
+  //   var streamedResponse = await request.send();
+  //   var response = await http.Response.fromStream(streamedResponse);
+
+  //     if (response.statusCode == 201) {
+  //       print("✅ Maintenance request submitted!");
+  //       return MaintenanceRequestResponse.fromJson(response.body);
+  //     } else {
+  //       print("❌ Error: ${response.statusCode}");
+  //       print("Response: ${response.body}");
+  //       return null;
+  //     }
+
+  //   } catch (e) {
+  //     print("storeMaintenanceRequest EXCEPTION: $e");
+  //     return null;
+  //   }
+  // }
 }

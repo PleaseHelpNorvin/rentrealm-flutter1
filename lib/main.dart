@@ -7,6 +7,7 @@ import 'package:app_links/app_links.dart';
 import 'package:rentealm_flutter/PROVIDERS/billing_provider.dart';
 
 import 'PROVIDERS/auth_provider.dart';
+import 'PROVIDERS/maintenanceRequest_provider.dart';
 import 'PROVIDERS/pickedRoom_provider.dart';
 import 'PROVIDERS/reservation_provider.dart';
 import 'PROVIDERS/theme_provider.dart';
@@ -74,6 +75,7 @@ Widget build(BuildContext context) {
       ChangeNotifierProvider(create: (_) => PaymentProvider()),
       ChangeNotifierProvider(create: (_) => ReservationProvider()),
       ChangeNotifierProvider(create: (_) => BillingProvider()),
+      ChangeNotifierProvider(create: (_) => MaintenancerequestProvider()),
       ChangeNotifierProvider(
         create: (context) => PickedRoomProvider(
           authProvider: Provider.of<AuthProvider>(context, listen: false),
