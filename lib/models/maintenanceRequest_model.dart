@@ -33,6 +33,8 @@ class MaintenanceData {
       requests = list.map((i) => MaintenanceRequest.fromJson(i)).toList();
     } else if (list is Map<String, dynamic>) {
       requests = [MaintenanceRequest.fromJson(list)];
+    } else {
+      requests = [];
     }
     
     return MaintenanceData(maintenanceRequests: requests);
@@ -45,9 +47,10 @@ class MaintenanceRequest {
   final int tenantId;
   final int roomId;
   final int? handymanId;
-  final String title;
-  final String description;
-  final List<String> images;
+  final int? assignedBy;
+  late final String title;
+  late final String description;
+  List<String> images;
   final String status;
   final DateTime requestedAt;
   final DateTime? assistedAt;
@@ -61,6 +64,7 @@ class MaintenanceRequest {
     required this.tenantId,
     required this.roomId,
     this.handymanId,
+    this.assignedBy,
     required this.title,
     required this.description,
     required this.images,
@@ -72,24 +76,35 @@ class MaintenanceRequest {
     required this.updatedAt,
   });
 
-  factory MaintenanceRequest.fromJson(Map<String, dynamic> json) {
-    return MaintenanceRequest(
-      id: int.parse(json['id'].toString()),
-      ticketCode: json['ticket_code'] ?? '',
-      tenantId: int.parse(json['tenant_id'].toString()),
-      roomId: int.parse(json['room_id'].toString()),
-      handymanId: json['handyman_id'] != null ? int.tryParse(json['handyman_id'].toString()) : null,
-      title: json['title'],
-      description: json['description'],
-      images: json['images'] != null && json['images'] is List
-          ? List<String>.from(json['images'])
-          : [],  // Handle empty or null images field
-      status: json['status'],
-      requestedAt: DateTime.parse(json['requested_at']),
-      assistedAt: json['assisted_at'] != null ? DateTime.parse(json['assisted_at']) : null,
-      completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at']) : null,
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-    );
+  List<String> get getImages => images;
+
+  // Now, you can modify the images list via this method.
+  void updateImages(List<String> newImages) {
+    images.clear(); // Clear the existing images
+    images.addAll(newImages); // Add new images
   }
+
+
+  factory MaintenanceRequest.fromJson(Map<String, dynamic> json) {
+  return MaintenanceRequest(
+    id: int.parse(json['id'].toString()),
+    ticketCode: json['ticket_code']?.toString() ?? "",  // ✅ Fix applied here
+    tenantId: int.parse(json['tenant_id'].toString()),
+    roomId: int.parse(json['room_id'].toString()),
+    handymanId: json['handyman_id'] != null ? int.tryParse(json['handyman_id'].toString()) : null,
+    assignedBy: json['assigned_by'] != null ? int.tryParse(json['assigned_by'].toString()) : null,
+    title: json['title']?.toString() ?? "",  // ✅ Null safety applied
+    description: json['description']?.toString() ?? "",  // ✅ Null safety applied
+    images: json['images'] != null && json['images'] is List
+        ? List<String>.from(json['images'])
+        : [],  
+    status: json['status']?.toString() ?? "",  // ✅ Fix applied here
+    requestedAt: DateTime.parse(json['requested_at']),
+    assistedAt: json['assisted_at'] != null ? DateTime.tryParse(json['assisted_at']) : null,
+    completedAt: json['completed_at'] != null ? DateTime.tryParse(json['completed_at']) : null,
+    createdAt: DateTime.parse(json['created_at']),
+    updatedAt: DateTime.parse(json['updated_at']),
+  );
+}
+
 }

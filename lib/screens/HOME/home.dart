@@ -1,10 +1,12 @@
-import 'package:flutter/foundation.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
-import 'package:rentealm_flutter/PROVIDERS/reservation_provider.dart';
-import 'package:rentealm_flutter/models/reservation_model.dart';
+// import 'package:rentealm_flutter/PROVIDERS/reservation_provider.dart';
+import 'package:rentealm_flutter/models/maintenanceRequest_model.dart';
+// import 'package:rentealm_flutter/models/reservation_model.dart';
 // import 'package:rentealm_flutter/PROVIDERS/reservation_provider.dart';
 // import 'package:rentealm_flutter/PROVIDERS/rentalAgreement_provider.dart';
 import '../../PROVIDERS/maintenanceRequest_provider.dart';
@@ -22,9 +24,9 @@ import '../outer_create_tenant_screen4.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-import 'package:rentealm_flutter/models/rentalAgreement_model.dart'
-    as rentalModel;
-import 'package:rentealm_flutter/models/tenant_model.dart' as tenantModel;
+// import 'package:rentealm_flutter/models/rentalAgreement_model.dart'
+    // as rentalModel;
+// import 'package:rentealm_flutter/models/tenant_model.dart' as tenantModel;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -35,6 +37,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<bool> _profileCheckFuture;
+   File? _image;
 
   @override
   void initState() {
@@ -83,6 +86,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     maintenancerequestProvider.fetchRoomByProfileId(context); 
+      setState(() {});
+
+    maintenancerequestProvider.fetchMaintenanceRequestListByTenantId(context);
       setState(() {});
   }
 
@@ -135,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
             final tenant = tenantProvider.tenant;
             final activeAgreements = rentalAgreementProvider.rentalAgreements;
             final roomByProfileIdList = maintenanceRequestProvider.roomByProfileIdList;
+            final maintenanceRequestsList = maintenanceRequestProvider.maintenanceRequests;
 
             // ✅ Show a loading spinner if any provider is still fetching data
             if (profileProvider.isLoading ||
@@ -153,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (tenant != null) ...[
                     _buildChangeActiveRentalAgreement(context, tenant),
                     _buildShowMonthlyCountdownDashboard(tenant),
-                    _buildShowMaintenanceRequestsList(tenant,roomByProfileIdList),
+                    _buildShowMaintenanceRequestsList(tenant,roomByProfileIdList, maintenanceRequestsList),
                   ] else ...[
                     if (singlePickedRoom != null)
                       _buildContinueReservationPayment(
@@ -464,13 +471,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildShowMaintenanceRequestsList(TenantResponse? tenantResponse, List<RoomByProfileId> roomByProfileIdList) {
+  Widget _buildShowMaintenanceRequestsList(TenantResponse? tenantResponse, List<RoomByProfileId> roomByProfileIdList, List<MaintenanceRequest> maintenanceRequestsList) {
     if (tenantResponse == null) return SizedBox();
 
     if (roomByProfileIdList == null) return SizedBox();
+    
 
-    final maintenanceRequests = tenantResponse.data.tenantMaintenanceRequest;
-
+    // final maintenanceRequests = tenantResponse.data.tenantMaintenanceRequest;
       
     return SizedBox(
       width: double.infinity,
@@ -512,7 +519,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 10),
 
               // Show maintenance requests
-              if (maintenanceRequests.isEmpty)
+              if (maintenanceRequestsList.isEmpty)
                 Center(
                   child: Text(
                     "No maintenance requests found.",
@@ -524,20 +531,28 @@ class _HomeScreenState extends State<HomeScreen> {
                 )
               else
                 SizedBox(
-                  height: 300, // Prevents overflow
+                  height: 500, // Prevents overflow
                   child: ListView.builder(
                     shrinkWrap: true,
                     physics: BouncingScrollPhysics(),
-                    itemCount: maintenanceRequests.length,
+                    itemCount: maintenanceRequestsList.length,
                     itemBuilder: (context, index) {
-                      final request = maintenanceRequests[index];
-                      return Card(
+                      final request = maintenanceRequestsList[index];
+                      DateTime requestedAt = DateTime.parse(request.requestedAt.toString());
+                      String formattedDate = DateFormat('MMMM dd, yyyy hh:mm a').format(requestedAt);
+
+                      return GestureDetector(
+                        onTap: () {
+                          print("tapped ${request.id}");
+                          _showMaintenanceRequestDetails(context, request.id);
+                        },
+                        child: Card(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(3)),
                         margin: EdgeInsets.symmetric(vertical: 5),
                         child: ListTile(
                           title: Text(
-                            "Issue: ${request.description}",
+                            "Issue: ${request.ticketCode}",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.blue),
@@ -547,20 +562,45 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Text("Status: ${request.status}",
                                   style: TextStyle(color: Colors.black87)),
-                              Text("Requested On: ${request.requestedAt}",
+                              Text("Requested On: $formattedDate",
                                   style: TextStyle(color: Colors.black54)),
                             ],
                           ),
-                          leading: Icon(Icons.build, color: Colors.blue),
-                          trailing: Icon(
-                            request.status == "Completed"
-                                ? Icons.check_circle
-                                : Icons.pending,
-                            color: request.status == "Completed"
-                                ? Colors.green
-                                : Colors.red,
+                         leading: Icon(Icons.build, color: Colors.blue),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min, // Makes the row take minimum space
+                            children: [
+                              Icon(
+                                request.status == "Completed"
+                                    ? Icons.check_circle
+                                    : Icons.pending,
+                                color: request.status == "Completed"
+                                    ? Colors.green
+                                    : Colors.red,
+                              ),
+                              SizedBox(width: 0), // Reduces the space between icons
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.blue),
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  // Handle the button tap here
+                                  print('Edit button tapped for ticket: ${request.ticketCode}');
+                                  _maintenanceRequestEditForm(context, request.id,  roomByProfileIdList);
+                                },
+                              ),
+                              SizedBox(width: 0), // Reduces the space between icons
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.blue),
+                                padding: EdgeInsets.zero,
+                                onPressed: () {
+                                  // Handle the button tap here
+                                  print('Delete button tapped for ticket: ${request.ticketCode}');
+                                },
+                              ),
+                            ],
                           ),
                         ),
+                      ),
                       );
                     },
                   ),
@@ -571,6 +611,270 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+
+Future<void> _maintenanceRequestEditForm(BuildContext context, int maintenanceId, List<RoomByProfileId> roomCodeLists) async {
+  print("from _maintenanceRequestEditForm() maintenanceId: $maintenanceId");
+
+  final maintenanceRequestProvider = Provider.of<MaintenancerequestProvider>(context, listen: false);
+  maintenanceRequestProvider.setSelectedMaintenanceRequest(maintenanceId);
+
+  final selectedRequest = maintenanceRequestProvider.selectedMaintenanceRequest;
+
+  if (selectedRequest != null) {
+    // Create controllers for title and description
+    TextEditingController titleController = TextEditingController(text: selectedRequest.title);
+    TextEditingController descriptionController = TextEditingController(text: selectedRequest.description);
+    int? _selectedRoomId;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async {
+            maintenanceRequestProvider.clearNewImage(); // Reset image when modal closes
+            return true;
+          },
+          child: DraggableScrollableSheet(
+            initialChildSize: 1.0, // Start at 80% of screen height
+            minChildSize: 0.8, // Minimum height (40% of screen)
+            maxChildSize: 1.0, // Maximum height (full screen)
+            builder: (BuildContext context, ScrollController scrollController) {
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title Section
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Edit Maintenance Request",
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close, color: Colors.grey[700]),
+                            onPressed: () {
+                              maintenanceRequestProvider.clearNewImage(); // Reset image
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                      Divider(),
+
+                      // Image Picker Section
+                      GestureDetector(
+                        onTap: () async {
+                          final picker = ImagePicker();
+                          final XFile? pickedFile = await picker.pickImage(source: ImageSource.camera);
+
+                          if (pickedFile != null) {
+                            print("pickedFile path: ${pickedFile.path}");
+                            maintenanceRequestProvider.updateNewImage(File(pickedFile.path));
+                          } else {
+                            print("No image selected.");
+                          }
+                        },
+                        child: Consumer<MaintenancerequestProvider>(
+                          builder: (context, maintenanceRequestProvider, child) {
+                            return maintenanceRequestProvider.newImage != null
+                                ? Image.file(
+                                    maintenanceRequestProvider.newImage!,
+                                    width: double.infinity,
+                                    height: 200,
+                                    fit: BoxFit.cover,
+                                  )
+                                : selectedRequest.images.isNotEmpty
+                                    ? CachedNetworkImage(
+                                        imageUrl: selectedRequest.images.single,
+                                        placeholder: (context, url) => CircularProgressIndicator(),
+                                        errorWidget: (context, url, error) => Icon(Icons.error),
+                                      )
+                                    : Container(
+                                        height: 200,
+                                        width: double.infinity,
+                                        color: Colors.grey[300],
+                                        child: Center(child: Text("No image selected")),
+                                      );
+                          },
+                        ),
+                      ),
+
+                      // Form Fields
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            DropdownButtonFormField<int>(
+                              value: _selectedRoomId,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  _selectedRoomId = newValue;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: "Select Room Code",
+                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              items: roomCodeLists.map((room) {
+                                return DropdownMenuItem<int>(
+                                  value: room.roomId,
+                                  child: Text(room.roomCode),
+                                );
+                              }).toList(),
+                              validator: (value) => value == null ? "Please select a room code" : null, // Validation
+                            ),
+
+                            Text('Ticket Code: ${selectedRequest.ticketCode}'),
+                            TextField(
+                              controller: titleController,
+                              decoration: InputDecoration(labelText: 'Title'),
+                            ),
+                            TextField(
+                              controller: descriptionController,
+                              decoration: InputDecoration(labelText: 'Description'),
+                            ),
+                            Text('Status: ${selectedRequest.status}'),
+                            Text('Requested At: ${selectedRequest.requestedAt}'),
+                            SizedBox(height: 20),
+
+                            // Save Button
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () async {
+                                    // Get the form field values
+                                    String updatedTitle = titleController.text;
+                                    String updatedDescription = descriptionController.text;
+
+                                    // Check if there is a new image to be updated 
+                                    if (maintenanceRequestProvider.newImage != null) {
+                                      print("Saving new image: ${maintenanceRequestProvider.newImage.toString()}");
+                                    }
+                                    // Update the selected request with the new data
+                                    // selectedRequest.title = updatedTitle;
+                                    // selectedRequest.description = updatedDescription;
+
+                                    // Optionally, you can update other fields such as status or image if needed
+                                    // if (maintenanceRequestProvider.newImage != null) {
+                                    //   selectedRequest.images = maintenanceRequestProvider.newImage;  // Example of updating an image
+                                    // }
+
+                                    // Now, update the provider with the selected maintenance request and close the modal
+                                    maintenanceRequestProvider.setSelectedMaintenanceRequest(maintenanceId);
+                                    File? selectedImage = maintenanceRequestProvider.newImage;
+
+                                    Provider.of<MaintenancerequestProvider>(context, listen: false).updateMaintenanceRequest(context, updatedTitle, updatedDescription, selectedRequest.roomId, selectedImage, maintenanceId);
+
+                                    print("Updated Maintenance Request: ${selectedRequest.title}, ${selectedRequest.description}");
+
+                                    // Logic for closing the modal
+                                    maintenanceRequestProvider.clearNewImage(); // Reset image
+                                    Navigator.pop(context);
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 15),
+                                    backgroundColor: Colors.blue,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                  ),
+                                  child: Text('Save', style: TextStyle(color: Colors.white)),
+                                ),
+                                SizedBox(width: 10),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  } else {
+    print("Selected maintenance request is null");
+  }
+}
+
+
+
+  void _showMaintenanceRequestDetails(BuildContext context, int maintenanceId) {
+    print("from _showMaintenanceRequestDetails() maintenanceId: $maintenanceId");
+
+    // Set the selected maintenance request
+    final maintenanceRequestProvider = Provider.of<MaintenancerequestProvider>(context, listen: false);
+    maintenanceRequestProvider.setSelectedMaintenanceRequest(maintenanceId);
+
+    // Fetch the selected maintenance request from the provider
+    final selectedRequest = maintenanceRequestProvider.selectedMaintenanceRequest;
+
+    // Show the dialog with the selected maintenance request details
+    if (selectedRequest != null) {
+      showGeneralDialog(
+        context: context,
+        barrierDismissible: true, // Allows the dialog to be dismissed by tapping outside of it
+        barrierLabel: 'Maintenance Request Details',
+        transitionDuration: Duration(milliseconds: 300),
+        pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+          return AlertDialog(
+            title: Text('Maintenance Request Details'),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(3), // Set the border radius here
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Ticket Code: ${selectedRequest.ticketCode}'),
+                  Text('Title: ${selectedRequest.title}'),
+                  Text('Description: ${selectedRequest.description}'),
+                  Text('Status: ${selectedRequest.status}'),
+                  Text('Requested At: ${selectedRequest.requestedAt}'),
+                  // Add more fields as needed, such as images or other details
+                  // Example to display images (if any) using CachedNetworkImage
+                  selectedRequest.images.isNotEmpty
+                      ? Column(
+                          children: selectedRequest.images.map((image) {
+                            return CachedNetworkImage(
+                              imageUrl: image,
+                              placeholder: (context, url) => CircularProgressIndicator(),
+                              errorWidget: (context, url, error) => Icon(Icons.error),
+                            );
+                          }).toList(),
+                        )
+                      : SizedBox(),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  print("Image from selectedRequest.images.map((image) or backend : ${selectedRequest.images.toString()} ");
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      print("Selected maintenance request is null");
+    }
+  }
+
 
   // Function to show Add Maintenance Request dialog
 
