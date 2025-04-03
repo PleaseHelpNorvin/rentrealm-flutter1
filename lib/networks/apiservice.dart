@@ -1377,67 +1377,243 @@ class ApiService {
     }
     return null;
   }
-Future<MaintenanceRequestResponse?> storeMaintenanceRequest({
-  required String token,
-  required int? tenantId, 
-  required String title, 
-  required String description, 
-  required int roomId, 
-  required File? savedImage
-}) async {
 
-  print(" API Call - storeMaintenanceRequest()");
+  Future<MaintenanceRequestResponse?> storeMaintenanceRequest({
+    required String token,
+    required int? tenantId, 
+    required String title, 
+    required String description, 
+    required int roomId, 
+    required File? savedImage
+  }) async {
 
-  // Ensure required fields are not empty or null
-  if (tenantId == null || title.isEmpty || description.isEmpty) {
-    print(" Missing required fields");
-    return null;
-  }
+    print(" API Call - storeMaintenanceRequest() token: $token");
+    print(" API Call - storeMaintenanceRequest() tenantId: $tenantId");
+    print(" API Call - storeMaintenanceRequest() title: $title");
+    print(" API Call - storeMaintenanceRequest() description: $description");
+    print(" API Call - storeMaintenanceRequest() roomId: $roomId");
+    print(" API Call - storeMaintenanceRequest() savedImage: $savedImage");
 
-  try {
-    Uri url = Uri.parse("$rest/landlord/maintenance_request/create-maintenance-request");
-    
-    var request = http.MultipartRequest("POST", url)
-      ..headers['Authorization'] = "Bearer $token"
-      ..headers['Accept'] = "application/json"
-      ..fields['title'] = title
-      ..fields['description'] = description
-      ..fields['room_id'] = roomId.toString();
 
-    if (tenantId != null) {
-      request.fields['tenant_id'] = tenantId.toString();
-    }
 
-    // Handle file if image exists
-    if (savedImage != null) {
-      print("📷 Image exists at: ${savedImage.path}");
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'images[]', // Match API field name
-          savedImage.absolute.path,
-        ),
-      );
-    } else {
-      print(" No image selected");
-    }
-
-    var streamedResponse = await request.send();
-    var response = await http.Response.fromStream(streamedResponse);
-    
-    if (response.statusCode == 201) {
-      print("streamedResponse: ${streamedResponse}");
-      print("✅ Maintenance request submitted!");
-      return MaintenanceRequestResponse.fromJson(jsonDecode(response.body));
-    } else {
-      print(" Error: ${response.statusCode}");
-      print("Response: ${response.body}");
+    // Ensure required fields are not empty or null
+    if (tenantId == null || title.isEmpty || description.isEmpty) {
+      print(" Missing required fields");
       return null;
     }
 
-  } catch (e) {
-    print("storeMaintenanceRequest EXCEPTION: $e");
+    try {
+      Uri url = Uri.parse("$rest/tenant/maintenance_request/create-maintenance-request");
+      
+      var request = http.MultipartRequest("POST", url)
+        ..headers['Authorization'] = "Bearer $token"
+        ..headers['Accept'] = "application/json"
+        ..fields['title'] = title
+        ..fields['description'] = description
+        ..fields['room_id'] = roomId.toString();
+
+      if (tenantId != null) {
+        request.fields['tenant_id'] = tenantId.toString();
+      }
+
+      // Handle file if image exists
+      if (savedImage != null) {
+        print("📷 Image exists at: ${savedImage.path}");
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'images[]', // Match API field name
+            savedImage.absolute.path,
+          ),
+        );
+      } else {
+        print(" No image selected");
+      }
+
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+      
+      if (response.statusCode == 201) {
+        print("streamedResponse: ${streamedResponse}");
+        print("✅ Maintenance request submitted!");
+        return MaintenanceRequestResponse.fromJson(jsonDecode(response.body));
+      } else {
+        print(" Error: ${response.statusCode}");
+        print("Response: ${response.body}");
+        return null;
+      }
+
+    } catch (e) {
+      print("storeMaintenanceRequest EXCEPTION: $e");
+      return null;
+    }
+  }
+
+  Future<MaintenanceRequestResponse?>getMaintenanceRequestsByTenantId({required String token, required int? tenantId}) async {
+    print("from getMaintenanceRequestsByTenantId(): token: $token");
+    print("from getMaintenanceRequestsByTenantId(): tenantId: $tenantId");
+
+    final uri = Uri.parse("$rest/tenant/maintenance_request/index-by-tenant-id/$tenantId");
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+    try {
+      final response = await http.get(uri, headers: header);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        debugPrint(
+            "responseData from getActiveRentalAgreementByProfileId Call: ${jsonEncode(responseData)}",
+            wrapWidth: 1024);
+        return MaintenanceRequestResponse.fromJson(
+            responseData); // Corrected this line
+      } else if (response.statusCode == 404) {
+        print('Error: ${response.statusCode} - ${response.body}');
+        print('navigating to create tenant screen');
+        return null;
+      }
+
+    } catch (e) {
+      print("EXCEPTION: $e");
+      return null;
+    }
     return null;
   }
-}
 
+
+  Future<MaintenanceRequestResponse?> patchMaintenanceRequest({
+    required String token,
+    required int? maintenanceRequestId,
+    required String? newTitle,
+    required String? newDescription,
+    required File? newSavedImagePath,
+    required int roomId,
+  }) async {
+    print("from patchMaintenanceRequest() token: $token");
+    print("from patchMaintenanceRequest() maintenanceRequestId: $maintenanceRequestId");
+    print("from patchMaintenanceRequest() newTitle: $newTitle");
+    print("from patchMaintenanceRequeest() newDescription: $newDescription");
+    print("from patchMaintenanceRequest() newSavedImagePath: $newSavedImagePath");
+    print("from patchMaintenanceRequest() roomId: $roomId");
+
+    // Validation: Check if maintenanceRequestId is null
+    if (maintenanceRequestId == null) {
+      print("❌ Missing maintenanceRequestId");
+      return null;
+    }
+
+    // Validation: Check if at least one field (title or description) is provided
+    if ((newTitle?.isEmpty ?? true) && (newDescription?.isEmpty ?? true)) {
+      print("❌ At least one field (title or description) must be provided for the update.");
+      return null;
+    }
+
+    // Create the request URI
+    final uri = Uri.parse("$rest/tenant/maintenance_request/update/$maintenanceRequestId");
+
+    // Start creating the request
+    var request = http.MultipartRequest("POST", uri)
+      ..headers['Authorization'] = "Bearer $token"
+      ..headers['Accept'] = "application/json"
+      ..fields['room_id'] = roomId.toString();
+
+    // Add title if it's not null or empty
+    if (newTitle?.isNotEmpty ?? false) {
+      request.fields['title'] = newTitle!;
+    }
+
+    // Add description if it's not null or empty
+    if (newDescription?.isNotEmpty ?? false) {
+      request.fields['description'] = newDescription!;
+    }
+
+    // Add image if it's not null (this part can be skipped for now if you want to test without image)
+    if (newSavedImagePath != null) {
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'images[]',  // Make sure this matches the key expected by the backend
+          newSavedImagePath.path,
+        ),
+      );
+    }
+
+    try {
+      // Send the request
+      var streamedResponse = await request.send();
+      var response = await http.Response.fromStream(streamedResponse);
+
+      print("Server Response: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
+      // Handle the response
+      if (response.statusCode == 200) {
+        return MaintenanceRequestResponse.fromJson(jsonDecode(response.body));
+      } else {
+        print("Failed to update maintenance request");
+        return null;
+      }
+    } catch (e) {
+      print("Error in patchMaintenanceRequest: $e");
+      return null;
+    }
+  }
+
+  Future<MaintenanceRequestResponse?>showMaintenanceByMaintenanceId({
+    required String token, 
+    required int maintenanceId
+  }) async {
+    print("from showMaintenanceById() token: $token");
+    print("from showMaintenanceById() maintenanceId: $maintenanceId");
+
+    final uri = Uri.parse("$rest/tenant/maintenance_request/show/$maintenanceId");
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.get(uri, headers: header);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from showMaintenanceByMaintenanceId() Call: $responseData");
+        return MaintenanceRequestResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print("EXCEPTION: $e");
+      return null;
+    }
+  }
+
+  Future<MaintenanceRequestResponse?>changeStatusToCancel({ 
+    required String token, 
+    required int maintenanceId
+  }) async {
+    final uri = Uri.parse("$rest/tenant/maintenance_request/cancel/$maintenanceId?status=cancelled");
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.patch(uri, headers: header);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from changeStatusToCancel() Call: $responseData");
+        return MaintenanceRequestResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print("EXCEPTION $e");
+      return null;
+    }
+  } 
 }
