@@ -28,15 +28,19 @@ class MaintenanceData {
   factory MaintenanceData.fromJson(Map<String, dynamic> json) {
     var list = json['maintenance_requests'];
     List<MaintenanceRequest> requests = [];
-    
+
     if (list is List) {
       requests = list.map((i) => MaintenanceRequest.fromJson(i)).toList();
     } else if (list is Map<String, dynamic>) {
+      // When there's only one maintenance request
       requests = [MaintenanceRequest.fromJson(list)];
+    } else if (json['id'] != null) {
+      // Handle the case where `data` contains a single object, not a list
+      requests = [MaintenanceRequest.fromJson(json)];
     } else {
       requests = [];
     }
-    
+
     return MaintenanceData(maintenanceRequests: requests);
   }
 }

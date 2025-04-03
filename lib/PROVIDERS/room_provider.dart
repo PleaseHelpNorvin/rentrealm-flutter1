@@ -92,16 +92,10 @@ class RoomProvider extends ChangeNotifier {
 
     // getRoomById
   Future<void> fetchRoomById(BuildContext context, int roomId) async {
-    // final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    // String? token = authProvider.token;
 
-    // print("Token: $token");
     print("Room ID: $roomId");
 
-    // if (token == null) {
-    //   print('Token is null, cannot fetch Room $roomId');
-    //   return;
-    // }
+
 
     _isLoading = true;
     notifyListeners();
