@@ -154,11 +154,49 @@ class _RentScreenState extends State<RentScreen> {
                       Text(property.name,
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                       SizedBox(height: 5),
-                      Text("Gender allowed: ${property.genderAllowed}", style: TextStyle(color: Colors.white)),
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Gender allowed: ",
+                              style: TextStyle(color: Colors.white), // Default color for "Gender allowed: "
+                            ),
+                            TextSpan(
+                              text: property.genderAllowed,
+                              style: TextStyle(
+                                color: property.genderAllowed == 'boys-only'
+                                    ? Colors.cyanAccent // Color for 'boy'
+                                    : property.genderAllowed == 'girls-only'
+                                        ? Colors.pink // Color for 'girl'
+                                        : Colors.white, // Default color if gender is something else
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       SizedBox(height: 5),
                       Text("Type: ${property.type}", style: TextStyle(color: Colors.white)),
                       SizedBox(height: 5),
-                      Text("Status: ${property.status}", style: TextStyle(color: Colors.white)),
+                      Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Status: ",
+                              style: TextStyle(color: Colors.white), // Default color for "Status:"
+                            ),
+                            TextSpan(
+                              text: property.status,
+                              style: TextStyle(
+                                color: property.status == 'vacant'
+                                    ? Colors.lightGreenAccent // Color for 'vacant'
+                                    : property.status == 'full'
+                                        ? Colors.red // Color for 'full'
+                                        : Colors.white, // Default color if status is something else
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),                      
                       SizedBox(height: 5),
                       Text("Location: ${property.address.line1} ${property.address.line2} ${property.address.province} ${property.address.postalCode}",
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),

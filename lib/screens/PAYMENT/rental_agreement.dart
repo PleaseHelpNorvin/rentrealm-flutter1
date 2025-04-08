@@ -199,10 +199,10 @@ class _RentalAgreementScreenState extends State<RentalAgreementScreen> {
                   ),
                   onPressed: () async {
                     // Capture the signature as an Image object
-                var signatureImage = await _RentalSignatureController.toImage();
+                  var signatureImage = await _RentalSignatureController.toImage();
 
-                // Convert the Image to ByteData
-                var byteData = await signatureImage!.toByteData(format: ImageByteFormat.png);
+                  // Convert the Image to ByteData
+                  var byteData = await signatureImage!.toByteData(format: ImageByteFormat.png);
                 
                 if (byteData != null) {
                   // Convert the ByteData into List<int>

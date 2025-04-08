@@ -20,7 +20,7 @@ class PaymentProvider extends ChangeNotifier {
   /// 🔹 Store authentication details as instance variables
   late String token;
   late int? profileId;
-
+  late int? userId;
   /// 🔹 Private variable to store checkout_url
   String? _checkoutUrl;
   /// ✅ Getter to retrieve checkout_url
@@ -65,6 +65,13 @@ class PaymentProvider extends ChangeNotifier {
       _receipts = newReceipts;
       notifyListeners();
     }
+    
+    CheckFailPaymentAgreement ? _checkFailPaymentAgreement;
+    CheckFailPaymentAgreement ? get checkFailPaymentAgreement => _checkFailPaymentAgreement;
+
+    CheckFailPaymentBilling ? _checkFailPaymentBilling;
+    CheckFailPaymentBilling ? get checkFailPaymentBilling => _checkFailPaymentBilling;
+
 
   /// ✅ Initialize token and profileId (Call this in the beginning)
   void initAuthDetails(BuildContext context) {
@@ -74,6 +81,7 @@ class PaymentProvider extends ChangeNotifier {
 
     token = authProvider.token ?? 'no token';
     profileId = profileProvider.userProfile?.data.id;
+    userId = authProvider.userId ?? 0;
   }
 
   Future<void> processPayment(
@@ -113,6 +121,10 @@ class PaymentProvider extends ChangeNotifier {
     if (response != null && response.success) {
       print("BILLABLE ID ${response.data.billings.single.billableId}");
       int billingId = response.data.billings.single.billableId;
+      
+      
+      print("calling fetchCheckFailPayment()");
+      fetchCheckFailPayment(context); 
 
       final procressPaymentResponse = await apiService.postPaymongo(
         token: token,
@@ -131,6 +143,9 @@ class PaymentProvider extends ChangeNotifier {
             context, MaterialPageRoute(builder: (context) => PaymentScreen(billingId: billingId)));
       } else {
         print("payment failed");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Payment failed. Please try again.")),
+        );
       }
     }
   }
@@ -151,6 +166,33 @@ class PaymentProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchCheckFailPayment(BuildContext context, ) async {
+    initAuthDetails(context);
+    print("from fetchcheckFailPayment() userId: $userId)");
+
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final response = await apiService.checkFailPaymentCall(token: token, userid: userId);
+       if (response != null && response.success) {
+        print("fetchCheckFailPayment success"); 
+
+        _checkFailPaymentAgreement = response.data.checkFailPaymentAgreement;
+        _checkFailPaymentBilling = response.data.checkFailPaymentBilling;
+
+       } else {
+        print("fetchCheckFailPayment failed");
+       }
+    } catch (e) {
+      print("EXCEPTION $e");
+      return;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
   Future<void> fetchReceiptsByProfileId(BuildContext context) async {
     initAuthDetails(context);
     print("from fetchReceiptsByProfileId(): $profileId");
@@ -170,3 +212,4 @@ class PaymentProvider extends ChangeNotifier {
   }
 }
 
+  
