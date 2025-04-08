@@ -218,12 +218,32 @@ Widget _buildRoomCard(Room rooms, BuildContext context) {
                     SizedBox(height: 5),
                     Text(
                       "Category: ${rooms.category}",
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold,),
                     ),
                     SizedBox(height: 5),
-                    Text(
-                      "Room Status: ${rooms.status}",
-                      style: TextStyle(color: Colors.white),
+                    Row(
+                      children: [
+                        Text(
+                          "Status: ",
+                          style: TextStyle(
+                            color: Colors.white, // You can set this to any color you prefer
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          rooms.status, // Example: 'reserved' / 'vacant' / 'occupied'
+                          style: TextStyle(
+                            color: rooms.status == 'reserved'
+                                ? Colors.cyanAccent
+                                : rooms.status == 'vacant'
+                                    ? Colors.green
+                                    : rooms.status == 'occupied'
+                                        ? Colors.red
+                                        : Colors.black, // default color
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
                     ),
                     SizedBox(height: 5),
                     Text(

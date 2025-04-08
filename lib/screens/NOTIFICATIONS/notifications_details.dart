@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 import 'package:rentealm_flutter/SCREENS/PAYMENT/rental_agreement.dart';
+import 'package:rentealm_flutter/screens/PAYMENT/payment.dart';
 
 import '../../PROVIDERS/notification_provider.dart';
 
@@ -75,6 +77,25 @@ class _NotificationsDetailsScreenState
                       ),
                     ),
                     child: const Text("Proceed to agreement"),
+                  ),
+                )
+              else if (widget.notificationTitle == "Payment Failed")
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      int? billingId = Provider.of<PaymentProvider>(context, listen:  false).checkFailPaymentBilling?.id;
+                      
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen(billingId: billingId ?? 0),),);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                    ),
+                    child: const Text("Retry Payment"),
                   ),
                 )
             ],

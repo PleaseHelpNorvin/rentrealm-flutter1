@@ -100,6 +100,21 @@ Widget build(BuildContext context) {
     ),
     bottomNavigationBar: room == null ? SizedBox() : _buildBottomBar(room),
   );
+} 
+void showStatusDialog(BuildContext context, String title, String message) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text(title),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('OK'),
+        )
+      ],
+    ),
+  );
 }
 
   Widget _buildBottomBar(Room room) {
@@ -148,7 +163,24 @@ Widget build(BuildContext context) {
                 print("no singlePickedRoom on inner_create_tenant_screen2");
                 return;
               }
-              Navigator.push(context, MaterialPageRoute(builder: (context) => OuterCreateTenantScreen4(roomId: widget.roomId, profileId: profileId, pickedRoomId: pickedRoomId)));
+              if (room.status == 'reserved') {
+                showStatusDialog(context, 'Room Reserved', 'Sorry, this room is already reserved.');
+                return;
+              } else if (room.status == 'occupied') {
+                showStatusDialog(context, 'Room Occupied', 'Sorry, this room is already occupied.');
+                return;
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OuterCreateTenantScreen4(
+                      roomId: widget.roomId,
+                      profileId: profileId,
+                      pickedRoomId: pickedRoomId,
+                    ),
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.white,

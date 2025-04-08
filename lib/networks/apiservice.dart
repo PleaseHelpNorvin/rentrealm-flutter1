@@ -1065,6 +1065,38 @@ class ApiService {
     }
   }
 
+  Future<CheckFailPaymentResponse?>checkFailPaymentCall({
+    required String token, 
+    required int? userid
+  }) async {
+    print("from CheckFailPaymentCall() token: $token");
+    print("from CheckFailPaymentCall() userid: $userid");
+
+    final uri = Uri.parse('$rest/tenant/payment/check-fail-payment/$userid');
+
+    final headers = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+    try {
+      final response = await http.get(uri, headers: headers);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Raw API response: ${response.body}");
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print("responseData from checkFailPaymentCall() Call: $responseData");
+        return CheckFailPaymentResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print("EXCEPTION: $e");
+      return null;
+    }
+  } 
+
   Future<PaymongoResponse?> postPaymongo({
     required String token,
     required int billingId,
@@ -1108,6 +1140,8 @@ class ApiService {
       return null;
     }
   }
+
+  
 
   Future<RetrievePaymongoPaymentResponse?> getRetrievePaymongoPayment(
       {required String token, required int billingId}) async {

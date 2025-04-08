@@ -45,36 +45,10 @@ class BillingProvider extends ChangeNotifier {
     print("from fetchBillingForRentalAgreement() $token");
     print("from fetchBillingForRentalAgreement() $profileId");
 
-    // final rentalAgreementProvder = Provider.of<RentalagreementProvider>(context, listen: false);
-    // int? rentalAgreementId = rentalAgreementProvder.
-
-    // if (profileId) {
-
-    // }
-
     print("from fetchBillingForRentalAgreement() ");
 
     // await response = await apiService.getBillingForRentalAgreement(token: token, rentalAgreementId: );
   }
 
-  // Future<void> fetchBillingDetails(BuildContext context, int billingId) async {
-  //   initAuthDetails(context);
-  //   print("from fetchBillingId(): $billingId");
-  //   print("from fetchBillingId(): $token");
-
-  //   _isLoading = true;
-  //   notifyListeners();
-
-  //   final response = await apiService.getBillingDetails(
-  //     token: token,
-  //     billingId: billingId,
-  //   );
-
-  //   if (response != null && response.success) {
-  //     billings = response.data.billings; // Update using setter
-  //   }
-
-  //   _isLoading = false;
-  //   notifyListeners();
-  // }
+  
 }

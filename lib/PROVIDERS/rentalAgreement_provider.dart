@@ -105,6 +105,10 @@ class RentalagreementProvider extends ChangeNotifier {
       final paymentProvider =
           Provider.of<PaymentProvider>(context, listen: false);
       print("Success response from storeRentalAgreement()");
+      
+      // print("calling fetchCheckFailPayment()");
+      // Provider.of<PaymentProvider>(context, listen: false).fetchCheckFailPayment(context);
+
       await paymentProvider.processPayment(
           context,
           reservationId,
