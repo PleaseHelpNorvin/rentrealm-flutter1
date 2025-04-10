@@ -30,7 +30,7 @@ class TenantProvider extends ChangeNotifier {
     _tenant = tenant;
     if (tenant != null) {
       _latestBilling = tenant.data.latestBilling;
-      _maintenanceRequests = tenant.data.tenantMaintenanceRequest; // Fixed
+      // _maintenanceRequests = tenant.data.tenantMaintenanceRequest; // Fixed
       _nextBillingMonth = tenant.data.nextBillingMonth;
       _rentalAgreement = tenant.data.tenant.rentalAgreement;
       print("setTenant() reached!");
@@ -67,8 +67,8 @@ class TenantProvider extends ChangeNotifier {
         if (response != null && response.success) {
           print(
               "responseData from fetchTenant Call: ${response.data.latestBilling?.billingMonth}");
-          print(
-              "responseData from fetchTenant Call: ${response.data.tenantMaintenanceRequest.first.description}");
+          // print(
+              // "responseData from fetchTenant Call: ${response.data.tenantMaintenanceRequest.first.description}");
           print(
               "responseData from fetchTenant Call: ${response.data.nextBillingMonth}");
           print(

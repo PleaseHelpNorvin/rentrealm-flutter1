@@ -22,28 +22,28 @@ class TenantData {
   final Tenant tenant;
   final TenantBilling? latestBilling;
   final String? nextBillingMonth;
-  final List<TenantMaintenanceRequest> tenantMaintenanceRequest;
+  // final List<TenantMaintenanceRequest> tenantMaintenanceRequest;
 
   TenantData({
     required this.tenant,
     this.latestBilling,
     this.nextBillingMonth,
-    required this.tenantMaintenanceRequest,
+    // required this.tenantMaintenanceRequest,
   });
 
   factory TenantData.fromJson(Map<String, dynamic> json) {
-    return TenantData(
-      tenant: Tenant.fromJson(json['tenant']),
-      latestBilling: json['latest_billing'] != null
-          ? TenantBilling.fromJson(json['latest_billing'])
-          : null,
-      nextBillingMonth: json['next_billing_month'],
-      tenantMaintenanceRequest: (json['maintenance_requests'] as List<dynamic>?)
-              ?.map((e) => TenantMaintenanceRequest.fromJson(e))
-              .toList() ??
-          [],
-    );
-  }
+  return TenantData(
+    tenant: Tenant.fromJson(json['tenant']),
+    latestBilling: json['latest_billing'] != null
+        ? TenantBilling.fromJson(json['latest_billing'])
+        : null,
+    nextBillingMonth: json['next_billing_month'],
+    // tenantMaintenanceRequest: (json['maintenance_requests'] as List<dynamic>?)
+    //         ?.map((e) => TenantMaintenanceRequest.fromJson(e))
+    //         .toList() ??
+    //     [], // If maintenance_requests is null or empty, use an empty list
+  );
+}
 }
 
 class Tenant {
@@ -153,7 +153,7 @@ class UserProfile {
   final String nationalId;
   final String? passportNumber;
   final String? socialSecurityNumber;
-  final int steps;
+  // final int steps;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -168,7 +168,7 @@ class UserProfile {
     required this.nationalId,
     this.passportNumber,
     this.socialSecurityNumber,
-    required this.steps,
+    // required this.steps,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -185,7 +185,7 @@ class UserProfile {
       nationalId: json['national_id'] ?? '',
       passportNumber: json['passport_number'] as String?,
       socialSecurityNumber: json['social_security_number'] as String?,
-      steps: json['steps'],
+      // steps: json['steps'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
     );

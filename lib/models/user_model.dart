@@ -3,6 +3,7 @@ class User {
   final String name;
   final String email;
   final String role;
+  final String? steps;
   final DateTime updatedAt;
   final DateTime createdAt;
 
@@ -11,6 +12,7 @@ class User {
     required this.name,
     required this.email,
     required this.role,
+    this.steps,
     required this.updatedAt,
     required this.createdAt,
   });
@@ -20,6 +22,7 @@ class User {
       name: json['name'],
       email: json['email'],
       role: json['role'],
+      steps: json['steps'],
       updatedAt: DateTime.parse(json['updated_at']),
       createdAt: DateTime.parse(json['created_at']),
       id: json['id'],
