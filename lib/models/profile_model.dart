@@ -109,6 +109,7 @@ class UserProfileResponse {
               updatedAt: null,
               createdAt: null,
               id: 0,
+              
             ),
     );
   }
