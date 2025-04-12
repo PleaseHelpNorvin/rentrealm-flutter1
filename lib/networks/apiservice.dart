@@ -1065,10 +1065,8 @@ class ApiService {
     }
   }
 
-  Future<CheckFailPaymentResponse?>checkFailPaymentCall({
-    required String token, 
-    required int? userid
-  }) async {
+  Future<CheckFailPaymentResponse?> checkFailPaymentCall(
+      {required String token, required int? userid}) async {
     print("from CheckFailPaymentCall() token: $token");
     print("from CheckFailPaymentCall() userid: $userid");
 
@@ -1095,7 +1093,7 @@ class ApiService {
       print("EXCEPTION: $e");
       return null;
     }
-  } 
+  }
 
   Future<PaymongoResponse?> postPaymongo({
     required String token,
@@ -1140,8 +1138,6 @@ class ApiService {
       return null;
     }
   }
-
-  
 
   Future<RetrievePaymongoPaymentResponse?> getRetrievePaymongoPayment(
       {required String token, required int billingId}) async {
@@ -1379,11 +1375,13 @@ class ApiService {
     return null;
   }
 
-  Future<RoomsByProfileIdResponse?>getRoomByProfileId({required String token, required int? profileId}) async {
+  Future<RoomsByProfileIdResponse?> getRoomByProfileId(
+      {required String token, required int? profileId}) async {
     print("from getRoomByProfileId() token: $token");
     print("from getRoomByProfileId() profileId: $profileId");
 
-    final uri = Uri.parse("$rest/landlord/rental_agreement/get-rooms-by-profileid/$profileId");
+    final uri = Uri.parse(
+        "$rest/landlord/rental_agreement/get-rooms-by-profileid/$profileId");
     final header = {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -1412,23 +1410,19 @@ class ApiService {
     return null;
   }
 
-  Future<MaintenanceRequestResponse?> storeMaintenanceRequest({
-    required String token,
-    required int? tenantId, 
-    required String title, 
-    required String description, 
-    required int roomId, 
-    required File? savedImage
-  }) async {
-
+  Future<MaintenanceRequestResponse?> storeMaintenanceRequest(
+      {required String token,
+      required int? tenantId,
+      required String title,
+      required String description,
+      required int roomId,
+      required File? savedImage}) async {
     print(" API Call - storeMaintenanceRequest() token: $token");
     print(" API Call - storeMaintenanceRequest() tenantId: $tenantId");
     print(" API Call - storeMaintenanceRequest() title: $title");
     print(" API Call - storeMaintenanceRequest() description: $description");
     print(" API Call - storeMaintenanceRequest() roomId: $roomId");
     print(" API Call - storeMaintenanceRequest() savedImage: $savedImage");
-
-
 
     // Ensure required fields are not empty or null
     if (tenantId == null || title.isEmpty || description.isEmpty) {
@@ -1437,8 +1431,9 @@ class ApiService {
     }
 
     try {
-      Uri url = Uri.parse("$rest/tenant/maintenance_request/create-maintenance-request");
-      
+      Uri url = Uri.parse(
+          "$rest/tenant/maintenance_request/create-maintenance-request");
+
       var request = http.MultipartRequest("POST", url)
         ..headers['Authorization'] = "Bearer $token"
         ..headers['Accept'] = "application/json"
@@ -1465,7 +1460,7 @@ class ApiService {
 
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
-      
+
       if (response.statusCode == 201) {
         print("streamedResponse: ${streamedResponse}");
         print("✅ Maintenance request submitted!");
@@ -1475,18 +1470,19 @@ class ApiService {
         print("Response: ${response.body}");
         return null;
       }
-
     } catch (e) {
       print("storeMaintenanceRequest EXCEPTION: $e");
       return null;
     }
   }
 
-  Future<MaintenanceRequestResponse?>getMaintenanceRequestsByTenantId({required String token, required int? tenantId}) async {
+  Future<MaintenanceRequestResponse?> getMaintenanceRequestsByTenantId(
+      {required String token, required int? tenantId}) async {
     print("from getMaintenanceRequestsByTenantId(): token: $token");
     print("from getMaintenanceRequestsByTenantId(): tenantId: $tenantId");
 
-    final uri = Uri.parse("$rest/tenant/maintenance_request/index-by-tenant-id/$tenantId");
+    final uri = Uri.parse(
+        "$rest/tenant/maintenance_request/index-by-tenant-id/$tenantId");
     final header = {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -1507,14 +1503,12 @@ class ApiService {
         print('navigating to create tenant screen');
         return null;
       }
-
     } catch (e) {
       print("EXCEPTION: $e");
       return null;
     }
     return null;
   }
-
 
   Future<MaintenanceRequestResponse?> patchMaintenanceRequest({
     required String token,
@@ -1525,10 +1519,12 @@ class ApiService {
     required int roomId,
   }) async {
     print("from patchMaintenanceRequest() token: $token");
-    print("from patchMaintenanceRequest() maintenanceRequestId: $maintenanceRequestId");
+    print(
+        "from patchMaintenanceRequest() maintenanceRequestId: $maintenanceRequestId");
     print("from patchMaintenanceRequest() newTitle: $newTitle");
     print("from patchMaintenanceRequeest() newDescription: $newDescription");
-    print("from patchMaintenanceRequest() newSavedImagePath: $newSavedImagePath");
+    print(
+        "from patchMaintenanceRequest() newSavedImagePath: $newSavedImagePath");
     print("from patchMaintenanceRequest() roomId: $roomId");
 
     // Validation: Check if maintenanceRequestId is null
@@ -1539,12 +1535,14 @@ class ApiService {
 
     // Validation: Check if at least one field (title or description) is provided
     if ((newTitle?.isEmpty ?? true) && (newDescription?.isEmpty ?? true)) {
-      print("❌ At least one field (title or description) must be provided for the update.");
+      print(
+          "❌ At least one field (title or description) must be provided for the update.");
       return null;
     }
 
     // Create the request URI
-    final uri = Uri.parse("$rest/tenant/maintenance_request/update/$maintenanceRequestId");
+    final uri = Uri.parse(
+        "$rest/tenant/maintenance_request/update/$maintenanceRequestId");
 
     // Start creating the request
     var request = http.MultipartRequest("POST", uri)
@@ -1566,7 +1564,7 @@ class ApiService {
     if (newSavedImagePath != null) {
       request.files.add(
         await http.MultipartFile.fromPath(
-          'images[]',  // Make sure this matches the key expected by the backend
+          'images[]', // Make sure this matches the key expected by the backend
           newSavedImagePath.path,
         ),
       );
@@ -1593,14 +1591,13 @@ class ApiService {
     }
   }
 
-  Future<MaintenanceRequestResponse?>showMaintenanceByMaintenanceId({
-    required String token, 
-    required int maintenanceId
-  }) async {
+  Future<MaintenanceRequestResponse?> showMaintenanceByMaintenanceId(
+      {required String token, required int maintenanceId}) async {
     print("from showMaintenanceById() token: $token");
     print("from showMaintenanceById() maintenanceId: $maintenanceId");
 
-    final uri = Uri.parse("$rest/tenant/maintenance_request/show/$maintenanceId");
+    final uri =
+        Uri.parse("$rest/tenant/maintenance_request/show/$maintenanceId");
     final header = {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -1611,7 +1608,8 @@ class ApiService {
       final response = await http.get(uri, headers: header);
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
-        print("responseData from showMaintenanceByMaintenanceId() Call: $responseData");
+        print(
+            "responseData from showMaintenanceByMaintenanceId() Call: $responseData");
         return MaintenanceRequestResponse.fromJson(responseData);
       } else {
         print('Error: ${response.statusCode} - ${response.body}');
@@ -1623,11 +1621,10 @@ class ApiService {
     }
   }
 
-  Future<MaintenanceRequestResponse?>changeStatusToCancel({ 
-    required String token, 
-    required int maintenanceId
-  }) async {
-    final uri = Uri.parse("$rest/tenant/maintenance_request/cancel/$maintenanceId?status=cancelled");
+  Future<MaintenanceRequestResponse?> changeStatusToCancel(
+      {required String token, required int maintenanceId}) async {
+    final uri = Uri.parse(
+        "$rest/tenant/maintenance_request/cancel/$maintenanceId?status=cancelled");
     final header = {
       "Content-Type": "application/json",
       "Accept": "application/json",
@@ -1649,5 +1646,5 @@ class ApiService {
       print("EXCEPTION $e");
       return null;
     }
-  } 
+  }
 }

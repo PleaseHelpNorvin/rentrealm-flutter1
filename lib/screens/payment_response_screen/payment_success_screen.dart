@@ -16,20 +16,21 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Debugging: Print billingId when screen initializes
     print("initState: Received billingId = ${widget.billingId}");
 
     // final billingProvider = Provider.of<BillingProvider>(context, listen: false);
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
     //   print("Fetching billing details for ID: ${widget.billingId}");
-      // await billingProvider.fetchBillingDetails(context, widget.billingId);
+    // await billingProvider.fetchBillingDetails(context, widget.billingId);
     // });
   }
 
   @override
   Widget build(BuildContext context) {
-    final billingProvider = Provider.of<BillingProvider>(context, listen: false);
+    final billingProvider =
+        Provider.of<BillingProvider>(context, listen: false);
 
     // Debugging: Print billingId inside build method
     // print("build: widget.billingId = ${widget.billingId}");
@@ -78,13 +79,14 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
           onPressed: () {
             passBillingIdToRetrievePaymongoDetails(widget.billingId);
           },
-          child: const Text("Go Back"), 
+          child: const Text("Go Back"),
         ),
       ),
     );
   }
-  void passBillingIdToRetrievePaymongoDetails(int billingId) async {
-    Provider.of<PaymentProvider>(context, listen: false).fetchRetrievePayment(context, billingId: billingId);
-  } 
-}
 
+  void passBillingIdToRetrievePaymongoDetails(int billingId) async {
+    Provider.of<PaymentProvider>(context, listen: false)
+        .fetchRetrievePayment(context, billingId: billingId);
+  }
+}
