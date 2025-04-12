@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
@@ -21,17 +19,20 @@ class PaymentProvider extends ChangeNotifier {
   late String token;
   late int? profileId;
   late int? userId;
+
   /// 🔹 Private variable to store checkout_url
   String? _checkoutUrl;
+
   /// ✅ Getter to retrieve checkout_url
   String? get checkoutUrl => _checkoutUrl;
+
   /// ✅ Setter to update checkout_url and notify listeners
   void setCheckoutUrl(String url) {
     _checkoutUrl = url;
     notifyListeners(); // Notify UI of the change
   }
-  
-  // private list 
+
+  // private list
   List<Billing> _billings = [];
   // getter
   List<Billing> get billings => _billings;
@@ -41,37 +42,41 @@ class PaymentProvider extends ChangeNotifier {
     print("setBillings() REACHED!");
     notifyListeners();
   }
-  // private variable to store 
+
+  // private variable to store
   RetrievePaymongoPaymentResponse? _paymongoPaymentResponse;
-  //getter to retrieve 
-  RetrievePaymongoPaymentResponse? get paymongoPaymentResponse => _paymongoPaymentResponse;
+  //getter to retrieve
+  RetrievePaymongoPaymentResponse? get paymongoPaymentResponse =>
+      _paymongoPaymentResponse;
   // setter to update and notifyListeners
   set paymongoPaymentResponse(RetrievePaymongoPaymentResponse? newResponse) {
     _paymongoPaymentResponse = newResponse;
-    notifyListeners();  // Notify UI about the update
+    notifyListeners(); // Notify UI about the update
   }
 
-    ReceiptsResponse ? _receiptResponse;
-    ReceiptsResponse ? get receiptResponse => _receiptResponse;
+  ReceiptsResponse? _receiptResponse;
+  ReceiptsResponse? get receiptResponse => _receiptResponse;
 
-    set receiptResponse(ReceiptsResponse ? newReceiptResponse) {
-      _receiptResponse = newReceiptResponse;
-      notifyListeners();
-    }
+  set receiptResponse(ReceiptsResponse? newReceiptResponse) {
+    _receiptResponse = newReceiptResponse;
+    notifyListeners();
+  }
 
-    List<Receipt> _receipts = [];
-    List<Receipt> get receipts => _receipts;
-    set receipts(List<Receipt> newReceipts) { // Setter
-      _receipts = newReceipts;
-      notifyListeners();
-    }
-    
-    CheckFailPaymentAgreement ? _checkFailPaymentAgreement;
-    CheckFailPaymentAgreement ? get checkFailPaymentAgreement => _checkFailPaymentAgreement;
+  List<Receipt> _receipts = [];
+  List<Receipt> get receipts => _receipts;
+  set receipts(List<Receipt> newReceipts) {
+    // Setter
+    _receipts = newReceipts;
+    notifyListeners();
+  }
 
-    CheckFailPaymentBilling ? _checkFailPaymentBilling;
-    CheckFailPaymentBilling ? get checkFailPaymentBilling => _checkFailPaymentBilling;
+  CheckFailPaymentAgreement? _checkFailPaymentAgreement;
+  CheckFailPaymentAgreement? get checkFailPaymentAgreement =>
+      _checkFailPaymentAgreement;
 
+  CheckFailPaymentBilling? _checkFailPaymentBilling;
+  CheckFailPaymentBilling? get checkFailPaymentBilling =>
+      _checkFailPaymentBilling;
 
   /// ✅ Initialize token and profileId (Call this in the beginning)
   void initAuthDetails(BuildContext context) {
@@ -121,10 +126,9 @@ class PaymentProvider extends ChangeNotifier {
     if (response != null && response.success) {
       print("BILLABLE ID ${response.data.billings.single.billableId}");
       int billingId = response.data.billings.single.billableId;
-      
-      
+
       print("calling fetchCheckFailPayment()");
-      fetchCheckFailPayment(context); 
+      fetchCheckFailPayment(context);
 
       final procressPaymentResponse = await apiService.postPaymongo(
         token: token,
@@ -140,7 +144,9 @@ class PaymentProvider extends ChangeNotifier {
         /// 🔹 Update checkout URL
         setCheckoutUrl(procressPaymentResponse.data.checkoutUrl);
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => PaymentScreen(billingId: billingId)));
+            context,
+            MaterialPageRoute(
+                builder: (context) => PaymentScreen(billingId: billingId)));
       } else {
         print("payment failed");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -150,7 +156,8 @@ class PaymentProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> fetchRetrievePayment(BuildContext context,{required int billingId}) async {
+  Future<void> fetchRetrievePayment(BuildContext context,
+      {required int billingId}) async {
     initAuthDetails(context);
     print("from fetchPaymongoDetails(): $billingId");
     print("from fetchPaymongoDetails(): $token");
@@ -158,31 +165,36 @@ class PaymentProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final response = await apiService.getRetrievePaymongoPayment(billingId: billingId, token: token);
-    if(response != null) {
+    final response = await apiService.getRetrievePaymongoPayment(
+        billingId: billingId, token: token);
+    if (response != null) {
       Navigator.pushNamed(context, '/');
+    } else {
+      print("${response}");
     }
     _isLoading = false;
     notifyListeners();
   }
 
-  Future<void> fetchCheckFailPayment(BuildContext context, ) async {
+  Future<void> fetchCheckFailPayment(
+    BuildContext context,
+  ) async {
     initAuthDetails(context);
     print("from fetchcheckFailPayment() userId: $userId)");
 
     _isLoading = true;
     notifyListeners();
     try {
-      final response = await apiService.checkFailPaymentCall(token: token, userid: userId);
-       if (response != null && response.success) {
-        print("fetchCheckFailPayment success"); 
+      final response =
+          await apiService.checkFailPaymentCall(token: token, userid: userId);
+      if (response != null && response.success) {
+        print("fetchCheckFailPayment success");
 
         _checkFailPaymentAgreement = response.data.checkFailPaymentAgreement;
         _checkFailPaymentBilling = response.data.checkFailPaymentBilling;
-
-       } else {
+      } else {
         print("fetchCheckFailPayment failed");
-       }
+      }
     } catch (e) {
       print("EXCEPTION $e");
       return;
@@ -192,7 +204,6 @@ class PaymentProvider extends ChangeNotifier {
     }
   }
 
-
   Future<void> fetchReceiptsByProfileId(BuildContext context) async {
     initAuthDetails(context);
     print("from fetchReceiptsByProfileId(): $profileId");
@@ -201,15 +212,14 @@ class PaymentProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final response = await apiService.getReceiptByProfileId(token: token, profileId: profileId);
-    
+    final response = await apiService.getReceiptByProfileId(
+        token: token, profileId: profileId);
+
     if (response != null && response.success) {
       _receipts = response.receipts;
-      notifyListeners(); 
+      notifyListeners();
     }
     _isLoading = false;
     notifyListeners();
   }
 }
-
-  

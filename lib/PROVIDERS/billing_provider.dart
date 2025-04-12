@@ -19,7 +19,7 @@ class BillingProvider extends ChangeNotifier {
   late String token;
   late int? profileId;
 
-    // Private Billing List
+  // Private Billing List
   List<Billing> _billings = [];
 
   // Getter: Get billing list
@@ -49,6 +49,4 @@ class BillingProvider extends ChangeNotifier {
 
     // await response = await apiService.getBillingForRentalAgreement(token: token, rentalAgreementId: );
   }
-
-  
 }
