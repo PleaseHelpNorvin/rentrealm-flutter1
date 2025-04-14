@@ -1284,7 +1284,7 @@ class ApiService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         debugPrint(
-            "responseData from getTenant Call: ${jsonEncode(responseData)}",
+            "responseData from getTenantByProfileId Call: ${jsonEncode(responseData)}",
             wrapWidth: 1024);
         return TenantResponse.fromJson(responseData); // Corrected this line
       } else if (response.statusCode == 404) {
