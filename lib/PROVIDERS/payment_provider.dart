@@ -124,8 +124,8 @@ class PaymentProvider extends ChangeNotifier {
         token: token, rentalagreementId: rentalagreementId);
 
     if (response != null && response.success) {
-      print("BILLABLE ID ${response.data.billings.single.billableId}");
-      int billingId = response.data.billings.single.billableId;
+      print("BILLABLE ID ${response.data.billings.single.id}");
+      int billingId = response.data.billings.single.id;
 
       print("calling fetchCheckFailPayment()");
       fetchCheckFailPayment(context);
