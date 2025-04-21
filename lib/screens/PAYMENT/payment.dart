@@ -44,14 +44,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       context: context,
                       builder: (_) => AlertDialog(
                         title: Text("Session Expired"),
-                        content: Text("The session has expired. Please try again."),
+                        content:
+                            Text("The session has expired. Please try again."),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (context) => PaymentScreen(billingId: widget.billingId)),
+                                MaterialPageRoute(
+                                    builder: (context) => PaymentScreen(
+                                        billingId: widget.billingId)),
                               );
                             },
                             child: Text("Retry"),
@@ -66,7 +69,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     Navigator.pop(context, true);
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => PaymentSuccessScreen(billingId: widget.billingId)),
+                      MaterialPageRoute(
+                          builder: (context) => PaymentSuccessScreen(
+                              billingId: widget.billingId)),
                     );
                     return NavigationDecision.prevent;
                   } else if (request.url.contains("payment-failed")) {

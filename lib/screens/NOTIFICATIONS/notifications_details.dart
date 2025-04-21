@@ -83,9 +83,18 @@ class _NotificationsDetailsScreenState
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      int? billingId = Provider.of<PaymentProvider>(context, listen:  false).checkFailPaymentBilling?.id;
-                      
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen(billingId: billingId ?? 0),),);
+                      int? billingId =
+                          Provider.of<PaymentProvider>(context, listen: false)
+                              .checkFailPaymentBilling
+                              ?.id;
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              PaymentScreen(billingId: billingId ?? 0),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
@@ -96,6 +105,28 @@ class _NotificationsDetailsScreenState
                       ),
                     ),
                     child: const Text("Retry Payment"),
+                  ),
+                )
+              else if (widget.notificationTitle
+                  .startsWith("Monthly Rent billing for"))
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Navigator.pushNamed(context, '/rentalAgreement',
+                      //     arguments: {
+                      //       'notifNotifiableReservationId':
+                      //           widget.notifNotifiableReservationId,
+                      //     });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                    ),
+                    child: const Text("Proceed to Rent Payment"),
                   ),
                 )
             ],
