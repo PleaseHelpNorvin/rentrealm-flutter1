@@ -17,12 +17,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<NotificationProvider>(context, listen: false).fetchNotification(context);
+      Provider.of<NotificationProvider>(context, listen: false)
+          .fetchNotification(context);
     });
   }
 
   Future<void> _refreshData() async {
-    await Provider.of<NotificationProvider>(context, listen: false).fetchNotification(context);
+    await Provider.of<NotificationProvider>(context, listen: false)
+        .fetchNotification(context);
   }
 
   Widget _buildNoDataCard() {
@@ -51,13 +53,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildNotificationListCard(Map<String, dynamic> notification) {
     String notificationTitle = notification["title"] ?? "No Title";
     String notificationMessage = notification["message"] ?? "No Message";
-    int? notifiableId = notification["notifiable_id"]; 
+    int? notifiableId = notification["notifiable_id"];
 
     return GestureDetector(
       onTap: () async {
         await Provider.of<NotificationProvider>(context, listen: false)
             .updateStatusToRead(context, notification["id"]);
-        
+
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -106,7 +108,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
         bool isSelected = provider.filterType == filterType;
 
         return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 5), // Add spacing between buttons
+          padding: EdgeInsets.symmetric(
+              horizontal: 5), // Add spacing between buttons
           child: ElevatedButton(
             onPressed: () {
               provider.setFilterType(filterType);
@@ -135,9 +138,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final notificationProvider = Provider.of<NotificationProvider>(context);
     final notifications = notificationProvider.notificationDetails;
 
-
-    
-
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: _refreshData,
@@ -146,13 +146,15 @@ class _NotificationScreenState extends State<NotificationScreen> {
             _buildListFilterRow(),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
+                padding:
+                    EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
                 child: notifications.isEmpty
                     ? _buildNoDataCard()
                     : ListView.builder(
                         itemCount: notifications.length,
                         itemBuilder: (context, index) {
-                          return _buildNotificationListCard(notifications[index]);
+                          return _buildNotificationListCard(
+                              notifications[index]);
                         },
                       ),
               ),

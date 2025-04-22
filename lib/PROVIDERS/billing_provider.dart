@@ -18,6 +18,18 @@ class BillingProvider extends ChangeNotifier {
 
   late String token;
   late int? profileId;
+  late int userId;
+
+  Billing? _billing;
+
+  // Getter: Get the billing object
+  Billing? get billing => _billing;
+
+  // Setter: Update the billing object
+  set billing(Billing? newBilling) {
+    _billing = newBilling;
+    notifyListeners();
+  }
 
   // Private Billing List
   List<Billing> _billings = [];
@@ -38,6 +50,11 @@ class BillingProvider extends ChangeNotifier {
 
     token = authProvider.token ?? 'no token';
     profileId = profileProvider.userProfile?.data.id;
+    if (authProvider.userId == null) {
+      throw Exception('User ID is null. Cannot proceed.');
+    }
+
+    userId = authProvider.userId!;
   }
 
   Future<void> fetchBillingForRentalAgreement(BuildContext context) async {
@@ -48,5 +65,27 @@ class BillingProvider extends ChangeNotifier {
     print("from fetchBillingForRentalAgreement() ");
 
     // await response = await apiService.getBillingForRentalAgreement(token: token, rentalAgreementId: );
+  }
+
+  Future<void> fetchLatestMonthlyRentBilling(BuildContext context) async {
+    initAuthDetails(context);
+    print("from fetchLatestMonthlyRentBilling() token: $token ");
+    print("from fetchLatestMonthlyRentBilling() profileId: $profileId ");
+    print("from fetchLatestMonthlyRentBilling() userId: $userId ");
+
+    final response = await apiService.getLatestMonthlyRentBilling(
+      token: token,
+      userId: userId, // now guaranteed non-null
+    );
+
+    if (response != null && response.success) {
+      _billing = response.data.latestRentBilling;
+
+      print(
+          'from fetchLatestMonthlyRentBilling single Billing getter : ${billing?.billingMonth}');
+      // } else {
+      // print("❌ billing is null!");
+      // Optionally handle error state or show dialog
+    }
   }
 }

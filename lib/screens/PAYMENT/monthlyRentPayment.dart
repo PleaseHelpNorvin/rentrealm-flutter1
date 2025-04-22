@@ -5,15 +5,16 @@ import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
 
 import '../payment_response_screen/payment_success_screen.dart';
 
-class PaymentScreen extends StatefulWidget {
+class Monthlyrentpayment extends StatefulWidget {
   final int billingId;
-  const PaymentScreen({super.key, required this.billingId});
+
+  const Monthlyrentpayment({super.key, required this.billingId});
 
   @override
-  _PaymentScreenState createState() => _PaymentScreenState();
+  State<Monthlyrentpayment> createState() => _MonthlyrentpaymentState();
 }
 
-class _PaymentScreenState extends State<PaymentScreen> {
+class _MonthlyrentpaymentState extends State<Monthlyrentpayment> {
   final WebViewController _controller = WebViewController();
 
   @override
@@ -53,7 +54,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => PaymentScreen(
+                                    builder: (context) => Monthlyrentpayment(
                                         billingId: widget.billingId)),
                               );
                             },

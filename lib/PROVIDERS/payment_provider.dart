@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/auth_provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/billing_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
 import 'package:rentealm_flutter/networks/apiservice.dart';
 import 'package:rentealm_flutter/screens/PAYMENT/payment.dart';
@@ -18,7 +19,18 @@ class PaymentProvider extends ChangeNotifier {
   /// 🔹 Store authentication details as instance variables
   late String token;
   late int? profileId;
-  late int? userId;
+  late int userId;
+
+  Billing? _billing;
+
+  // Getter: Get the billing object
+  Billing? get billing => _billing;
+
+  // Setter: Update the billing object
+  set billing(Billing? newBilling) {
+    _billing = newBilling;
+    notifyListeners();
+  }
 
   /// 🔹 Private variable to store checkout_url
   String? _checkoutUrl;
@@ -29,6 +41,7 @@ class PaymentProvider extends ChangeNotifier {
   /// ✅ Setter to update checkout_url and notify listeners
   void setCheckoutUrl(String url) {
     _checkoutUrl = url;
+    print("new ChechoutUrl: $_checkoutUrl");
     notifyListeners(); // Notify UI of the change
   }
 
@@ -86,7 +99,14 @@ class PaymentProvider extends ChangeNotifier {
 
     token = authProvider.token ?? 'no token';
     profileId = profileProvider.userProfile?.data.id;
-    userId = authProvider.userId ?? 0;
+
+    if (authProvider.userId == null) {
+      throw Exception('User ID is null. Cannot proceed.');
+    }
+
+    userId = authProvider.userId!;
+
+    // userId = authProvider.userId ?? 0;
   }
 
   Future<void> processPayment(
@@ -221,5 +241,48 @@ class PaymentProvider extends ChangeNotifier {
     }
     _isLoading = false;
     notifyListeners();
+  }
+
+  Future<void> processRentPaymongoPayment(BuildContext context) async {
+    initAuthDetails(context);
+    print("from processRentPaymongoPayment() token: $token ");
+    print("from processRentPaymongoPayment() profileId: $profileId ");
+    print("from processRentPaymongoPayment() userId: $userId ");
+
+    // final response = await apiService.(
+    //   token: token,
+    //   userId: userId, // now guaranteed non-null
+    // );
+
+    // if (response != null && response.success) {
+    final billingProvider =
+        Provider.of<BillingProvider>(context, listen: false);
+    final billing = billingProvider.billing;
+
+    double billingTotalAmount = billing!.totalAmount.toDouble();
+    String billingDescription = billing.billingTitle;
+    int billingId = billing.id;
+
+    print("from processRentPaymongoPayment billing Id: $billingId");
+    print(
+        "from processRentPaymongoPayment billingTotalAmount: $billingTotalAmount");
+    print(
+        "from processRentPaymongoPayment billingDescription: $billingDescription");
+    final postPaymongoResponse = await apiService.postPaymongo(
+      token: token,
+      amount: billingTotalAmount,
+      billingId: billingId,
+      paymentDescription: billingDescription,
+      // description: billingDescription,
+    );
+
+    if (postPaymongoResponse != null && postPaymongoResponse.success) {
+      setCheckoutUrl(postPaymongoResponse.data.checkoutUrl);
+    }
+    // final sessionId = response.data.latestRentBilling.checkoutSessionId;
+    // amount = res
+    // await apiService.postPaymongo(amount: )
+    print(
+        'from processRentPaymongoPayment single Billing getter : ${billing?.billingMonth}');
   }
 }

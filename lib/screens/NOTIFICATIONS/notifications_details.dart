@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/billing_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
-import 'package:rentealm_flutter/SCREENS/PAYMENT/rental_agreement.dart';
+import 'package:rentealm_flutter/screens/PAYMENT/monthlyRentPayment.dart';
 import 'package:rentealm_flutter/screens/PAYMENT/payment.dart';
 
 import '../../PROVIDERS/notification_provider.dart';
@@ -32,6 +33,8 @@ class _NotificationsDetailsScreenState
     super.initState();
     Provider.of<NotificationProvider>(context, listen: false)
         .updateStatusToRead(context, widget.notificationId);
+    Provider.of<BillingProvider>(context, listen: false)
+        .fetchLatestMonthlyRentBilling(context);
   }
 
   @override
@@ -83,9 +86,18 @@ class _NotificationsDetailsScreenState
                 Center(
                   child: ElevatedButton(
                     onPressed: () {
-                      int? billingId = Provider.of<PaymentProvider>(context, listen:  false).checkFailPaymentBilling?.id;
-                      
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentScreen(billingId: billingId ?? 0),),);
+                      int? billingId =
+                          Provider.of<PaymentProvider>(context, listen: false)
+                              .checkFailPaymentBilling
+                              ?.id;
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              PaymentScreen(billingId: billingId ?? 0),
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
@@ -96,6 +108,43 @@ class _NotificationsDetailsScreenState
                       ),
                     ),
                     child: const Text("Retry Payment"),
+                  ),
+                )
+              else if (widget.notificationTitle
+                  .startsWith("Monthly Rent billing for"))
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      Provider.of<PaymentProvider>(context, listen: false)
+                          .processRentPaymongoPayment(context);
+
+                      final billingId =
+                          Provider.of<BillingProvider>(context, listen: false)
+                              .billing
+                              ?.id;
+
+                      if (billingId != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                Monthlyrentpayment(billingId: billingId),
+                          ),
+                        );
+                      } else {
+                        // Handle null billingId if needed (optional)
+                        print("Billing ID is null");
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 10,
+                      ),
+                    ),
+                    child: const Text("Proceed to Rent Payment"),
                   ),
                 )
             ],
