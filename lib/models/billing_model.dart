@@ -2,6 +2,40 @@ import 'dart:convert';
 
 import 'profile_model.dart';
 
+class LatestRentBillingResponse {
+  final bool success;
+  final String message;
+  final LatestRentBillingData data;
+
+  LatestRentBillingResponse({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
+
+  factory LatestRentBillingResponse.fromJson(Map<String, dynamic> json) {
+    return LatestRentBillingResponse(
+      success: json['success'],
+      message: json['message'],
+      data: LatestRentBillingData.fromJson(json['data']),
+    );
+  }
+}
+
+class LatestRentBillingData {
+  final Billing latestRentBilling;
+
+  LatestRentBillingData({
+    required this.latestRentBilling,
+  });
+
+  factory LatestRentBillingData.fromJson(Map<String, dynamic> json) {
+    return LatestRentBillingData(
+      latestRentBilling: Billing.fromMap(json['latest_rent_billing']),
+    );
+  }
+}
+
 class BillingResponse {
   final bool success;
   final String message;
@@ -43,8 +77,9 @@ class Billing {
   final int id;
   final int profileId;
   final String billableType;
+  final String billingTitle;
   final int billableId;
-  final String totalAmount;
+  final double totalAmount;
   final String amountPaid;
   final String remainingBalance;
   final DateTime billingMonth;
@@ -57,6 +92,7 @@ class Billing {
     required this.id,
     required this.profileId,
     required this.billableType,
+    required this.billingTitle,
     required this.billableId,
     required this.totalAmount,
     required this.amountPaid,
@@ -72,8 +108,9 @@ class Billing {
         id: json["id"],
         profileId: json["profile_id"],
         billableType: json["billable_type"],
+        billingTitle: json["billing_title"],
         billableId: json["billable_id"],
-        totalAmount: json["total_amount"],
+        totalAmount: double.parse(json["total_amount"].toString()),
         amountPaid: json["amount_paid"],
         remainingBalance: json["remaining_balance"],
         billingMonth: DateTime.parse(json["billing_month"]),
@@ -87,6 +124,7 @@ class Billing {
         "id": id,
         "profile_id": profileId,
         "billable_type": billableType,
+        "bbilling_title": billingTitle,
         "billable_id": billableId,
         "total_amount": totalAmount,
         "amount_paid": amountPaid,
@@ -98,8 +136,6 @@ class Billing {
         "updated_at": updatedAt.toIso8601String(),
       };
 }
-
-
 
 class CheckFailPaymentResponse {
   bool success;
@@ -132,8 +168,10 @@ class CheckFailPaymentData {
 
   factory CheckFailPaymentData.fromJson(Map<String, dynamic> json) {
     return CheckFailPaymentData(
-      checkFailPaymentAgreement: CheckFailPaymentAgreement.fromJson(json['unpaid_rental_agreement']),
-      checkFailPaymentBilling: CheckFailPaymentBilling.fromJson(json['pending_billing']),
+      checkFailPaymentAgreement:
+          CheckFailPaymentAgreement.fromJson(json['unpaid_rental_agreement']),
+      checkFailPaymentBilling:
+          CheckFailPaymentBilling.fromJson(json['pending_billing']),
     );
   }
 }
@@ -175,7 +213,9 @@ class CheckFailPaymentAgreement {
       reservationId: json['reservation_id'],
       agreementCode: json['agreement_code'],
       rentStartDate: DateTime.parse(json['rent_start_date']),
-      rentEndDate: json['rent_end_date'] != null ? DateTime.parse(json['rent_end_date']) : null, // Handle null for rent_end_date
+      rentEndDate: json['rent_end_date'] != null
+          ? DateTime.parse(json['rent_end_date'])
+          : null, // Handle null for rent_end_date
       personCount: json['person_count'],
       totalAmount: double.parse(json['total_amount'].toString()),
       isAdvancePayment: json['is_advance_payment'],
@@ -187,8 +227,6 @@ class CheckFailPaymentAgreement {
     );
   }
 }
-
-
 
 class CheckFailPaymentBilling {
   int id;
@@ -238,7 +276,9 @@ class CheckFailPaymentBilling {
       checkoutSessionId: json['checkout_session_id'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      userProfile: json['user_profile'] != null ? UserProfile.fromJson(json['user_profile']) : null, // Nullable
+      userProfile: json['user_profile'] != null
+          ? UserProfile.fromJson(json['user_profile'])
+          : null, // Nullable
     );
   }
 }

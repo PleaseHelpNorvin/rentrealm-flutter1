@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:provider/provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/pickedRoom_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/profile_provider.dart';
@@ -77,9 +78,9 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
             switch (settings.name) {
               case '/':
                 if (_currentIndex == 0) {
-                  page =  ContractScreen();
+                  page = ContractScreen();
                 } else if (_currentIndex == 1) {
-                  page =  RentScreen();
+                  page = RentScreen();
                 } else if (_currentIndex == 2) {
                   page = const HomeScreen();
                 } else if (_currentIndex == 3) {
@@ -106,11 +107,12 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
                     notifNotifiableReservationId:
                         args?['notifNotifiableReservationId']);
                 break;
+              // case '':
               default:
                 if (_currentIndex == 0) {
-                  page =  ContractScreen();
+                  page = ContractScreen();
                 } else if (_currentIndex == 1) {
-                  page =  RentScreen();
+                  page = RentScreen();
                 } else if (_currentIndex == 2) {
                   page = const HomeScreen();
                 } else if (_currentIndex == 3) {

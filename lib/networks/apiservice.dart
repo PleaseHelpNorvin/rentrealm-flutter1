@@ -1647,4 +1647,31 @@ class ApiService {
       return null;
     }
   }
+
+// http://127.0.0.1:8000/api/tenant/billing/retrieve-latest-billing-for-monthly-rent/4
+  Future<LatestRentBillingResponse?> getLatestMonthlyRentBilling(
+      {required String token, required int userId}) async {
+    final uri = Uri.parse(
+        "$rest/tenant/billing/retrieve-latest-billing-for-monthly-rent/$userId");
+    final header = {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    try {
+      final response = await http.get(uri, headers: header);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print(" getLatestMonthlyRentBilling Response body: ${response.body}");
+        return LatestRentBillingResponse.fromJson(responseData);
+      } else {
+        print('Error: ${response.statusCode} - ${response.body}');
+        return null;
+      }
+    } catch (e) {
+      print("EXCEPTION: $e");
+      return null;
+    }
+  }
 }

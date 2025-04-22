@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/billing_provider.dart';
 import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
-import 'package:rentealm_flutter/SCREENS/PAYMENT/rental_agreement.dart';
+import 'package:rentealm_flutter/screens/PAYMENT/monthlyRentPayment.dart';
 import 'package:rentealm_flutter/screens/PAYMENT/payment.dart';
 
 import '../../PROVIDERS/notification_provider.dart';
@@ -32,6 +33,8 @@ class _NotificationsDetailsScreenState
     super.initState();
     Provider.of<NotificationProvider>(context, listen: false)
         .updateStatusToRead(context, widget.notificationId);
+    Provider.of<BillingProvider>(context, listen: false)
+        .fetchLatestMonthlyRentBilling(context);
   }
 
   @override
@@ -111,12 +114,27 @@ class _NotificationsDetailsScreenState
                   .startsWith("Monthly Rent billing for"))
                 Center(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Navigator.pushNamed(context, '/rentalAgreement',
-                      //     arguments: {
-                      //       'notifNotifiableReservationId':
-                      //           widget.notifNotifiableReservationId,
-                      //     });
+                    onPressed: () async {
+                      Provider.of<PaymentProvider>(context, listen: false)
+                          .processRentPaymongoPayment(context);
+
+                      final billingId =
+                          Provider.of<BillingProvider>(context, listen: false)
+                              .billing
+                              ?.id;
+
+                      if (billingId != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                Monthlyrentpayment(billingId: billingId),
+                          ),
+                        );
+                      } else {
+                        // Handle null billingId if needed (optional)
+                        print("Billing ID is null");
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,

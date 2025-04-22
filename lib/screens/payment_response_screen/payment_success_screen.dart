@@ -29,8 +29,7 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final billingProvider =
-        Provider.of<BillingProvider>(context, listen: false);
+    Provider.of<BillingProvider>(context, listen: false);
 
     // Debugging: Print billingId inside build method
     // print("build: widget.billingId = ${widget.billingId}");
