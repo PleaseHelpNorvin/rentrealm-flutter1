@@ -19,13 +19,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          const SizedBox(height: 20),
-          ProfilePicture(),
-          const SizedBox(height: 20),
-          ListTiles(),
-        ],
+      body: SingleChildScrollView(
+        // 🟢 Wrap the entire body in a scroll view
+        child: Column(
+          children: <Widget>[
+            const SizedBox(height: 20),
+            ProfilePicture(),
+            const SizedBox(height: 20),
+            ListTiles(), // this itself doesn’t need to scroll
+          ],
+        ),
       ),
     );
   }
@@ -121,65 +124,62 @@ class ListTiles extends StatelessWidget {
           color: Colors.blue,
           borderRadius: BorderRadius.circular(8.0),
         ),
-        child: Column(
-          children: <Widget>[
-            ListTile(
-              textColor: Colors.white,
-              iconColor: Colors.white,
-              title: const Text('Edit User Data'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(builder: (context) => EditUserScreen()),
-                // );
-                // Navigator.of(context).pushNamed('/edituser');
-
-                Navigator.pushNamed(context, '/edituser');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              textColor: Colors.white,
-              iconColor: Colors.white,
-              title: const Text('Edit User Profile'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                Navigator.pushNamed(context, '/editprofile');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              textColor: Colors.white,
-              iconColor: Colors.white,
-              title: const Text('Edit Address'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                Navigator.pushNamed(context, '/editaddress');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              textColor: Colors.white,
-              iconColor: Colors.white,
-              title: const Text('Edit Identifications'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                Navigator.pushNamed(context, '/editidentification');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              textColor: Colors.red,
-              iconColor: Colors.red,
-              title: const Text('Logout'),
-              trailing: const Icon(Icons.exit_to_app),
-              onTap: () {
-                Provider.of<UserProvider>(context, listen: false)
-                    .logoutUser(context);
-              },
-            ),
-          ],
+        child: SingleChildScrollView(
+          // 🟢 This makes it scrollable!
+          child: Column(
+            children: <Widget>[
+              ListTile(
+                textColor: Colors.white,
+                iconColor: Colors.white,
+                title: const Text('Edit User Data'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.pushNamed(context, '/edituser');
+                },
+              ),
+              const Divider(),
+              ListTile(
+                textColor: Colors.white,
+                iconColor: Colors.white,
+                title: const Text('Edit User Profile'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.pushNamed(context, '/editprofile');
+                },
+              ),
+              const Divider(),
+              ListTile(
+                textColor: Colors.white,
+                iconColor: Colors.white,
+                title: const Text('Edit Address'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.pushNamed(context, '/editaddress');
+                },
+              ),
+              const Divider(),
+              ListTile(
+                textColor: Colors.white,
+                iconColor: Colors.white,
+                title: const Text('Edit Identifications'),
+                trailing: const Icon(Icons.arrow_forward_ios),
+                onTap: () {
+                  Navigator.pushNamed(context, '/editidentification');
+                },
+              ),
+              const Divider(),
+              ListTile(
+                textColor: Colors.red,
+                iconColor: Colors.red,
+                title: const Text('Logout'),
+                trailing: const Icon(Icons.exit_to_app),
+                onTap: () {
+                  Provider.of<UserProvider>(context, listen: false)
+                      .logoutUser(context);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

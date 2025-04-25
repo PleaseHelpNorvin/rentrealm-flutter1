@@ -26,7 +26,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 // import 'package:rentealm_flutter/models/rentalAgreement_model.dart'
-    // as rentalModel;
+// as rentalModel;
 // import 'package:rentealm_flutter/models/tenant_model.dart' as tenantModel;
 
 class HomeScreen extends StatefulWidget {
@@ -38,8 +38,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<bool> _profileCheckFuture;
-   File? _image;
-    String? selectedStatus;  // To store the selected status for filtering
+  File? _image;
+  String? selectedStatus; // To store the selected status for filtering
   int? selectedRoomId;
 
   @override
@@ -62,10 +62,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final tenantProvider = Provider.of<TenantProvider>(context, listen: false);
     final rentalProvider =
         Provider.of<RentalagreementProvider>(context, listen: false);
-    final maintenancerequestProvider = Provider.of<MaintenancerequestProvider>(context, listen:false);
+    final maintenancerequestProvider =
+        Provider.of<MaintenancerequestProvider>(context, listen: false);
 
     rentalProvider.fetchActiveRentalAgreementByProfileId(context);
-
 
     final hasProfile = await profileProvider.loadUserProfile(context);
 
@@ -89,13 +89,13 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {}); // 🔥 UI refresh after tenant is updated
     }
 
-    maintenancerequestProvider.fetchRoomByProfileId(context); 
-      setState(() {});
+    maintenancerequestProvider.fetchRoomByProfileId(context);
+    setState(() {});
 
-    await maintenancerequestProvider.fetchMaintenanceRequestListByTenantId(context);
+    await maintenancerequestProvider
+        .fetchMaintenanceRequestListByTenantId(context);
     // if (!mounted) return; // ✅ Final check before UI update
     setState(() {}); // ✅ Just an empty setState to trigger UI rebuild
-
   }
 
   @override
@@ -140,15 +140,23 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
         child: Consumer5<ProfileProvider, PickedRoomProvider, TenantProvider,
-            RentalagreementProvider, MaintenancerequestProvider >(
-          builder: (context, profileProvider, pickedRoomProvider,
-              tenantProvider, rentalAgreementProvider, maintenanceRequestProvider, child) {
+            RentalagreementProvider, MaintenancerequestProvider>(
+          builder: (context,
+              profileProvider,
+              pickedRoomProvider,
+              tenantProvider,
+              rentalAgreementProvider,
+              maintenanceRequestProvider,
+              child) {
             final singlePickedRoom = pickedRoomProvider.singlePickedRoom;
             final tenant = tenantProvider.tenant;
             final activeAgreements = rentalAgreementProvider.rentalAgreements;
-            final roomByProfileIdList = maintenanceRequestProvider.roomByProfileIdList;
-            final maintenanceRequestsList = maintenanceRequestProvider.maintenanceRequests;
-            final maintenanceRequestObj = maintenanceRequestProvider.selectedMaintenanceRequest;
+            final roomByProfileIdList =
+                maintenanceRequestProvider.roomByProfileIdList;
+            final maintenanceRequestsList =
+                maintenanceRequestProvider.maintenanceRequests;
+            final maintenanceRequestObj =
+                maintenanceRequestProvider.selectedMaintenanceRequest;
 
             // ✅ Show a loading spinner if any provider is still fetching data
             if (profileProvider.isLoading ||
@@ -167,7 +175,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (tenant != null) ...[
                     _buildChangeActiveRentalAgreement(context, tenant),
                     _buildShowMonthlyCountdownDashboard(tenant),
-                    _buildShowMaintenanceRequestsList(tenant,roomByProfileIdList, maintenanceRequestsList, maintenanceRequestObj),
+                    _buildShowMaintenanceRequestsList(
+                        tenant,
+                        roomByProfileIdList,
+                        maintenanceRequestsList,
+                        maintenanceRequestObj),
                   ] else ...[
                     if (singlePickedRoom != null)
                       _buildContinueReservationPayment(
@@ -482,10 +494,9 @@ class _HomeScreenState extends State<HomeScreen> {
   //   if (tenantResponse == null) return SizedBox();
 
   //   if (roomByProfileIdList == null) return SizedBox();
-    
 
   //   // final maintenanceRequests = tenantResponse.data.tenantMaintenanceRequest;
-      
+
   //   return SizedBox(
   //     width: double.infinity,
   //     child: Card(
@@ -624,14 +635,16 @@ class _HomeScreenState extends State<HomeScreen> {
       List<RoomByProfileId> roomByProfileIdList,
       List<MaintenanceRequest> maintenanceRequestsList,
       MaintenanceRequest? maintenanceRequestObj) {
-
     if (tenantResponse == null) return SizedBox();
     if (roomByProfileIdList == null) return SizedBox();
 
     // Apply filters
-    List<MaintenanceRequest> filteredRequests = maintenanceRequestsList.where((request) {
-      bool matchesStatus = selectedStatus == null || request.status == selectedStatus;
-      bool matchesRoomId = selectedRoomId == null || request.roomId == selectedRoomId;
+    List<MaintenanceRequest> filteredRequests =
+        maintenanceRequestsList.where((request) {
+      bool matchesStatus =
+          selectedStatus == null || request.status == selectedStatus;
+      bool matchesRoomId =
+          selectedRoomId == null || request.roomId == selectedRoomId;
 
       return matchesStatus && matchesRoomId;
     }).toList();
@@ -651,27 +664,35 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Text(
                     "Maintenance Requests",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue),
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue),
                   ),
                   const SizedBox(height: 10),
-                  
+
                   // Row containing the ElevatedButton and DropdownButton
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,  // Aligns items to take up available space
+                    mainAxisAlignment: MainAxisAlignment
+                        .spaceBetween, // Aligns items to take up available space
                     children: [
                       ElevatedButton.icon(
                         onPressed: () {
-                          _showAddMaintenanceRequestDialog(context, roomByProfileIdList);
+                          _showAddMaintenanceRequestDialog(
+                              context, roomByProfileIdList);
                         },
                         icon: Icon(Icons.add),
                         label: Text("Add Request"),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.blue,
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3)),
                         ),
                       ),
-                      SizedBox(width: 10), // Adds some space between the button and dropdown
+                      SizedBox(
+                          width:
+                              10), // Adds some space between the button and dropdown
                       DropdownButton<String>(
                         hint: Text("Filter by Status"),
                         value: selectedStatus,
@@ -680,8 +701,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             selectedStatus = newValue;
                           });
                         },
-                        items: <String>['pending','assigned', 'completed', 'in_progress', 'cancelled']
-                            .map<DropdownMenuItem<String>>((String value) {
+                        items: <String>[
+                          'pending',
+                          'assigned',
+                          'completed',
+                          'in_progress',
+                          'cancelled'
+                        ].map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -699,7 +725,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 Center(
                   child: Text(
                     "No maintenance requests found.",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black54),
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black54),
                   ),
                 )
               else
@@ -711,53 +740,74 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: filteredRequests.length,
                     itemBuilder: (context, index) {
                       final request = filteredRequests[index];
-                      DateTime requestedAt = DateTime.parse(request.requestedAt.toString());
-                      String formattedDate = DateFormat('MMMM dd, yyyy hh:mm a').format(requestedAt);
+                      DateTime requestedAt =
+                          DateTime.parse(request.requestedAt.toString());
+                      String formattedDate = DateFormat('MMMM dd, yyyy hh:mm a')
+                          .format(requestedAt);
 
                       return GestureDetector(
                         onTap: () {
                           print("tapped ${request.id}");
-                          _showMaintenanceRequestDetails(context, maintenanceRequestObj, request.id);
+                          _showMaintenanceRequestDetails(
+                              context, maintenanceRequestObj, request.id);
                         },
                         child: Card(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3)),
                           margin: EdgeInsets.symmetric(vertical: 5),
                           child: ListTile(
                             title: Text(
                               "Issue: ${request.ticketCode}",
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue),
                             ),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Status: ${request.status}", style: TextStyle(color: Colors.black87)),
-                                Text("Requested On: $formattedDate", style: TextStyle(color: Colors.black54)),
+                                Text("Status: ${request.status}",
+                                    style: TextStyle(color: Colors.black87)),
+                                Text("Requested On: $formattedDate",
+                                    style: TextStyle(color: Colors.black54)),
                               ],
                             ),
                             leading: Icon(Icons.build, color: Colors.blue),
                             trailing: Row(
-                              mainAxisSize: MainAxisSize.min, // Makes the row take minimum space
+                              mainAxisSize: MainAxisSize
+                                  .min, // Makes the row take minimum space
                               children: [
                                 Icon(
-                                  request.status == "Completed" ? Icons.check_circle : Icons.pending,
-                                  color: request.status == "Completed" ? Colors.green : Colors.red,
+                                  request.status == "Completed"
+                                      ? Icons.check_circle
+                                      : Icons.pending,
+                                  color: request.status == "Completed"
+                                      ? Colors.green
+                                      : Colors.red,
                                 ),
-                                SizedBox(width: 0), // Reduces the space between icons
+                                SizedBox(
+                                    width:
+                                        0), // Reduces the space between icons
                                 IconButton(
                                   icon: Icon(Icons.edit, color: Colors.blue),
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
-                                    print('Edit button tapped for ticket: ${request.ticketCode}');
-                                    _maintenanceRequestEditForm(context, request.id, roomByProfileIdList);
+                                    print(
+                                        'Edit button tapped for ticket: ${request.ticketCode}');
+                                    _maintenanceRequestEditForm(context,
+                                        request.id, roomByProfileIdList);
                                   },
                                 ),
-                                SizedBox(width: 0), // Reduces the space between icons
+                                SizedBox(
+                                    width:
+                                        0), // Reduces the space between icons
                                 IconButton(
                                   icon: Icon(Icons.delete, color: Colors.blue),
                                   padding: EdgeInsets.zero,
                                   onPressed: () {
-                                    print('Delete button tapped for ticket: ${request.ticketCode}');
-                                    _maintenanceCancelConfirmDialog(context, request.id);
+                                    print(
+                                        'Delete button tapped for ticket: ${request.ticketCode}');
+                                    _maintenanceCancelConfirmDialog(
+                                        context, request.id);
                                     // Handle delete action
                                   },
                                 ),
@@ -776,23 +826,29 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
-
-  Future<void> _maintenanceRequestEditForm(BuildContext context, int maintenanceId, List<RoomByProfileId> roomCodeLists) async {
+  Future<void> _maintenanceRequestEditForm(BuildContext context,
+      int maintenanceId, List<RoomByProfileId> roomCodeLists) async {
     print("from _maintenanceRequestEditForm() maintenanceId: $maintenanceId");
 
-    final maintenanceRequestProvider = Provider.of<MaintenancerequestProvider>(context, listen: false);
-    await maintenanceRequestProvider.fetchMaintenanceRequestSingleObject(context, maintenanceId);
+    final maintenanceRequestProvider =
+        Provider.of<MaintenancerequestProvider>(context, listen: false);
+    await maintenanceRequestProvider.fetchMaintenanceRequestSingleObject(
+        context, maintenanceId);
 
-    final selectedRequest =  maintenanceRequestProvider.selectedMaintenanceRequest;
+    final selectedRequest =
+        maintenanceRequestProvider.selectedMaintenanceRequest;
 
     if (selectedRequest != null) {
-      TextEditingController titleController = TextEditingController(text: selectedRequest.title);
-      TextEditingController descriptionController = TextEditingController(text: selectedRequest.description);
-      
-      int? _selectedRoomId = selectedRequest.roomId;  // ✅ Get the existing room ID
+      TextEditingController titleController =
+          TextEditingController(text: selectedRequest.title);
+      TextEditingController descriptionController =
+          TextEditingController(text: selectedRequest.description);
 
-      await Provider.of<RoomProvider>(context, listen: false).fetchRoomById(context, _selectedRoomId!);
+      int? _selectedRoomId =
+          selectedRequest.roomId; // ✅ Get the existing room ID
+
+      await Provider.of<RoomProvider>(context, listen: false)
+          .fetchRoomById(context, _selectedRoomId!);
 
       showModalBottomSheet(
         context: context,
@@ -807,9 +863,11 @@ class _HomeScreenState extends State<HomeScreen> {
               initialChildSize: 1.0,
               minChildSize: 0.8,
               maxChildSize: 1.0,
-              builder: (BuildContext context, ScrollController scrollController) {
+              builder:
+                  (BuildContext context, ScrollController scrollController) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                   child: SingleChildScrollView(
                     controller: scrollController,
                     child: Column(
@@ -819,7 +877,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Edit Maintenance Request", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text("Edit Maintenance Request",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
                             IconButton(
                               icon: Icon(Icons.close, color: Colors.grey[700]),
                               onPressed: () {
@@ -835,17 +895,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         GestureDetector(
                           onTap: () async {
                             final picker = ImagePicker();
-                            final XFile? pickedFile = await picker.pickImage(source: ImageSource.camera);
+                            final XFile? pickedFile = await picker.pickImage(
+                                source: ImageSource.camera);
 
                             if (pickedFile != null) {
                               print("pickedFile path: ${pickedFile.path}");
-                              maintenanceRequestProvider.updateNewImage(File(pickedFile.path));
+                              maintenanceRequestProvider
+                                  .updateNewImage(File(pickedFile.path));
                             } else {
                               print("No image selected.");
                             }
                           },
                           child: Consumer<MaintenancerequestProvider>(
-                            builder: (context, maintenanceRequestProvider, child) {
+                            builder:
+                                (context, maintenanceRequestProvider, child) {
                               return maintenanceRequestProvider.newImage != null
                                   ? Image.file(
                                       maintenanceRequestProvider.newImage!,
@@ -855,15 +918,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )
                                   : selectedRequest.images.isNotEmpty
                                       ? CachedNetworkImage(
-                                          imageUrl: selectedRequest.images.single,
-                                          placeholder: (context, url) => CircularProgressIndicator(),
-                                          errorWidget: (context, url, error) => Icon(Icons.error),
+                                          imageUrl:
+                                              selectedRequest.images.single,
+                                          placeholder: (context, url) =>
+                                              CircularProgressIndicator(),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
                                         )
                                       : Container(
                                           height: 200,
                                           width: double.infinity,
                                           color: Colors.grey[300],
-                                          child: Center(child: Text("No image selected")),
+                                          child: Center(
+                                              child: Text("No image selected")),
                                         );
                             },
                           ),
@@ -885,7 +952,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     },
                                     decoration: InputDecoration(
                                       labelText: "Select Room Code",
-                                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
                                     ),
                                     items: roomCodeLists.map((room) {
                                       return DropdownMenuItem<int>(
@@ -893,22 +962,27 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: Text(room.roomCode),
                                       );
                                     }).toList(),
-                                    validator: (value) => value == null ? "Please select a room code" : null,
+                                    validator: (value) => value == null
+                                        ? "Please select a room code"
+                                        : null,
                                   );
                                 },
                               ),
 
-                              Text('Ticket Code: ${selectedRequest.ticketCode}'),
+                              Text(
+                                  'Ticket Code: ${selectedRequest.ticketCode}'),
                               TextField(
                                 controller: titleController,
                                 decoration: InputDecoration(labelText: 'Title'),
                               ),
                               TextField(
                                 controller: descriptionController,
-                                decoration: InputDecoration(labelText: 'Description'),
+                                decoration:
+                                    InputDecoration(labelText: 'Description'),
                               ),
                               Text('Status: ${selectedRequest.status}'),
-                              Text('Requested At: ${selectedRequest.requestedAt}'),
+                              Text(
+                                  'Requested At: ${selectedRequest.requestedAt}'),
                               SizedBox(height: 20),
 
                               // Save Button
@@ -917,26 +991,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                 children: [
                                   ElevatedButton(
                                     onPressed: () async {
-                                      String updatedTitle = titleController.text;
-                                      String updatedDescription = descriptionController.text;
-                                      File? selectedImage = maintenanceRequestProvider.newImage;
-                                      final maintenanceProvider = Provider.of<MaintenancerequestProvider>(context, listen: false);
+                                      String updatedTitle =
+                                          titleController.text;
+                                      String updatedDescription =
+                                          descriptionController.text;
+                                      File? selectedImage =
+                                          maintenanceRequestProvider.newImage;
+                                      final maintenanceProvider = Provider.of<
+                                              MaintenancerequestProvider>(
+                                          context,
+                                          listen: false);
 
-                                          maintenanceProvider.updateMaintenanceRequest(context, updatedTitle, updatedDescription, _selectedRoomId!, selectedImage, maintenanceId);
-                                         
-                                      print("Updated Maintenance Request: $updatedTitle, $updatedDescription");
+                                      maintenanceProvider
+                                          .updateMaintenanceRequest(
+                                              context,
+                                              updatedTitle,
+                                              updatedDescription,
+                                              _selectedRoomId!,
+                                              selectedImage,
+                                              maintenanceId);
 
-                                      maintenanceRequestProvider.clearNewImage();
+                                      print(
+                                          "Updated Maintenance Request: $updatedTitle, $updatedDescription");
+
+                                      maintenanceRequestProvider
+                                          .clearNewImage();
                                       Navigator.pop(context);
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(vertical: 15),
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 15),
                                       backgroundColor: Colors.blue,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(5),
                                       ),
                                     ),
-                                    child: Text('Save', style: TextStyle(color: Colors.white)),
+                                    child: Text('Save',
+                                        style: TextStyle(color: Colors.white)),
                                   ),
                                   SizedBox(width: 10),
                                 ],
@@ -958,18 +1049,20 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-    void _maintenanceCancelConfirmDialog(BuildContext context, int maintenanceId) {
+  void _maintenanceCancelConfirmDialog(
+      BuildContext context, int maintenanceId) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Cancel Maintenance Request'),
-          content: Text('Are you sure you want to cancel this maintenance request?'),
+          content:
+              Text('Are you sure you want to cancel this maintenance request?'),
           actions: <Widget>[
             // Cancel button
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();  // Close the dialog
+                Navigator.of(context).pop(); // Close the dialog
               },
               child: Text('Cancel'),
             ),
@@ -978,8 +1071,10 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 // Call the function to cancel the maintenance request
                 // Replace with your actual API call or logic
-                await Provider.of<MaintenancerequestProvider>(context, listen:  false).patchStatusToCancel(context, maintenanceId);
-                Navigator.of(context).pop();  // Close the dialog
+                await Provider.of<MaintenancerequestProvider>(context,
+                        listen: false)
+                    .patchStatusToCancel(context, maintenanceId);
+                Navigator.of(context).pop(); // Close the dialog
               },
               child: Text('Confirm'),
             ),
@@ -989,29 +1084,35 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showMaintenanceRequestDetails(BuildContext context,
+      MaintenanceRequest? maintenanceRequestObj, int maintenanceId) async {
+    print(
+        "from _showMaintenanceRequestDetails() maintenanceId: ${maintenanceRequestObj?.id}");
 
-
-  void _showMaintenanceRequestDetails(BuildContext context, MaintenanceRequest? maintenanceRequestObj, int maintenanceId) async {
-    print("from _showMaintenanceRequestDetails() maintenanceId: ${maintenanceRequestObj?.id}");
-
-    final maintenanceRequestProvider = Provider.of<MaintenancerequestProvider>(context, listen: false);
-    await maintenanceRequestProvider.fetchMaintenanceRequestSingleObject(context, maintenanceId);
+    final maintenanceRequestProvider =
+        Provider.of<MaintenancerequestProvider>(context, listen: false);
+    await maintenanceRequestProvider.fetchMaintenanceRequestSingleObject(
+        context, maintenanceId);
 
     // Fetch the selected maintenance request from the provider
-    final selectedRequest = maintenanceRequestProvider.selectedMaintenanceRequest;
+    final selectedRequest =
+        maintenanceRequestProvider.selectedMaintenanceRequest;
 
     // Show the dialog with the selected maintenance request details
     if (selectedRequest != null) {
       showGeneralDialog(
         context: context,
-        barrierDismissible: true, // Allows the dialog to be dismissed by tapping outside of it
+        barrierDismissible:
+            true, // Allows the dialog to be dismissed by tapping outside of it
         barrierLabel: 'Maintenance Request Details',
         transitionDuration: Duration(milliseconds: 300),
-        pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+        pageBuilder: (BuildContext context, Animation<double> animation,
+            Animation<double> secondaryAnimation) {
           return AlertDialog(
             title: Text('Maintenance Request Details'),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(3), // Set the border radius here
+              borderRadius:
+                  BorderRadius.circular(3), // Set the border radius here
             ),
             content: SingleChildScrollView(
               child: Column(
@@ -1029,8 +1130,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: selectedRequest.images.map((image) {
                             return CachedNetworkImage(
                               imageUrl: image,
-                              placeholder: (context, url) => CircularProgressIndicator(),
-                              errorWidget: (context, url, error) => Icon(Icons.error),
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
                             );
                           }).toList(),
                         )
@@ -1041,7 +1144,8 @@ class _HomeScreenState extends State<HomeScreen> {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  print("Image from selectedRequest.images.map((image) or backend : ${selectedRequest.images.toString()} ");
+                  print(
+                      "Image from selectedRequest.images.map((image) or backend : ${selectedRequest.images.toString()} ");
                   Navigator.of(context).pop(); // Close the dialog
                 },
                 child: Text('Close'),
@@ -1055,10 +1159,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
   // Function to show Add Maintenance Request dialog
 
-    void _showAddMaintenanceRequestDialog(BuildContext context, List<RoomByProfileId> roomCodeLists) {
+  void _showAddMaintenanceRequestDialog(
+      BuildContext context, List<RoomByProfileId> roomCodeLists) {
     final _formKey = GlobalKey<FormState>(); // Form key for validation
     TextEditingController _titleController = TextEditingController();
     TextEditingController _descriptionController = TextEditingController();
@@ -1075,7 +1179,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return Padding(
+            return SingleChildScrollView(
               padding: EdgeInsets.only(
                 left: 16,
                 right: 16,
@@ -1092,7 +1196,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     Center(
                       child: Text(
                         "Add Maintenance Request",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -1107,7 +1214,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       decoration: InputDecoration(
                         labelText: "Select Room Code",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
                       items: roomCodeLists.map((room) {
                         return DropdownMenuItem<int>(
@@ -1115,7 +1223,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Text(room.roomCode),
                         );
                       }).toList(),
-                      validator: (value) => value == null ? "Please select a room code" : null, // Validation
+                      validator: (value) => value == null
+                          ? "Please select a room code"
+                          : null, // Validation
                     ),
                     const SizedBox(height: 20),
 
@@ -1124,9 +1234,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       controller: _titleController,
                       decoration: InputDecoration(
                         labelText: "Title of the issue",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
-                      validator: (value) => value == null || value.trim().isEmpty ? "Title cannot be empty" : null, // Validation
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
+                              ? "Title cannot be empty"
+                              : null, // Validation
                     ),
                     const SizedBox(height: 20),
 
@@ -1135,17 +1249,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       controller: _descriptionController,
                       decoration: InputDecoration(
                         labelText: "Describe the issue",
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
                       ),
                       maxLines: 3,
-                      validator: (value) => value == null || value.trim().isEmpty ? "Description cannot be empty" : null, // Validation
+                      validator: (value) =>
+                          value == null || value.trim().isEmpty
+                              ? "Description cannot be empty"
+                              : null, // Validation
                     ),
                     const SizedBox(height: 20),
 
                     // Image Picker Button
                     ElevatedButton.icon(
                       onPressed: () async {
-                        final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                        final pickedFile = await ImagePicker()
+                            .pickImage(source: ImageSource.gallery);
                         if (pickedFile != null) {
                           setState(() {
                             _selectedImage = File(pickedFile.path);
@@ -1154,7 +1273,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       icon: Icon(Icons.photo),
                       label: Text("Add Photo"),
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue),
                     ),
                     const SizedBox(height: 5),
 
@@ -1162,7 +1282,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (_selectedImage != null)
                       Column(
                         children: [
-                          Image.file(_selectedImage!, height: 150, fit: BoxFit.cover),
+                          Image.file(_selectedImage!,
+                              height: 150, fit: BoxFit.cover),
                           const SizedBox(height: 10),
                           TextButton(
                             onPressed: () {
@@ -1170,7 +1291,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 _selectedImage = null;
                               });
                             },
-                            child: Text("Remove Photo", style: TextStyle(color: Colors.red)),
+                            child: Text("Remove Photo",
+                                style: TextStyle(color: Colors.red)),
                           ),
                         ],
                       ),
@@ -1182,28 +1304,36 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                          child: Text("Cancel",
+                              style: TextStyle(color: Colors.red)),
                         ),
                         ElevatedButton(
                           onPressed: () {
-                            if (_formKey.currentState!.validate()) { // Validate before submitting
+                            if (_formKey.currentState!.validate()) {
+                              // Validate before submitting
                               String title = _titleController.text.trim();
-                              String description = _descriptionController.text.trim();
+                              String description =
+                                  _descriptionController.text.trim();
                               int? roomId = _selectedRoomId;
-                              File? imageFile = _selectedImage; // Get image file path
-                              
+                              File? imageFile =
+                                  _selectedImage; // Get image file path
+
                               if (roomId == null) {
                                 print("Room ID is required.");
                                 return;
                               }
 
-                              Provider.of<MaintenancerequestProvider>(context, listen: false)
-                                .createMaintenanceRequest(context, title, description, roomId, imageFile);
+                              Provider.of<MaintenancerequestProvider>(context,
+                                      listen: false)
+                                  .createMaintenanceRequest(context, title,
+                                      description, roomId, imageFile);
                               Navigator.of(context).pop();
                             }
                           },
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                          child: Text("Submit", style: TextStyle(color: Colors.white)),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue),
+                          child: Text("Submit",
+                              style: TextStyle(color: Colors.white)),
                         ),
                       ],
                     ),
@@ -1216,7 +1346,6 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
-
 
   /// Widget shown when the user doesn't have a profile
   Widget _buildNoDataCard() {

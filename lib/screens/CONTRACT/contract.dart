@@ -24,7 +24,7 @@ class _ContractScreenState extends State<ContractScreen> {
       Provider.of<RentalagreementProvider>(context, listen: false)
           .fetchIndexRentalAgreement(context);
 
-          Provider.of<PaymentProvider>(context, listen:  false)
+      Provider.of<PaymentProvider>(context, listen: false)
           .fetchReceiptsByProfileId(context);
     });
   }
@@ -59,18 +59,13 @@ class _ContractScreenState extends State<ContractScreen> {
       style: ElevatedButton.styleFrom(
         backgroundColor: isSelected ? Colors.blue : Colors.white,
         foregroundColor: isSelected ? Colors.white : Colors.blue,
-        padding: EdgeInsets.symmetric(
-          horizontal: MediaQuery.of(context).size.width * 0.15,
-          vertical: 5,
-        ),
+        padding: EdgeInsets.symmetric(vertical: 12),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(3),
+          borderRadius: BorderRadius.circular(5),
+          side: BorderSide(color: Colors.blue),
         ),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(5),
-        child: Text(text),
-      ),
+      child: Text(text),
     );
   }
 
@@ -131,9 +126,10 @@ class _ContractScreenState extends State<ContractScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => 
-            ReceiptDetailsScreen(paymongoPaymentReference: receipt.paymongoPaymentReference, receiptUrl: receipt.receiptUrl,)
-          ),
+              builder: (context) => ReceiptDetailsScreen(
+                    paymongoPaymentReference: receipt.paymongoPaymentReference,
+                    receiptUrl: receipt.receiptUrl,
+                  )),
         );
       },
       child: Card(
@@ -145,7 +141,8 @@ class _ContractScreenState extends State<ContractScreen> {
         margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         child: ListTile(
           leading: Icon(Icons.receipt_long, color: Colors.green),
-          title: Text(receipt.paymongoPaymentReference, style: TextStyle(fontSize: 16)),
+          title: Text(receipt.paymongoPaymentReference,
+              style: TextStyle(fontSize: 16)),
           trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
         ),
       ),
@@ -162,22 +159,26 @@ class _ContractScreenState extends State<ContractScreen> {
             _buildToggleButtons(), // ✅ Buttons for switching
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
+                padding:
+                    EdgeInsets.only(top: 10, bottom: 20, left: 10, right: 10),
                 child: Consumer<PaymentProvider>(
                   builder: (context, paymentProvider, child) {
-                    final receipts = paymentProvider.receipts; // ✅ Get receipts from provider
+                    final receipts = paymentProvider
+                        .receipts; // ✅ Get receipts from provider
 
                     if (isShowingContracts) {
                       return Consumer<RentalagreementProvider>(
                         builder: (context, rentalAgreementProvider, child) {
-                          final contracts = rentalAgreementProvider.rentalAgreements;
+                          final contracts =
+                              rentalAgreementProvider.rentalAgreements;
 
                           return contracts.isEmpty
                               ? _buildNoDataCard("No contracts found")
                               : ListView.builder(
                                   itemCount: contracts.length,
                                   itemBuilder: (context, index) {
-                                    return _buildContractListCard(contracts[index]);
+                                    return _buildContractListCard(
+                                        contracts[index]);
                                   },
                                 );
                         },
@@ -196,7 +197,6 @@ class _ContractScreenState extends State<ContractScreen> {
                 ),
               ),
             ),
-
           ],
         ),
       ),

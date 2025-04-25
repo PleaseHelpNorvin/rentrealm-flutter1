@@ -70,7 +70,6 @@ class PaymongoErrorData {
   Map<String, dynamic> toJson() => {'code': code, 'detail': detail};
 }
 
-
 class RetrievePaymongoPaymentResponse {
   final String paymentId;
   final String status;
@@ -82,7 +81,6 @@ class RetrievePaymongoPaymentResponse {
     this.referenceNumber,
   });
 
-  // Factory method to create an instance from JSON
   factory RetrievePaymongoPaymentResponse.fromJson(Map<String, dynamic> json) {
     return RetrievePaymongoPaymentResponse(
       paymentId: json['payment_id'] ?? '',
@@ -91,7 +89,6 @@ class RetrievePaymongoPaymentResponse {
     );
   }
 
-  // Convert the instance to JSON
   Map<String, dynamic> toJson() {
     return {
       'payment_id': paymentId,

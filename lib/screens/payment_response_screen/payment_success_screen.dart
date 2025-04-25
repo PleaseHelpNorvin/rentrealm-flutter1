@@ -13,28 +13,18 @@ class PaymentSuccessScreen extends StatefulWidget {
 }
 
 class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
+  bool _isLoading = false; // Step 1
+
   @override
   void initState() {
     super.initState();
-
-    // Debugging: Print billingId when screen initializes
     print("initState: Received billingId = ${widget.billingId}");
-
-    // final billingProvider = Provider.of<BillingProvider>(context, listen: false);
-    // WidgetsBinding.instance.addPostFrameCallback((_) async {
-    //   print("Fetching billing details for ID: ${widget.billingId}");
-    // await billingProvider.fetchBillingDetails(context, widget.billingId);
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
     Provider.of<BillingProvider>(context, listen: false);
 
-    // Debugging: Print billingId inside build method
-    // print("build: widget.billingId = ${widget.billingId}");
-
-    // Prevent crash if billings list is empty
     return Scaffold(
       body: SizedBox(
         width: double.infinity,
@@ -45,21 +35,13 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text("Received BillingId: ${widget.billingId}"),
-              // Text("Fetched BillingId: $billingId"),
-              Text(
-                "✅",
-                style: TextStyle(fontSize: 100),
-              ),
+              Text("✅", style: TextStyle(fontSize: 100)),
               SizedBox(height: 20),
-              Text(
-                "Success!",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              Text("Success!",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
               SizedBox(height: 10),
-              Text(
-                "Your payment was processed successfully.",
-                textAlign: TextAlign.center,
-              ),
+              Text("Your payment was processed successfully.",
+                  textAlign: TextAlign.center),
             ],
           ),
         ),
@@ -71,21 +53,33 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
             side: const BorderSide(color: Colors.blue, width: 1),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(3),
-            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
           ),
-          onPressed: () {
-            passBillingIdToRetrievePaymongoDetails(widget.billingId);
-          },
-          child: const Text("Go Back"),
+          onPressed: _isLoading
+              ? null
+              : () {
+                  setState(() => _isLoading = true); // Step 2
+                  passBillingIdToRetrievePaymongoDetails(widget.billingId);
+                },
+          child: _isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                      color: Colors.white, strokeWidth: 2),
+                )
+              : const Text("Go Back"),
         ),
       ),
     );
   }
 
-  void passBillingIdToRetrievePaymongoDetails(int billingId) async {
-    Provider.of<PaymentProvider>(context, listen: false)
+  Future<void> passBillingIdToRetrievePaymongoDetails(int billingId) async {
+    await Provider.of<PaymentProvider>(context, listen: false)
         .fetchRetrievePayment(context, billingId: billingId);
+
+    // Optional: Navigate or do something else after loading
+    setState(() => _isLoading = false);
   }
 }
