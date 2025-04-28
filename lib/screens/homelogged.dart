@@ -13,6 +13,7 @@ import '../PROVIDERS/auth_provider.dart';
 import '../PROVIDERS/user_provider.dart';
 import '../SCREENS/HOME/home.dart';
 import '../SCREENS/PROFILE/profile.dart';
+import 'PAYMENT/advancePayment.dart';
 import 'PAYMENT/rental_agreement.dart';
 import 'PROFILE/UPDATE/edit_user_screen.dart';
 import 'PROFILE/UPDATE/edit_profile_screen.dart';
@@ -106,6 +107,9 @@ class HomeLoggedScreenState extends State<HomeLoggedScreen> {
                 page = RentalAgreementScreen(
                     notifNotifiableReservationId:
                         args?['notifNotifiableReservationId']);
+                break;
+              case '/advancepayment':
+                page = const AdvancePaymentScreen();
                 break;
               // case '':
               default:

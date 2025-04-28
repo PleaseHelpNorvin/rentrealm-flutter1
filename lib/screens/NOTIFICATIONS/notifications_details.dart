@@ -113,38 +113,57 @@ class _NotificationsDetailsScreenState
               else if (widget.notificationTitle
                   .startsWith("Monthly Rent billing for"))
                 Center(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      Provider.of<PaymentProvider>(context, listen: false)
-                          .processRentPaymongoPayment(context);
+                  child: Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () async {
+                          Provider.of<PaymentProvider>(context, listen: false)
+                              .processRentPaymongoPayment(context);
 
-                      final billingId =
-                          Provider.of<BillingProvider>(context, listen: false)
+                          final billingId = Provider.of<BillingProvider>(
+                                  context,
+                                  listen: false)
                               .billing
                               ?.id;
 
-                      if (billingId != null) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                Monthlyrentpayment(billingId: billingId),
+                          if (billingId != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    Monthlyrentpayment(billingId: billingId),
+                              ),
+                            );
+                          } else {
+                            // Handle null billingId if needed (optional)
+                            print("Billing ID is null");
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
                           ),
-                        );
-                      } else {
-                        // Handle null billingId if needed (optional)
-                        print("Billing ID is null");
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 10,
+                        ),
+                        child: const Text("Proceed to Rent Payment"),
                       ),
-                    ),
-                    child: const Text("Proceed to Rent Payment"),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, "/advancepayment");
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 10,
+                          ),
+                        ),
+                        child: const Text("Pay Advance"),
+                      ),
+                    ],
                   ),
                 )
             ],
