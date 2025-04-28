@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rentealm_flutter/PROVIDERS/payment_provider.dart';
+
+import '../../PROVIDERS/billing_provider.dart';
 
 class AdvancePaymentScreen extends StatefulWidget {
   const AdvancePaymentScreen({super.key});
@@ -9,7 +13,23 @@ class AdvancePaymentScreen extends StatefulWidget {
 
 class _AdvancePaymentScreenState extends State<AdvancePaymentScreen> {
   int selectedMonths = 1; // default
-  double monthlyRent = 5000; // assume ₱5000 per month
+  double monthlyRent = 0; // assume ₱5000 per month
+
+  @override
+  void initState() {
+    super.initState();
+    final billingProvider =
+        Provider.of<BillingProvider>(context, listen: false);
+
+    billingProvider.fetchLatestMonthlyRentBilling(context).then((_) {
+      // After fetching billing, update monthlyRent based on billing.totalAmount
+      if (billingProvider.billing != null) {
+        setState(() {
+          monthlyRent = billingProvider.billing!.totalAmount;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,10 +110,14 @@ class _AdvancePaymentScreenState extends State<AdvancePaymentScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // TODO: trigger PayMongo payment here
                   print(
                       'Proceed to pay ₱$totalAmount for $selectedMonths months');
+
+                  await Provider.of<PaymentProvider>(context, listen: false)
+                      .processAdvanceRentPaymongoPayment(
+                          context, totalAmount, selectedMonths);
                 },
                 child: const Text('Proceed to Pay'),
                 style: ElevatedButton.styleFrom(

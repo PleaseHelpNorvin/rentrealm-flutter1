@@ -241,7 +241,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           body: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(10),

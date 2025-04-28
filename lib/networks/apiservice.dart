@@ -1100,6 +1100,7 @@ class ApiService {
     required int billingId,
     required double amount,
     required String paymentDescription,
+    int? selectedMonthsToPay,
   }) async {
     print("PAYMONGOPOST() REACHED!");
     print("from PaymongoPost $token");
@@ -1117,6 +1118,7 @@ class ApiService {
         "billing_id": billingId,
         "amount": amount,
         "payment_description": paymentDescription,
+        "selected_months_to_pay": selectedMonthsToPay,
       };
 
       final request = await http.post(

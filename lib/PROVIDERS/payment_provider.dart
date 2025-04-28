@@ -249,12 +249,6 @@ class PaymentProvider extends ChangeNotifier {
     print("from processRentPaymongoPayment() profileId: $profileId ");
     print("from processRentPaymongoPayment() userId: $userId ");
 
-    // final response = await apiService.(
-    //   token: token,
-    //   userId: userId, // now guaranteed non-null
-    // );
-
-    // if (response != null && response.success) {
     final billingProvider =
         Provider.of<BillingProvider>(context, listen: false);
     final billing = billingProvider.billing;
@@ -273,16 +267,57 @@ class PaymentProvider extends ChangeNotifier {
       amount: billingTotalAmount,
       billingId: billingId,
       paymentDescription: billingDescription,
-      // description: billingDescription,
     );
 
     if (postPaymongoResponse != null && postPaymongoResponse.success) {
       setCheckoutUrl(postPaymongoResponse.data.checkoutUrl);
     }
-    // final sessionId = response.data.latestRentBilling.checkoutSessionId;
-    // amount = res
-    // await apiService.postPaymongo(amount: )
+
     print(
         'from processRentPaymongoPayment single Billing getter : ${billing?.billingMonth}');
+  }
+
+  Future<void> processAdvanceRentPaymongoPayment(
+      BuildContext context, totalAmount, selectedMonths) async {
+    initAuthDetails(context);
+    final billingProvider =
+        Provider.of<BillingProvider>(context, listen: false);
+    final billing = billingProvider.billing;
+
+    // double billingTotalAmount = billing!.totalAmount.toDouble();
+    String billingDescription = billing!.billingTitle;
+    int billingId = billing.id;
+    print("from processAdvanceRentPaymongoPayment billing Id: $billingId");
+    // print(
+    // "from processAdvanceRentPaymongoPayment billingDescription: $billingDescription");
+    print("from processAdvanceRentPaymongoPayment totalAmount: $totalAmount");
+
+    print(
+        "from processAdvanceRentPaymongoPayment selectedMonths: $selectedMonths");
+
+    try {
+      final response = await apiService.postPaymongo(
+        token: token,
+        billingId: billingId,
+        amount: totalAmount,
+        paymentDescription: "Advance Payment",
+        selectedMonthsToPay: selectedMonths,
+      );
+
+      if (response != null && response.success) {
+        print("Success PayMongo");
+        print("Checkout URL: ${response.data.checkoutUrl}");
+
+        /// 🔹 Update checkout URL
+        setCheckoutUrl(response.data.checkoutUrl);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PaymentScreen(billingId: billingId)));
+      }
+    } catch (e) {
+      print("failed processAdvanceRentPaymongoPayment(): $e");
+      return;
+    }
   }
 }
